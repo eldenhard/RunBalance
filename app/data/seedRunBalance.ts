@@ -5,16 +5,19 @@ import type { Shoe } from '~/types/shoe'
 import type { Workout } from '~/types/workout'
 import { createDefaultHeartRateZones } from '~/services/heartRateZones'
 
-export const mockProfile: UserProfile = {
+export const seedProfile: UserProfile = {
   id: 'runner-1',
   displayName: 'Элден',
   goal: '10k',
   maxHeartRate: 190,
   trainingDays: [1, 3, 5],
-  zones: createDefaultHeartRateZones(190)
+  zones: createDefaultHeartRateZones(190).map((zone) => ({
+    ...zone,
+    color: zone.id
+  }))
 }
 
-export const mockRecovery: RecoveryCheckIn = {
+export const seedRecovery: RecoveryCheckIn = {
   id: 'recovery-1',
   date: '2026-05-18',
   sleepQuality: 4,
@@ -26,7 +29,7 @@ export const mockRecovery: RecoveryCheckIn = {
   readinessScore: 78
 }
 
-export const mockShoes: Shoe[] = [
+export const seedShoes: Shoe[] = [
   {
     id: 'shoe-1',
     name: 'Daily Trainer',
@@ -46,20 +49,10 @@ export const mockShoes: Shoe[] = [
     mileageKm: 128,
     resourceKm: 700,
     status: 'active'
-  },
-  {
-    id: 'shoe-3',
-    name: 'Old Reliable',
-    brand: 'Saucony',
-    model: 'Ride 16',
-    startedAt: '2025-08-20',
-    mileageKm: 718,
-    resourceKm: 800,
-    status: 'replace_soon'
   }
 ]
 
-export const mockRoute: Route = {
+export const seedRoute: Route = {
   id: 'route-1',
   name: 'Парк и набережная',
   distanceKm: 6.2,
@@ -88,47 +81,19 @@ export const mockRoute: Route = {
   }
 }
 
-export const todayWorkout: Workout = {
-  id: 'workout-today',
-  type: 'easy',
-  title: 'Лёгкий бег',
-  plannedDurationMin: 42,
-  plannedDistanceKm: 6,
-  targetZoneId: 'z2',
-  routeId: mockRoute.id,
-  shoeId: 'shoe-1',
-  heartRateSource: 'unavailable'
-}
-
-export const workoutHistory: Workout[] = [
+export const seedPlannedWorkouts: Workout[] = [
   {
-    id: 'history-1',
-    title: 'Восстановительный бег',
-    type: 'recovery',
-    finishedAt: '2026-05-16T08:05:00.000Z',
-    distanceKm: 4.8,
-    durationSec: 2260,
-    avgPaceSecPerKm: 471,
-    shoeId: 'shoe-1'
-  },
-  {
-    id: 'history-2',
-    title: 'Темповый блок',
-    type: 'tempo',
-    finishedAt: '2026-05-14T17:30:00.000Z',
-    distanceKm: 7.2,
-    durationSec: 3060,
-    avgPaceSecPerKm: 425,
-    shoeId: 'shoe-2'
-  },
-  {
-    id: 'history-3',
-    title: 'Длинная спокойная',
-    type: 'long',
-    finishedAt: '2026-05-11T09:40:00.000Z',
-    distanceKm: 12.4,
-    durationSec: 6120,
-    avgPaceSecPerKm: 494,
-    shoeId: 'shoe-1'
+    id: 'workout-plan-1',
+    type: 'easy',
+    title: 'Лёгкий бег',
+    scheduledDate: '2026-05-18',
+    plannedDurationMin: 42,
+    plannedDistanceKm: 6,
+    targetZoneId: 'z2',
+    routeId: seedRoute.id,
+    shoeId: 'shoe-1',
+    heartRateSource: 'unavailable'
   }
 ]
+
+export const seedHistory: Workout[] = []

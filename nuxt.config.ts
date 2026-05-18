@@ -4,6 +4,24 @@ export default defineNuxtConfig({
   compatibilityDate: '2026-05-18',
   devtools: { enabled: true },
   modules: ['@pinia/nuxt', '@vueuse/nuxt', '@vite-pwa/nuxt'],
+  app: {
+    head: {
+      htmlAttrs: {
+        lang: 'ru'
+      },
+      meta: [
+        {
+          name: 'viewport',
+          content: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover'
+        },
+        { name: 'apple-mobile-web-app-capable', content: 'yes' },
+        { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
+        { name: 'apple-mobile-web-app-title', content: 'RunBalance' },
+        { name: 'mobile-web-app-capable', content: 'yes' },
+        { name: 'format-detection', content: 'telephone=no' }
+      ]
+    }
+  },
   components: [
     {
       path: '~/components',
@@ -20,6 +38,7 @@ export default defineNuxtConfig({
       theme_color: '#111827',
       background_color: '#f8fafc',
       display: 'standalone',
+      display_override: ['standalone'],
       orientation: 'portrait',
       start_url: '/',
       scope: '/',

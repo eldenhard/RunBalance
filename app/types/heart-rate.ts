@@ -5,6 +5,7 @@ export type HeartRateZone = {
   name: string
   minBpm: number
   maxBpm: number
+  color?: string
 }
 
 export type HeartRateSourceKind = 'none' | 'manual' | 'mock' | 'webBluetooth' | 'capacitorPolarH10'
@@ -21,4 +22,3 @@ export type HeartRateSourceState = {
   latestReading?: HeartRateReading
   message: string
 }
-

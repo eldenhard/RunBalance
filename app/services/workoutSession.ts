@@ -2,6 +2,9 @@ import type { Workout } from '~/types/workout'
 import type { TrackPoint, WorkoutSession } from '~/types/workout-session'
 
 const EARTH_RADIUS_KM = 6371
+const MAX_POINT_ACCURACY_M = 30
+const MIN_MOVEMENT_M = 8
+const MAX_RUNNING_SPEED_M_PER_SEC = 8
 
 export function createWorkoutSession(workout: Workout, startedAt: string): WorkoutSession {
   return {
@@ -22,7 +25,7 @@ export function calculateTrackDistanceKm(trackPoints: TrackPoint[]) {
   for (let index = 1; index < trackPoints.length; index += 1) {
     const previousPoint = trackPoints[index - 1]
     const point = trackPoints[index]
-    if (previousPoint && point) {
+    if (previousPoint && point && shouldCountTrackSegment(previousPoint, point)) {
       distance += getDistanceBetweenPointsKm(previousPoint, point)
     }
   }
@@ -89,4 +92,28 @@ function getDistanceBetweenPointsKm(from: TrackPoint, to: TrackPoint) {
 
 function toRadians(value: number) {
   return (value * Math.PI) / 180
+}
+
+function shouldCountTrackSegment(from: TrackPoint, to: TrackPoint) {
+  if ((from.accuracyM ?? 0) > MAX_POINT_ACCURACY_M || (to.accuracyM ?? 0) > MAX_POINT_ACCURACY_M) {
+    return false
+  }
+
+  const distanceKm = getDistanceBetweenPointsKm(from, to)
+  const distanceM = distanceKm * 1000
+  const accuracyFloorM = Math.max(
+    MIN_MOVEMENT_M,
+    Math.round((((from.accuracyM ?? MIN_MOVEMENT_M) + (to.accuracyM ?? MIN_MOVEMENT_M)) / 2) * 0.6)
+  )
+
+  if (distanceM < accuracyFloorM) {
+    return false
+  }
+
+  const elapsedSec = Math.max(
+    1,
+    Math.round((new Date(to.recordedAt).getTime() - new Date(from.recordedAt).getTime()) / 1000)
+  )
+
+  return distanceM / elapsedSec <= MAX_RUNNING_SPEED_M_PER_SEC
 }

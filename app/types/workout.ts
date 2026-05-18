@@ -6,6 +6,7 @@ export type Workout = {
   id: string
   type: WorkoutType
   title: string
+  scheduledDate?: string
   plannedDurationMin?: number
   plannedDistanceKm?: number
   targetZoneId?: string
@@ -20,4 +21,3 @@ export type Workout = {
   maxHeartRate?: number
   heartRateSource?: HeartRateSourceStatus
 }
-

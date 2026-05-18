@@ -25,6 +25,9 @@ const store = useRunBalanceStore()
         <div>
           <p class="text-xs text-[#767676]">Тренировка дня</p>
           <h2 class="text-xl font-medium text-[#111111]">{{ store.adaptedWorkout.title }}</h2>
+          <p class="mt-1 text-sm text-[#767676]">
+            {{ store.selectedWorkoutId ? `Запланирована на ${store.workoutOfTheDay.scheduledDate}` : 'План пуст. Создай тренировку во вкладке «План» или запусти свободный бег.' }}
+          </p>
         </div>
         <Activity class="h-6 w-6 text-[#767676]" />
       </div>

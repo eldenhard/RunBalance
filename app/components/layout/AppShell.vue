@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { CalendarDays, History, Home, Play, User } from '@lucide/vue'
 
+const route = useRoute()
 const navItems = [
   { label: 'Сегодня', to: '/', icon: Home },
   { label: 'План', to: '/plan', icon: CalendarDays },
@@ -8,15 +9,16 @@ const navItems = [
   { label: 'История', to: '/history', icon: History },
   { label: 'Профиль', to: '/profile', icon: User }
 ]
+const showBottomNav = computed(() => !['/start', '/workout/active', '/workout/result'].includes(route.path))
 </script>
 
 <template>
   <div class="min-h-dvh bg-[#f7f7f5]">
-    <main class="app-frame min-h-dvh pb-24">
+    <main class="app-frame min-h-dvh" :class="showBottomNav ? 'pb-24' : ''">
       <slot />
     </main>
 
-    <nav class="fixed inset-x-0 bottom-0 z-40 border-t border-[#deded9] bg-white/95 backdrop-blur">
+    <nav v-if="showBottomNav" class="fixed inset-x-0 bottom-0 z-40 border-t border-[#deded9] bg-white/95 backdrop-blur">
       <div class="mx-auto grid h-16 max-w-md grid-cols-5">
         <NuxtLink
           v-for="item in navItems"

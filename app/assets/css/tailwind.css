@@ -23,21 +23,36 @@
   --sport-accent: #ff5a00;
 }
 
+html {
+  height: 100%;
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
+  min-height: 100%;
   margin: 0;
   background: var(--app-bg);
   color: var(--app-foreground);
   font-family: "Helvetica Now Display", "Helvetica Neue", Arial, sans-serif;
   font-weight: 400;
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
 }
 
 a {
   color: inherit;
   text-decoration: none;
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  font-size: 16px;
 }
 
 .theme-light {
@@ -67,4 +82,7 @@ a {
 .app-frame {
   width: min(100%, 430px);
   margin-inline: auto;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  padding-bottom: env(safe-area-inset-bottom);
 }

@@ -8,6 +8,11 @@ async function startWorkout() {
   store.startWorkoutSession()
   await router.push('/workout/active')
 }
+
+async function startFreeWorkout() {
+  store.startFreeWorkoutSession()
+  await router.push('/workout/active')
+}
 </script>
 
 <template>
@@ -15,7 +20,7 @@ async function startWorkout() {
     <ScreenHeader
       eyebrow="Готово к старту"
       :title="store.adaptedWorkout.title"
-      description="Проверь маршрут, обувь и начинай без лишних отвлечений."
+      :description="store.selectedWorkoutId ? 'Проверь маршрут, обувь и начинай без лишних отвлечений.' : 'Если плана нет, можно сразу уйти в свободный бег.'"
     />
 
     <Card class="p-4">
@@ -75,7 +80,7 @@ async function startWorkout() {
       <button class="mx-auto flex h-[84px] w-[84px] items-center justify-center rounded-full bg-white text-[#0b0b0c] active:bg-[#e8e8e8]" aria-label="Старт тренировки" @click="startWorkout">
         <Play class="h-8 w-8 fill-current" />
       </button>
-      <Button class="w-full" size="lg" variant="outline" @click="startWorkout">Свободный</Button>
+      <Button class="w-full" size="lg" variant="outline" @click="startFreeWorkout">Свободный</Button>
     </div>
   </div>
 </template>

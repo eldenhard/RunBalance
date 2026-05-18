@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { mockProfile, mockRecovery, mockRoute, mockShoes, todayWorkout, workoutHistory } from '~/data/mockRunBalance'
+import { seedHistory, seedPlannedWorkouts, seedProfile, seedRecovery, seedRoute, seedShoes } from '~/data/seedRunBalance'
 import { iosSafariPwaHeartRateUnavailable } from '~/services/heart-rate/heartRateSource'
 import { getHeartRateZoneAppearance } from '~/services/heartRateZones'
 import { getRecoveryRecommendation } from '~/services/recovery'
@@ -7,27 +7,54 @@ import { addWorkoutDistanceToShoe } from '~/services/shoes'
 import { adaptWorkoutForReadiness } from '~/services/trainingPlan'
 import { createWorkoutSession, finishWorkoutSession, restoreWorkoutSession, serializeWorkoutSession, updateWorkoutSessionMetrics } from '~/services/workoutSession'
 import { getWorkoutAlert } from '~/services/voiceAlerts'
-import type { Workout } from '~/types/workout'
+import type { UserProfile } from '~/types/profile'
+import type { RecoveryCheckIn } from '~/types/recovery'
+import type { Route } from '~/types/route'
+import type { Shoe } from '~/types/shoe'
+import type { Workout, WorkoutType } from '~/types/workout'
 import type { TrackPoint, WorkoutSession } from '~/types/workout-session'
 
+const APP_STATE_STORAGE_KEY = 'runbalance.appState'
 const ACTIVE_SESSION_STORAGE_KEY = 'runbalance.activeWorkoutSession'
 
+type RunBalanceSnapshot = {
+  profile: UserProfile
+  recovery: RecoveryCheckIn
+  route: Route
+  shoes: Shoe[]
+  plannedWorkouts: Workout[]
+  selectedWorkoutId: string | null
+  history: Workout[]
+}
+
 export const useRunBalanceStore = defineStore('run-balance', () => {
-  const profile = ref(mockProfile)
-  const recovery = ref(mockRecovery)
-  const route = ref(mockRoute)
-  const shoes = ref(mockShoes)
-  const workoutOfTheDay = ref(todayWorkout)
-  const currentWorkout = ref<Workout>(todayWorkout)
-  const history = ref(workoutHistory)
+  const profile = ref(structuredClone(seedProfile))
+  const recovery = ref(structuredClone(seedRecovery))
+  const route = ref(structuredClone(seedRoute))
+  const shoes = ref(structuredClone(seedShoes))
+  const plannedWorkouts = ref<Workout[]>(structuredClone(seedPlannedWorkouts))
+  const selectedWorkoutId = ref<string | null>(plannedWorkouts.value[0]?.id ?? null)
+  const history = ref<Workout[]>(structuredClone(seedHistory))
   const heartRateSource = ref(iosSafariPwaHeartRateUnavailable)
   const activeSession = ref<WorkoutSession | null>(null)
+  const currentWorkout = ref<Workout>(createFallbackWorkout())
+  const hasHydrated = ref(false)
 
-  const selectedShoe = computed(() => shoes.value.find((shoe) => shoe.id === workoutOfTheDay.value.shoeId))
-  const targetZone = computed(() => profile.value.zones.find((zone) => zone.id === workoutOfTheDay.value.targetZoneId))
+  const workoutOfTheDay = computed<Workout>(() => {
+    const selectedWorkout = plannedWorkouts.value.find((workout) => workout.id === selectedWorkoutId.value)
+    return selectedWorkout ?? plannedWorkouts.value[0] ?? createFallbackWorkout()
+  })
+  const adaptedWorkout = computed(() => adaptWorkoutForReadiness(workoutOfTheDay.value, recovery.value.readinessScore))
+  const selectedShoe = computed(() => {
+    const shoeId = currentWorkout.value.shoeId ?? workoutOfTheDay.value.shoeId
+    return shoes.value.find((shoe) => shoe.id === shoeId) ?? shoes.value[0]
+  })
+  const targetZone = computed(() => {
+    const zoneId = currentWorkout.value.targetZoneId ?? adaptedWorkout.value.targetZoneId
+    return profile.value.zones.find((zone) => zone.id === zoneId)
+  })
   const targetZoneAppearance = computed(() => getHeartRateZoneAppearance(targetZone.value?.id))
   const recoveryRecommendation = computed(() => getRecoveryRecommendation(recovery.value.readinessScore))
-  const adaptedWorkout = computed(() => adaptWorkoutForReadiness(workoutOfTheDay.value, recovery.value.readinessScore))
   const sessionProgress = computed(() => {
     if (!activeSession.value) return 0
     const distanceProgress = adaptedWorkout.value.plannedDistanceKm
@@ -40,10 +67,23 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
     return Math.min(100, Math.round(Math.max(distanceProgress, durationProgress)))
   })
 
+  watch(adaptedWorkout, (nextWorkout) => {
+    if (activeSession.value) return
+    currentWorkout.value = nextWorkout
+  }, { immediate: true, deep: true })
+
   function startWorkoutSession(startedAt = new Date().toISOString()) {
-    const nextSession = createWorkoutSession(adaptedWorkout.value, startedAt)
-    activeSession.value = nextSession
-    syncCurrentWorkoutFromSession()
+    startSession(adaptedWorkout.value, startedAt)
+  }
+
+  function startFreeWorkoutSession(startedAt = new Date().toISOString()) {
+    startSession(createFreeWorkout(selectedShoe.value?.id), startedAt)
+  }
+
+  function startSession(workout: Workout, startedAt: string) {
+    currentWorkout.value = workout
+    activeSession.value = createWorkoutSession(workout, startedAt)
+    persistState()
     persistActiveSession()
   }
 
@@ -120,12 +160,16 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
       if (shoe.id !== finishedWorkout.shoeId || !finishedWorkout.distanceKm) return shoe
       return addWorkoutDistanceToShoe(shoe, finishedWorkout.distanceKm)
     })
+    plannedWorkouts.value = plannedWorkouts.value.filter((workout) => workout.id !== activeSession.value?.workoutId)
+    if (selectedWorkoutId.value === activeSession.value.workoutId) {
+      selectedWorkoutId.value = plannedWorkouts.value[0]?.id ?? null
+    }
     activeSession.value = {
       ...activeSession.value,
       status: 'finished',
       finishedAt
     }
-    syncCurrentWorkoutFromSession()
+    persistState()
     clearPersistedActiveSession()
     return finishedWorkout
   }
@@ -137,6 +181,82 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
     activeSession.value = restored
     syncCurrentWorkoutFromSession()
     return restored
+  }
+
+  function restoreLocalState() {
+    if (!import.meta.client || hasHydrated.value) return
+
+    const snapshot = window.localStorage.getItem(APP_STATE_STORAGE_KEY)
+    if (snapshot) {
+      try {
+        const parsed = JSON.parse(snapshot) as RunBalanceSnapshot
+        profile.value = parsed.profile
+        recovery.value = parsed.recovery
+        route.value = parsed.route
+        shoes.value = parsed.shoes
+        plannedWorkouts.value = parsed.plannedWorkouts
+        selectedWorkoutId.value = parsed.selectedWorkoutId
+        history.value = parsed.history
+      } catch {
+        window.localStorage.removeItem(APP_STATE_STORAGE_KEY)
+      }
+    }
+
+    hasHydrated.value = true
+  }
+
+  function createPlannedWorkout(input: CreateWorkoutInput) {
+    const nextWorkout: Workout = {
+      id: `workout-plan-${Date.now()}`,
+      title: input.title.trim(),
+      type: input.type,
+      scheduledDate: input.scheduledDate,
+      plannedDistanceKm: input.plannedDistanceKm,
+      plannedDurationMin: input.plannedDurationMin,
+      targetZoneId: input.targetZoneId,
+      routeId: route.value.id,
+      shoeId: input.shoeId,
+      heartRateSource: 'unavailable'
+    }
+
+    plannedWorkouts.value = [nextWorkout, ...plannedWorkouts.value]
+    selectedWorkoutId.value = nextWorkout.id
+    persistState()
+  }
+
+  function selectPlannedWorkout(workoutId: string) {
+    selectedWorkoutId.value = workoutId
+    persistState()
+  }
+
+  function deletePlannedWorkout(workoutId: string) {
+    plannedWorkouts.value = plannedWorkouts.value.filter((workout) => workout.id !== workoutId)
+    if (selectedWorkoutId.value === workoutId) {
+      selectedWorkoutId.value = plannedWorkouts.value[0]?.id ?? null
+    }
+    persistState()
+  }
+
+  function updateHeartRateZone(zoneId: string, updates: { name: string, minBpm: number, maxBpm: number }) {
+    profile.value = {
+      ...profile.value,
+      zones: profile.value.zones.map((zone) => zone.id === zoneId ? { ...zone, ...updates } : zone)
+    }
+    persistState()
+  }
+
+  function persistState() {
+    if (!import.meta.client) return
+    const snapshot: RunBalanceSnapshot = {
+      profile: profile.value,
+      recovery: recovery.value,
+      route: route.value,
+      shoes: shoes.value,
+      plannedWorkouts: plannedWorkouts.value,
+      selectedWorkoutId: selectedWorkoutId.value,
+      history: history.value
+    }
+    window.localStorage.setItem(APP_STATE_STORAGE_KEY, JSON.stringify(snapshot))
   }
 
   function persistActiveSession() {
@@ -153,8 +273,7 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
     if (!activeSession.value) return
 
     currentWorkout.value = {
-      ...adaptedWorkout.value,
-      id: 'workout-active',
+      ...currentWorkout.value,
       startedAt: activeSession.value.startedAt,
       finishedAt: activeSession.value.finishedAt,
       distanceKm: activeSession.value.distanceKm,
@@ -168,6 +287,8 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
     recovery,
     route,
     shoes,
+    plannedWorkouts,
+    selectedWorkoutId,
     workoutOfTheDay,
     currentWorkout,
     history,
@@ -180,15 +301,56 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
     adaptedWorkout,
     sessionProgress,
     startWorkoutSession,
+    startFreeWorkoutSession,
     pauseWorkoutSession,
     resumeWorkoutSession,
     appendTrackPoint,
     refreshActiveSession,
     evaluateWorkoutAlert,
     finishActiveSession,
-    restorePersistedActiveSession
+    restorePersistedActiveSession,
+    restoreLocalState,
+    createPlannedWorkout,
+    selectPlannedWorkout,
+    deletePlannedWorkout,
+    updateHeartRateZone
   }
 })
+
+type CreateWorkoutInput = {
+  title: string
+  type: WorkoutType
+  scheduledDate: string
+  plannedDistanceKm?: number
+  plannedDurationMin?: number
+  targetZoneId?: string
+  shoeId?: string
+}
+
+function createFreeWorkout(shoeId?: string): Workout {
+  return {
+    id: `free-${Date.now()}`,
+    type: 'free',
+    title: 'Свободный бег',
+    plannedDurationMin: 0,
+    plannedDistanceKm: 0,
+    targetZoneId: 'z2',
+    shoeId,
+    heartRateSource: 'unavailable'
+  }
+}
+
+function createFallbackWorkout(): Workout {
+  return {
+    id: 'workout-empty',
+    type: 'free',
+    title: 'Свободный бег',
+    plannedDurationMin: 0,
+    plannedDistanceKm: 0,
+    targetZoneId: 'z2',
+    heartRateSource: 'unavailable'
+  }
+}
 
 function getPlannedPaceSecPerKm(durationMin?: number, distanceKm?: number) {
   if (!durationMin || !distanceKm) return undefined
