@@ -9,8 +9,8 @@ const props = withDefaults(defineProps<{
 })
 
 const variantClass = computed(() => ({
-  default: 'bg-[#111111] text-white',
-  secondary: 'bg-[#f0f0ed] text-[#555]',
+  default: 'bg-[var(--screen-foreground)] text-[var(--screen-bg)]',
+  secondary: 'bg-[var(--screen-surface-muted)] text-[var(--screen-muted)]',
   success: 'bg-[#e8efe5] text-[#2f6b31]',
   warning: 'bg-[#fff2d6] text-[#8a5a00]',
   danger: 'bg-[#f8dddd] text-[#8f1d1d]'

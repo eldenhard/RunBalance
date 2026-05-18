@@ -8,6 +8,13 @@
   --app-foreground: #111111;
   --app-muted: #767676;
   --app-border: #deded9;
+  --screen-bg: var(--app-bg);
+  --screen-surface: var(--app-surface);
+  --screen-surface-muted: var(--app-surface-muted);
+  --screen-foreground: var(--app-foreground);
+  --screen-muted: var(--app-muted);
+  --screen-border: var(--app-border);
+  --screen-shadow: 0 12px 30px rgba(0, 0, 0, 0.045);
   --workout-bg: #0b0b0c;
   --workout-surface: #151515;
   --workout-border: #252525;
@@ -34,11 +41,30 @@ a {
 }
 
 .theme-light {
+  --screen-bg: var(--app-bg);
+  --screen-surface: var(--app-surface);
+  --screen-surface-muted: var(--app-surface-muted);
+  --screen-foreground: var(--app-foreground);
+  --screen-muted: var(--app-muted);
+  --screen-border: var(--app-border);
+  --screen-shadow: 0 12px 30px rgba(0, 0, 0, 0.045);
   background: var(--app-bg);
   color: var(--app-foreground);
 }
 
 .theme-dark {
+  --screen-bg: var(--workout-bg);
+  --screen-surface: var(--workout-surface);
+  --screen-surface-muted: #101011;
+  --screen-foreground: var(--workout-foreground);
+  --screen-muted: var(--workout-muted);
+  --screen-border: var(--workout-border);
+  --screen-shadow: none;
   background: var(--workout-bg);
   color: var(--workout-foreground);
+}
+
+.app-frame {
+  width: min(100%, 430px);
+  margin-inline: auto;
 }

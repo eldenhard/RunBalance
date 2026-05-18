@@ -12,7 +12,7 @@ const navItems = [
 
 <template>
   <div class="min-h-dvh bg-[#f7f7f5]">
-    <main class="mx-auto min-h-dvh w-full max-w-md pb-24">
+    <main class="app-frame min-h-dvh pb-24">
       <slot />
     </main>
 

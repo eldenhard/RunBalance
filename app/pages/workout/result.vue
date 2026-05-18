@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Footprints, MapPinned } from '@lucide/vue'
+import { Footprints, History, Home, MapPinned, Play } from '@lucide/vue'
 
 const store = useRunBalanceStore()
 const workout = computed(() => store.currentWorkout)
@@ -50,5 +50,28 @@ const workout = computed(() => store.currentWorkout)
         </div>
       </div>
     </Card>
+
+    <div class="grid gap-3 pt-2">
+      <NuxtLink to="/" class="block">
+        <Button class="w-full" size="lg">
+          <Home class="h-5 w-5" />
+          На сегодня
+        </Button>
+      </NuxtLink>
+      <div class="grid grid-cols-2 gap-3">
+        <NuxtLink to="/history" class="block">
+          <Button class="w-full" variant="outline">
+            <History class="h-4 w-4" />
+            История
+          </Button>
+        </NuxtLink>
+        <NuxtLink to="/start" class="block">
+          <Button class="w-full" variant="outline">
+            <Play class="h-4 w-4" />
+            Новый старт
+          </Button>
+        </NuxtLink>
+      </div>
+    </div>
   </div>
 </template>

@@ -10,8 +10,7 @@ const width = computed(() => `${Math.min(100, Math.max(0, (props.value / props.m
 </script>
 
 <template>
-  <div class="h-1.5 overflow-hidden rounded-full bg-[#ececea] dark:bg-[#252525]">
-    <div class="h-full rounded-full bg-[#111111] transition-all dark:bg-white" :style="{ width }" />
+  <div class="h-1.5 overflow-hidden rounded-full bg-[var(--screen-surface-muted)]">
+    <div class="h-full rounded-full bg-[var(--screen-foreground)] transition-all" :style="{ width }" />
   </div>
 </template>
-

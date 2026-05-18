@@ -11,10 +11,10 @@ const props = withDefaults(defineProps<{
 })
 
 const variantClass = computed(() => ({
-  default: 'bg-[#111111] text-white active:bg-[#2a2a2a] dark:bg-white dark:text-[#0b0b0c]',
-  secondary: 'bg-[#f0f0ed] text-[#111111] active:bg-[#e7e7e2] dark:bg-[#151515] dark:text-white',
-  outline: 'border border-[#deded9] bg-white text-[#111111] active:bg-[#f7f7f5] dark:border-[#303030] dark:bg-transparent dark:text-white',
-  ghost: 'text-[#444] active:bg-[#f0f0ed] dark:text-[#d8d8d8] dark:active:bg-[#151515]',
+  default: 'bg-[var(--screen-foreground)] text-[var(--screen-bg)] active:opacity-90',
+  secondary: 'bg-[var(--screen-surface-muted)] text-[var(--screen-foreground)] active:opacity-90',
+  outline: 'border border-[var(--screen-border)] bg-transparent text-[var(--screen-foreground)] active:bg-[var(--screen-surface-muted)]',
+  ghost: 'text-[var(--screen-foreground)] active:bg-[var(--screen-surface-muted)]',
   destructive: 'bg-red-600 text-white active:bg-red-700'
 }[props.variant]))
 
