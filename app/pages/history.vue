@@ -40,12 +40,16 @@ function formatRunDate(workout: { finishedAt?: string, scheduledDate?: string })
 
     <div v-if="store.history.length" class="space-y-4">
       <Card v-for="workout in store.history" :key="workout.id" class="p-4">
+        <ClientOnly v-if="workout.routeSnapshot">
+          <RouteMap :route="workout.routeSnapshot" class="mb-4 h-36 w-full" />
+        </ClientOnly>
         <div class="flex items-start justify-between gap-3">
-          <div>
+          <div class="min-w-0">
             <h2 class="font-medium">{{ workout.title }}</h2>
             <p class="text-sm text-[#767676]">
-              {{ formatRunDate(workout) }} · {{ formatDistance(workout.distanceKm) }} · {{ formatDuration(workout.durationSec) }} · {{ formatPace(workout.avgPaceSecPerKm) }}
+              {{ formatRunDate(workout) }} · {{ formatDistance(workout.distanceKm) }} · {{ formatDuration(workout.durationSec) }}
             </p>
+            <p class="mt-1 text-sm text-[#767676]">{{ formatPace(workout.avgPaceSecPerKm) }}</p>
           </div>
           <Badge variant="secondary">{{ workout.type }}</Badge>
         </div>

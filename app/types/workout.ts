@@ -1,4 +1,5 @@
 import type { HeartRateSourceStatus } from './heart-rate'
+import type { Route } from './route'
 
 export type WorkoutType = 'easy' | 'recovery' | 'long' | 'tempo' | 'intervals' | 'fartlek' | 'free'
 
@@ -20,4 +21,5 @@ export type Workout = {
   avgHeartRate?: number
   maxHeartRate?: number
   heartRateSource?: HeartRateSourceStatus
+  routeSnapshot?: Route
 }

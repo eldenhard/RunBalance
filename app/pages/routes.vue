@@ -46,7 +46,7 @@ function saveRoute() {
     <ScreenHeader
       eyebrow="Маршруты"
       title="Свои петли и маршруты"
-      description="Сохрани часто используемые петли и быстро привязывай их к тренировкам без необходимости рисовать заново."
+      description="Сохрани петли и быстро привязывай их к тренировкам."
     />
 
     <Card v-if="suggested" class="overflow-hidden p-0">
@@ -72,7 +72,7 @@ function saveRoute() {
         <CirclePlus class="h-5 w-5 text-[#111111]" />
         <div>
           <h2 class="font-medium">Новый маршрут</h2>
-          <p class="text-sm text-[#767676]">Достаточно дать имя и километраж, остальное можно дозаполнить позже.</p>
+          <p class="text-sm text-[#767676]">Имя и километраж достаточно для старта.</p>
         </div>
       </div>
 
@@ -82,7 +82,7 @@ function saveRoute() {
           <input v-model="form.name" class="h-12 rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none" placeholder="Например, парковая восьмёрка" />
         </label>
 
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <label class="grid gap-1.5">
             <span class="text-sm font-medium">Дистанция, км</span>
             <input v-model="form.distanceKm" inputmode="decimal" class="h-12 rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none" />
@@ -96,7 +96,7 @@ function saveRoute() {
           </label>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <label class="grid gap-1.5">
             <span class="text-sm font-medium">Покрытие</span>
             <input v-model="form.surface" class="h-12 rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none" />

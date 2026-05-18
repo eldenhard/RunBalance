@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { MapPin, Pause, Play, Radio, Square, Volume2, VolumeX, ZapOff } from '@lucide/vue'
+import { createRouteFromTrack } from '~/services/routes'
 
 const store = useRunBalanceStore()
 const router = useRouter()
@@ -31,11 +32,21 @@ const zoneDetail = computed(() => {
   if (!targetZone.value) return 'зона не выбрана'
   return `${targetZone.value.minBpm}-${targetZone.value.maxBpm} уд/мин`
 })
+const liveRoute = computed(() => {
+  if (session.value?.trackPoints.length && store.activeRoute) {
+    return createRouteFromTrack(session.value.trackPoints, store.activeRoute)
+  }
+
+  return store.activeRoute
+})
 let runtimeInterval: ReturnType<typeof window.setInterval> | null = null
 
 onMounted(() => {
   store.restorePersistedActiveSession()
   syncRuntimeTimer()
+  if (session.value?.status === 'active' && !gps.isTracking.value) {
+    gps.start()
+  }
 })
 
 onBeforeUnmount(() => {
@@ -104,8 +115,14 @@ function stopRuntimeTimer() {
     <ScreenHeader
       eyebrow="Активная тренировка"
       :title="workout.title"
-      :description="session?.status === 'paused' ? 'Пауза. Продолжи, когда будешь готов.' : 'Сессия сохраняется локально во время тренировки.'"
+      :description="session?.status === 'paused' ? 'Пауза.' : 'Тренировка идёт и сохраняется локально.'"
     />
+
+    <Card v-if="liveRoute" class="overflow-hidden p-0">
+      <ClientOnly>
+        <RouteMap :route="liveRoute" theme="dark" class="h-44 w-full" />
+      </ClientOnly>
+    </Card>
 
     <section class="grid grid-cols-2 gap-3">
       <MetricTile label="Дистанция" :value="formatDistance(session?.distanceKm)" dark />
@@ -135,9 +152,7 @@ function stopRuntimeTimer() {
         <ZapOff class="mt-0.5 h-5 w-5 shrink-0 text-[#9b9b9b]" />
         <div>
           <h2 class="font-medium text-white">Пульс не подключён</h2>
-          <p class="mt-1 text-sm leading-5 text-[#b8b8b8]">
-            Сейчас тренировка идёт по GPS, времени и темпу. События подсказок уже дублируются визуально.
-          </p>
+          <p class="mt-1 text-sm leading-5 text-[#b8b8b8]">Сейчас работаем по GPS, времени и темпу.</p>
         </div>
       </div>
     </Card>

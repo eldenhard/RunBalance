@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import {
   CalendarDays,
-  Footprints,
   History,
   Home,
-  Map,
   Play,
   User
 } from '@lucide/vue'
@@ -17,11 +15,6 @@ const navItems = [
   { label: 'Старт', to: '/start', icon: Play, primary: true },
   { label: 'История', to: '/history', icon: History },
   { label: 'Профиль', to: '/profile', icon: User }
-]
-
-const moreItems = [
-  { label: 'Маршруты', to: '/routes', icon: Map },
-  { label: 'Кроссовки', to: '/shoes', icon: Footprints }
 ]
 
 const hideNavRoutes = ['/workout/active', '/welcome']
@@ -63,19 +56,6 @@ function isActive(path: string) {
           <span class="bottom-nav__label">{{ item.label }}</span>
         </NuxtLink>
       </div>
-
-      <div class="bottom-nav__more">
-        <NuxtLink
-          v-for="item in moreItems"
-          :key="item.to"
-          :to="item.to"
-          class="bottom-nav__more-link"
-          :class="isActive(item.to) ? 'bottom-nav__more-link--active' : ''"
-        >
-          <component :is="item.icon" class="h-4 w-4" />
-          <span>{{ item.label }}</span>
-        </NuxtLink>
-      </div>
     </nav>
   </div>
 </template>
@@ -87,13 +67,13 @@ function isActive(path: string) {
 
 .app-frame {
   box-sizing: border-box;
-  padding-top: calc(env(safe-area-inset-top, 0px) + 12px);
+  padding-top: calc(env(safe-area-inset-top, 0px) + 20px);
   padding-left: max(env(safe-area-inset-left, 0px), 0px);
   padding-right: max(env(safe-area-inset-right, 0px), 0px);
 }
 
 .app-frame--with-nav {
-  padding-bottom: calc(5.75rem + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(5.15rem + env(safe-area-inset-bottom, 0px));
 }
 
 .bottom-nav {
@@ -114,7 +94,7 @@ function isActive(path: string) {
   gap: 2px;
   max-width: 430px;
   margin: 0 auto;
-  padding: 6px 8px 4px;
+  padding: 8px 8px 10px;
 }
 
 .bottom-nav__item {
@@ -162,32 +142,5 @@ function isActive(path: string) {
 
 .bottom-nav__label {
   line-height: 1.1;
-}
-
-.bottom-nav__more {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  max-width: 430px;
-  margin: 0 auto;
-  padding: 0 12px 8px;
-  border-top: 1px solid #f0f0ed;
-}
-
-.bottom-nav__more-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 9999px;
-  font-size: 12px;
-  font-weight: 500;
-  color: #767676;
-  text-decoration: none;
-}
-
-.bottom-nav__more-link--active {
-  color: #111111;
-  background: #f0f0ed;
 }
 </style>

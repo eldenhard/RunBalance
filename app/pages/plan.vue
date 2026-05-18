@@ -57,14 +57,14 @@ function toOptionalNumber(value: string) {
 
 <template>
   <div class="theme-light min-h-dvh space-y-4 p-4">
-    <ScreenHeader eyebrow="План" title="Свои тренировки" description="Здесь создаётся реальный локальный план: дата, дистанция, длительность, зона и обувь." />
+    <ScreenHeader eyebrow="План" title="Свои тренировки" description="Создай тренировку, привяжи зону, обувь и маршрут." />
 
     <Card class="p-4">
       <div class="mb-4 flex items-center gap-3">
         <CirclePlus class="h-5 w-5 text-[#111111]" />
         <div>
           <h2 class="font-medium">Новая тренировка</h2>
-          <p class="text-sm text-[#767676]">После создания она сразу доступна на экране «Сегодня» и на старте.</p>
+          <p class="text-sm text-[#767676]">Сразу появится на «Сегодня» и «Старт».</p>
         </div>
       </div>
 
@@ -74,7 +74,7 @@ function toOptionalNumber(value: string) {
           <input v-model="form.title" class="h-12 rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none" placeholder="Например, темповый 8 км" />
         </label>
 
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <label class="grid gap-1.5">
             <span class="text-sm font-medium">Тип</span>
             <select v-model="form.type" class="h-12 rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none">
@@ -88,7 +88,7 @@ function toOptionalNumber(value: string) {
           </label>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <label class="grid gap-1.5">
             <span class="text-sm font-medium">Дистанция, км</span>
             <input v-model="form.plannedDistanceKm" inputmode="decimal" class="h-12 rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none" />
@@ -100,7 +100,7 @@ function toOptionalNumber(value: string) {
           </label>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <label class="grid gap-1.5">
             <span class="text-sm font-medium">Зона</span>
             <select v-model="form.targetZoneId" class="h-12 rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none">
@@ -144,7 +144,7 @@ function toOptionalNumber(value: string) {
         <CalendarDays class="h-5 w-5 text-[#111111]" />
         <div>
           <h2 class="font-medium">Запланированные</h2>
-          <p class="text-sm text-[#767676]">Текущая тренировка дня отмечена отдельно и попадёт на стартовый экран.</p>
+          <p class="text-sm text-[#767676]">Одна из них может быть выбрана на сегодня.</p>
         </div>
       </div>
 
@@ -167,7 +167,7 @@ function toOptionalNumber(value: string) {
             <Badge variant="secondary">{{ workout.type }}</Badge>
           </div>
 
-          <div class="mt-4 grid grid-cols-2 gap-3">
+          <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div class="rounded-2xl border border-[#e5e5df] bg-white p-3">
               <p class="text-xs text-[#767676]">Целевая зона</p>
               <p class="mt-1 font-medium">{{ workout.targetZoneId?.toUpperCase() ?? '—' }}</p>
@@ -218,8 +218,8 @@ function toOptionalNumber(value: string) {
       <div class="flex items-center gap-3">
         <Clock3 class="h-5 w-5 text-[#111111]" />
         <div>
-          <h2 class="font-medium">Что будет дальше</h2>
-          <p class="text-sm text-[#767676]">Дальше — связка маршрута с MapLibre-картой и онбординг новых тренировочных целей.</p>
+          <h2 class="font-medium">Маршруты и цели</h2>
+          <p class="text-sm text-[#767676]">Маршруты доступны отдельно и могут привязываться к тренировкам.</p>
         </div>
       </div>
     </Card>

@@ -25,7 +25,7 @@ async function startFreeWorkout() {
     <ScreenHeader
       eyebrow="Готово к старту"
       :title="hasPlan ? store.adaptedWorkout.title : 'Свободный бег'"
-      :description="hasPlan ? 'Проверь маршрут, обувь и начинай без лишних отвлечений.' : 'Плана сегодня нет — стартуй свободно, тренировка сохранится в историю.'"
+      :description="hasPlan ? 'Маршрут, обувь и старт.' : 'Можно стартовать сразу.'"
     />
 
     <Card class="p-4">
@@ -103,7 +103,7 @@ async function startFreeWorkout() {
         <Radio class="mt-0.5 h-5 w-5 text-[var(--screen-muted)]" />
         <div>
           <h2 class="font-medium">Пульсометр позже</h2>
-          <p class="mt-1 text-sm leading-5 text-[var(--screen-muted)]">Пока тренировка идёт по GPS, времени и темпу. Polar H10 добавим через Capacitor BLE.</p>
+          <p class="mt-1 text-sm text-[var(--screen-muted)]">Сейчас тренировка идёт по GPS, времени и темпу.</p>
         </div>
       </div>
     </Card>

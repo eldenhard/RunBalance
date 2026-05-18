@@ -41,6 +41,7 @@ body {
   overscroll-behavior: none;
   -webkit-text-size-adjust: 100%;
   touch-action: manipulation;
+  overflow-x: hidden;
 }
 
 a {

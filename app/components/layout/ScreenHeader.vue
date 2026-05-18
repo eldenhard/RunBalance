@@ -18,7 +18,6 @@ defineProps<{
 
 <style scoped>
 .screen-header {
-  /* Доп. отступ не нужен: safe-area уже на .app-frame */
-  padding-top: 4px;
+  padding-top: 0;
 }
 </style>

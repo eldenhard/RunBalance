@@ -19,6 +19,7 @@ const map = shallowRef<Map | null>(null)
 const isMounted = ref(false)
 const errorMessage = ref<string | null>(null)
 const hasTrack = computed(() => getRouteLineCoordinates(props.route).length >= 2)
+const routeSignature = computed(() => JSON.stringify(getRouteLineCoordinates(props.route)))
 
 const palette = computed(() => {
   if (props.theme === 'dark') {
@@ -213,7 +214,7 @@ onMounted(() => {
   ensureMap()
 })
 
-watch(() => props.route.id, () => {
+watch([() => props.route.id, routeSignature], () => {
   ensureMap()
 })
 

@@ -11,7 +11,7 @@ import { buildAnalyticsReport } from '~/services/analytics'
 import { iosSafariPwaHeartRateUnavailable } from '~/services/heart-rate/heartRateSource'
 import { createDefaultHeartRateZones, getHeartRateZoneAppearance } from '~/services/heartRateZones'
 import { getRecoveryRecommendation } from '~/services/recovery'
-import { createRoute, pickSuggestedRoute, type RouteDraft } from '~/services/routes'
+import { createRoute, createRouteFromTrack, pickSuggestedRoute, type RouteDraft } from '~/services/routes'
 import { addWorkoutDistanceToShoe, getShoeStatus } from '~/services/shoes'
 import { adaptWorkoutForReadiness } from '~/services/trainingPlan'
 import { createWorkoutSession, finishWorkoutSession, restoreWorkoutSession, serializeWorkoutSession, updateWorkoutSessionMetrics } from '~/services/workoutSession'
@@ -207,7 +207,14 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
   function finishActiveSession(finishedAt = new Date().toISOString()) {
     if (!activeSession.value) return currentWorkout.value
 
-    const finishedWorkout = finishWorkoutSession(activeSession.value, currentWorkout.value, finishedAt)
+    const routeSnapshot = activeSession.value.trackPoints.length >= 2 && activeRoute.value
+      ? createRouteFromTrack(activeSession.value.trackPoints, activeRoute.value)
+      : activeRoute.value
+
+    const finishedWorkout = {
+      ...finishWorkoutSession(activeSession.value, currentWorkout.value, finishedAt),
+      routeSnapshot
+    }
     currentWorkout.value = finishedWorkout
     history.value = [finishedWorkout, ...history.value]
     shoes.value = shoes.value.map((shoe) => {

@@ -1,16 +1,9 @@
 <script setup lang="ts">
 import { Footprints, History, Home, MapPinned, Play } from '@lucide/vue'
-import { createRouteFromTrack } from '~/services/routes'
 
 const store = useRunBalanceStore()
 const workout = computed(() => store.currentWorkout)
-const resultRoute = computed(() => {
-  const trackPoints = store.activeSession?.trackPoints ?? []
-  if (trackPoints.length >= 2 && store.activeRoute) {
-    return createRouteFromTrack(trackPoints, store.activeRoute)
-  }
-  return store.activeRoute
-})
+const resultRoute = computed(() => workout.value.routeSnapshot ?? store.activeRoute)
 </script>
 
 <template>
@@ -46,9 +39,7 @@ const resultRoute = computed(() => {
         <MapPinned class="h-5 w-5 text-slate-500" />
         <div>
           <h2 class="font-medium">{{ resultRoute.name }}</h2>
-          <p class="text-sm text-[#767676]">
-            {{ store.activeSession?.trackPoints.length ? 'Трек собран из реальных GPS-точек сессии.' : 'GPS-точки не сохранились — показываем плановый маршрут.' }}
-          </p>
+          <p class="text-sm text-[#767676]">{{ workout.routeSnapshot ? 'Трек сохранён по GPS.' : 'Показываем привязанный маршрут тренировки.' }}</p>
         </div>
       </div>
     </Card>
