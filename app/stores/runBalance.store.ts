@@ -207,8 +207,8 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
   function finishActiveSession(finishedAt = new Date().toISOString()) {
     if (!activeSession.value) return currentWorkout.value
 
-    const routeSnapshot = activeSession.value.trackPoints.length >= 2 && activeRoute.value
-      ? createRouteFromTrack(activeSession.value.trackPoints, activeRoute.value)
+    const routeSnapshot = activeSession.value.trackPoints.length >= 2
+      ? createRouteFromTrack(activeSession.value.trackPoints, activeRoute.value, activeSession.value.distanceKm)
       : activeRoute.value
 
     const finishedWorkout = {
@@ -233,6 +233,11 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
     persistState()
     clearPersistedActiveSession()
     return finishedWorkout
+  }
+
+  function deleteHistoryWorkout(workoutId: string) {
+    history.value = history.value.filter((workout) => workout.id !== workoutId)
+    persistState()
   }
 
   function restorePersistedActiveSession() {
@@ -522,6 +527,7 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
     refreshActiveSession,
     evaluateWorkoutAlert,
     finishActiveSession,
+    deleteHistoryWorkout,
     restorePersistedActiveSession,
     restoreLocalState,
     completeOnboarding,

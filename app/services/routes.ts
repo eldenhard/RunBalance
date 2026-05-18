@@ -71,17 +71,24 @@ export function getRouteLineCoordinates(route: Route): [number, number][] {
 
 export type RouteBounds = [[number, number], [number, number]]
 
-export function createRouteFromTrack(trackPoints: TrackPoint[], baseRoute: Route): Route {
+export function createRouteFromTrack(trackPoints: TrackPoint[], baseRoute?: Route, distanceKm?: number): Route {
   const coordinates: [number, number][] = trackPoints.map((point) => [point.longitude, point.latitude])
+  const fallbackName = baseRoute?.name ?? 'GPS-трек'
   return {
-    ...baseRoute,
-    id: `${baseRoute.id}-track`,
+    id: `${baseRoute?.id ?? `route-track-${Date.now()}`}-track`,
+    name: fallbackName,
+    distanceKm: distanceKm ?? baseRoute?.distanceKm ?? 0,
+    type: baseRoute?.type ?? 'free',
+    surface: baseRoute?.surface ?? 'не указано',
+    elevationHint: baseRoute?.elevationHint ?? 'нет данных',
+    isPrivate: true,
+    notes: baseRoute?.notes,
     geojson: {
       type: 'FeatureCollection',
       features: [
         {
           type: 'Feature',
-          properties: { name: baseRoute.name },
+          properties: { name: fallbackName },
           geometry: {
             type: 'LineString',
             coordinates

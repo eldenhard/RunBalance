@@ -33,8 +33,8 @@ const zoneDetail = computed(() => {
   return `${targetZone.value.minBpm}-${targetZone.value.maxBpm} уд/мин`
 })
 const liveRoute = computed(() => {
-  if (session.value?.trackPoints.length && store.activeRoute) {
-    return createRouteFromTrack(session.value.trackPoints, store.activeRoute)
+  if (session.value?.trackPoints.length) {
+    return createRouteFromTrack(session.value.trackPoints, store.activeRoute, session.value.distanceKm)
   }
 
   return store.activeRoute

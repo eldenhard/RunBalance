@@ -3,7 +3,7 @@ import { Footprints, History, Home, MapPinned, Play } from '@lucide/vue'
 
 const store = useRunBalanceStore()
 const workout = computed(() => store.currentWorkout)
-const resultRoute = computed(() => workout.value.routeSnapshot ?? store.activeRoute)
+const resultRoute = computed(() => workout.value.routeSnapshot)
 </script>
 
 <template>
