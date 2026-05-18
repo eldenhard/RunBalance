@@ -64,6 +64,9 @@ export default defineNuxtConfig({
       ]
     },
     workbox: {
+      cleanupOutdatedCaches: true,
+      clientsClaim: true,
+      skipWaiting: true,
       navigateFallback: '/'
     }
   },
