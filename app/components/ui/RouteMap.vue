@@ -3,9 +3,11 @@ import type { Map, StyleSpecification } from 'maplibre-gl'
 import { cn } from '~/utils/cn'
 import { getRouteBounds, getRouteLineCoordinates } from '~/services/routes'
 import type { Route } from '~/types/route'
+import type { TrackPoint } from '~/types/workout-session'
 
 const props = withDefaults(defineProps<{
-  route: Route
+  route?: Route
+  currentPoint?: TrackPoint | null
   theme?: 'light' | 'dark'
   interactive?: boolean
   class?: string
@@ -18,8 +20,13 @@ const container = ref<HTMLDivElement | null>(null)
 const map = shallowRef<Map | null>(null)
 const isMounted = ref(false)
 const errorMessage = ref<string | null>(null)
-const hasTrack = computed(() => getRouteLineCoordinates(props.route).length >= 2)
-const routeSignature = computed(() => JSON.stringify(getRouteLineCoordinates(props.route)))
+const routeCoordinates = computed(() => props.route ? getRouteLineCoordinates(props.route) : [])
+const hasTrack = computed(() => routeCoordinates.value.length >= 2)
+const hasCurrentPoint = computed(() => Boolean(props.currentPoint))
+const routeSignature = computed(() => JSON.stringify({
+  route: routeCoordinates.value,
+  point: props.currentPoint ? [props.currentPoint.longitude, props.currentPoint.latitude] : null
+}))
 
 const palette = computed(() => {
   if (props.theme === 'dark') {
@@ -86,12 +93,14 @@ async function ensureMap() {
 
   try {
     const maplibre = await import('maplibre-gl')
-    const bounds = getRouteBounds(props.route)
+    const bounds = props.route ? getRouteBounds(props.route) : null
     const fallbackCenter: [number, number] = bounds
       ? [
           (bounds[0][0] + bounds[1][0]) / 2,
           (bounds[0][1] + bounds[1][1]) / 2
         ]
+      : props.currentPoint
+        ? [props.currentPoint.longitude, props.currentPoint.latitude]
       : [37.6173, 55.7558]
 
     const instance = new maplibre.Map({
@@ -126,9 +135,10 @@ function applyRoute() {
   const instance = map.value
   if (!instance) return
 
-  const coordinates = getRouteLineCoordinates(props.route)
+  const coordinates = routeCoordinates.value
   const sourceId = 'route-line'
   const startSourceId = 'route-start-marker'
+  const currentSourceId = 'route-current-marker'
 
   const geojson = {
     type: 'FeatureCollection' as const,
@@ -201,9 +211,55 @@ function applyRoute() {
     }
   }
 
-  const bounds = getRouteBounds(props.route)
+  if (props.currentPoint) {
+    const currentData = {
+      type: 'FeatureCollection' as const,
+      features: [{
+        type: 'Feature' as const,
+        properties: {},
+        geometry: {
+          type: 'Point' as const,
+          coordinates: [props.currentPoint.longitude, props.currentPoint.latitude]
+        }
+      }]
+    }
+    const currentSource = instance.getSource(currentSourceId)
+    if (currentSource && 'setData' in currentSource) {
+      ;(currentSource as { setData: (data: typeof currentData) => void }).setData(currentData)
+    } else {
+      instance.addSource(currentSourceId, { type: 'geojson', data: currentData })
+      instance.addLayer({
+        id: 'route-current-pulse',
+        type: 'circle',
+        source: currentSourceId,
+        paint: {
+          'circle-radius': 12,
+          'circle-color': palette.value.track,
+          'circle-opacity': 0.18
+        }
+      })
+      instance.addLayer({
+        id: 'route-current-dot',
+        type: 'circle',
+        source: currentSourceId,
+        paint: {
+          'circle-radius': 6,
+          'circle-color': palette.value.marker,
+          'circle-stroke-color': palette.value.track,
+          'circle-stroke-width': 3
+        }
+      })
+    }
+  }
+
+  const bounds = props.route ? getRouteBounds(props.route) : null
   if (bounds && coordinates.length >= 2) {
     instance.fitBounds(bounds, { padding: 32, animate: false, maxZoom: 15 })
+  } else if (props.currentPoint) {
+    instance.jumpTo({
+      center: [props.currentPoint.longitude, props.currentPoint.latitude],
+      zoom: 16
+    })
   }
 
   requestAnimationFrame(() => instance.resize())
@@ -214,7 +270,7 @@ onMounted(() => {
   ensureMap()
 })
 
-watch([() => props.route.id, routeSignature], () => {
+watch([() => props.route?.id, routeSignature], () => {
   ensureMap()
 })
 
@@ -247,7 +303,7 @@ onBeforeUnmount(() => {
       v-else-if="!hasTrack"
       :class="cn('pointer-events-none absolute inset-x-4 bottom-3 rounded-full px-3 py-1 text-center text-[11px] leading-snug', placeholderClass)"
     >
-      Трек ещё не записан — после пробежки линия появится автоматически.
+      {{ hasCurrentPoint ? 'Трек появится после движения.' : 'Ждём первую GPS-точку.' }}
     </div>
   </div>
 </template>

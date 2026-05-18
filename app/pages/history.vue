@@ -25,6 +25,14 @@ function getWorkoutOffset(workoutId: string) {
   return swipedWorkoutId.value === workoutId ? -revealDistancePx : 0
 }
 
+function getWorkoutCardClass(workoutId: string) {
+  const isOpen = swipedWorkoutId.value === workoutId || dragWorkoutId.value === workoutId
+  return [
+    'relative p-4 transition-transform duration-200 ease-out',
+    isOpen ? 'rounded-r-none shadow-none' : ''
+  ].join(' ')
+}
+
 function onSwipeStart(event: PointerEvent, workoutId: string) {
   dragWorkoutId.value = workoutId
   dragStartX.value = event.clientX
@@ -93,9 +101,9 @@ function cancelDelete() {
       <div
         v-for="workout in store.history"
         :key="workout.id"
-        class="relative overflow-hidden rounded-[18px]"
+        class="relative overflow-hidden rounded-[18px] bg-red-600"
       >
-        <div class="absolute inset-y-0 right-0 flex w-[92px] items-stretch justify-end bg-red-600">
+        <div class="absolute inset-y-0 right-0 flex w-[92px] items-stretch justify-end rounded-r-[18px] bg-red-600">
           <button
             class="flex w-full flex-col items-center justify-center gap-1 text-xs font-medium text-white"
             type="button"
@@ -107,7 +115,7 @@ function cancelDelete() {
         </div>
 
         <Card
-          class="relative p-4 transition-transform duration-200 ease-out"
+          :class="getWorkoutCardClass(workout.id)"
           :style="{ transform: `translateX(${getWorkoutOffset(workout.id)}px)`, touchAction: 'pan-y' }"
           @pointerdown="onSwipeStart($event, workout.id)"
           @pointermove="onSwipeMove($event, workout.id)"

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { MapPin, Pause, Play, Radio, Square, Volume2, VolumeX, ZapOff } from '@lucide/vue'
+import { HeartPulse, Pause, Play, Radio, Satellite, Square, Volume2, VolumeX } from '@lucide/vue'
 import { createRouteFromTrack } from '~/services/routes'
 
 const store = useRunBalanceStore()
@@ -17,21 +17,11 @@ const gps = useGeolocationTracking({
     voice.speak(alert)
   }
 })
-const gpsLabel = computed(() => {
-  if (gps.status.value === 'tracking') return 'GPS пишет трек'
-  if (gps.status.value === 'denied') return 'GPS выключен'
-  if (gps.status.value === 'unsupported') return 'GPS недоступен'
-  if (gps.status.value === 'error') return 'GPS ждёт сигнал'
-  return 'GPS готов'
-})
-const voiceLabel = computed(() => {
-  if (!voice.isSupported.value) return 'Голос недоступен'
-  return voice.isEnabled.value ? 'Голос включён' : 'Голос выключен'
-})
 const zoneDetail = computed(() => {
   if (!targetZone.value) return 'зона не выбрана'
   return `${targetZone.value.minBpm}-${targetZone.value.maxBpm} уд/мин`
 })
+const currentPoint = computed(() => gps.latestPoint.value ?? session.value?.trackPoints.at(-1) ?? null)
 const liveRoute = computed(() => {
   if (session.value?.trackPoints.length) {
     return createRouteFromTrack(session.value.trackPoints, store.activeRoute, session.value.distanceKm)
@@ -98,10 +88,17 @@ function stopRuntimeTimer() {
     runtimeInterval = null
   }
 }
+
+const gpsStatusClass = computed(() => gps.status.value === 'tracking'
+  ? 'border-white/20 bg-white text-[#0b0b0c]'
+  : 'border-white/10 bg-white/5 text-[#8f8f8f]')
+const voiceStatusClass = computed(() => voice.isEnabled.value && voice.isSupported.value
+  ? 'border-white/20 bg-white text-[#0b0b0c]'
+  : 'border-white/10 bg-white/5 text-[#8f8f8f]')
 </script>
 
 <template>
-  <div class="theme-dark min-h-dvh space-y-5 p-4">
+  <div class="theme-dark min-h-dvh space-y-6 p-4">
     <Card v-if="!session" class="p-5">
       <div class="space-y-4">
         <ScreenHeader eyebrow="Активная тренировка" title="Сессия ещё не началась" description="Запусти тренировку со стартового экрана, чтобы пошли реальные время, расстояние и темп." />
@@ -112,19 +109,46 @@ function stopRuntimeTimer() {
     </Card>
 
     <template v-else>
-    <ScreenHeader
-      eyebrow="Активная тренировка"
-      :title="workout.title"
-      :description="session?.status === 'paused' ? 'Пауза.' : 'Тренировка идёт и сохраняется локально.'"
-    />
+    <div class="flex items-center justify-between gap-4">
+      <ScreenHeader
+        eyebrow="Активная тренировка"
+        :title="workout.title"
+        :description="session?.status === 'paused' ? 'Пауза.' : ''"
+      />
+      <div class="flex shrink-0 items-center gap-2">
+        <button
+          type="button"
+          :class="['flex h-10 w-10 items-center justify-center rounded-full border transition-colors', gpsStatusClass]"
+          aria-label="GPS"
+          @click="toggleGps"
+        >
+          <Satellite class="h-5 w-5" />
+        </button>
+        <button
+          type="button"
+          :class="['flex h-10 w-10 items-center justify-center rounded-full border transition-colors', voiceStatusClass]"
+          aria-label="Голосовые подсказки"
+          @click="voice.toggle()"
+        >
+          <Volume2 v-if="voice.isEnabled.value" class="h-5 w-5" />
+          <VolumeX v-else class="h-5 w-5" />
+        </button>
+        <div
+          class="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-[#8f8f8f]"
+          aria-label="Пульс недоступен"
+        >
+          <HeartPulse class="h-5 w-5" />
+        </div>
+      </div>
+    </div>
 
-    <Card v-if="liveRoute" class="overflow-hidden p-0">
+    <Card class="overflow-hidden p-0">
       <ClientOnly>
-        <RouteMap :route="liveRoute" theme="dark" class="h-44 w-full" />
+        <RouteMap :route="liveRoute" :current-point="currentPoint" theme="dark" class="h-56 w-full" />
       </ClientOnly>
     </Card>
 
-    <section class="grid grid-cols-2 gap-3">
+    <section class="grid grid-cols-2 gap-4">
       <MetricTile label="Дистанция" :value="formatDistance(session?.distanceKm)" dark />
       <MetricTile label="Время" :value="formatDuration(session?.durationSec)" dark />
       <MetricTile label="Темп" :value="formatPace(session?.avgPaceSecPerKm)" dark />
@@ -147,46 +171,7 @@ function stopRuntimeTimer() {
       </div>
     </Card>
 
-    <Card class="p-4">
-      <div class="flex gap-3">
-        <ZapOff class="mt-0.5 h-5 w-5 shrink-0 text-[#9b9b9b]" />
-        <div>
-          <h2 class="font-medium text-white">Пульс не подключён</h2>
-          <p class="mt-1 text-sm leading-5 text-[#b8b8b8]">Сейчас работаем по GPS, времени и темпу.</p>
-        </div>
-      </div>
-    </Card>
-
-    <section class="grid grid-cols-2 gap-3">
-      <Card class="p-4">
-        <div class="flex items-center gap-3">
-          <MapPin class="h-5 w-5 text-[var(--screen-muted)]" />
-          <div>
-            <p class="text-xs text-[var(--screen-muted)]">Трекинг</p>
-            <p class="mt-1 font-medium">{{ gpsLabel }}</p>
-          </div>
-        </div>
-        <Button class="mt-4 w-full" variant="outline" @click="toggleGps">
-          {{ gps.isTracking.value ? 'Остановить GPS' : 'Включить GPS' }}
-        </Button>
-      </Card>
-
-      <Card class="p-4">
-        <div class="flex items-center gap-3">
-          <Volume2 v-if="voice.isEnabled.value" class="h-5 w-5 text-[var(--screen-muted)]" />
-          <VolumeX v-else class="h-5 w-5 text-[var(--screen-muted)]" />
-          <div>
-            <p class="text-xs text-[var(--screen-muted)]">Подсказки</p>
-            <p class="mt-1 font-medium">{{ voiceLabel }}</p>
-          </div>
-        </div>
-        <Button class="mt-4 w-full" variant="outline" @click="voice.toggle()">
-          {{ voice.isEnabled.value ? 'Выключить' : 'Включить' }}
-        </Button>
-      </Card>
-    </section>
-
-    <section>
+    <section class="pt-2">
       <div class="mb-2 flex items-center justify-between text-sm text-[#b8b8b8]">
         <span>Прогресс</span>
         <span>{{ progress }}%</span>
@@ -196,7 +181,7 @@ function stopRuntimeTimer() {
       </div>
     </section>
 
-    <div class="grid grid-cols-2 gap-3 pt-3">
+    <div class="grid grid-cols-2 gap-3 pt-4">
       <Button class="bg-white text-[#0b0b0c] active:bg-[#e8e8e8]" size="lg" @click="togglePause">
         <Play v-if="session?.status === 'paused'" class="h-5 w-5" />
         <Pause v-else class="h-5 w-5" />

@@ -25,16 +25,18 @@ export function useGeolocationTracking(options: UseGeolocationTrackingOptions) {
 
     status.value = 'tracking'
     errorMessage.value = null
+    window.navigator.geolocation.getCurrentPosition(
+      handlePosition,
+      handleError,
+      {
+        enableHighAccuracy: true,
+        maximumAge: 1000,
+        timeout: 8000
+      }
+    )
     watchId.value = window.navigator.geolocation.watchPosition(
-      (position) => {
-        const point = positionToTrackPoint(position)
-        latestPoint.value = point
-        options.onPoint(point)
-      },
-      (error) => {
-        status.value = error.code === 1 ? 'denied' : 'error'
-        errorMessage.value = getGeolocationErrorMessage(error)
-      },
+      handlePosition,
+      handleError,
       {
         enableHighAccuracy: true,
         maximumAge: 1000,
@@ -48,6 +50,17 @@ export function useGeolocationTracking(options: UseGeolocationTrackingOptions) {
     window.navigator.geolocation.clearWatch(watchId.value)
     watchId.value = null
     status.value = 'idle'
+  }
+
+  function handlePosition(position: GeolocationPosition) {
+    const point = positionToTrackPoint(position)
+    latestPoint.value = point
+    options.onPoint(point)
+  }
+
+  function handleError(error: GeolocationPositionError) {
+    status.value = error.code === 1 ? 'denied' : 'error'
+    errorMessage.value = getGeolocationErrorMessage(error)
   }
 
   onBeforeUnmount(stop)
