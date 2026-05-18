@@ -1,11 +1,30 @@
 <script setup lang="ts">
-import { Pause, Play, Radio, Square, ZapOff } from '@lucide/vue'
+import { MapPin, Pause, Play, Radio, Square, Volume2, VolumeX, ZapOff } from '@lucide/vue'
 
 const store = useRunBalanceStore()
 const router = useRouter()
 const workout = computed(() => store.currentWorkout)
 const session = computed(() => store.activeSession)
 const progress = computed(() => store.sessionProgress)
+const voice = useVoiceAlerts()
+const gps = useGeolocationTracking({
+  onPoint: (point) => {
+    store.appendTrackPoint(point)
+    const alert = store.evaluateWorkoutAlert()
+    voice.speak(alert)
+  }
+})
+const gpsLabel = computed(() => {
+  if (gps.status.value === 'tracking') return 'GPS пишет трек'
+  if (gps.status.value === 'denied') return 'GPS выключен'
+  if (gps.status.value === 'unsupported') return 'GPS недоступен'
+  if (gps.status.value === 'error') return 'GPS ждёт сигнал'
+  return 'GPS готов'
+})
+const voiceLabel = computed(() => {
+  if (!voice.isSupported.value) return 'Голос недоступен'
+  return voice.isEnabled.value ? 'Голос включён' : 'Голос выключен'
+})
 
 onMounted(() => {
   store.restorePersistedActiveSession()
@@ -14,13 +33,25 @@ onMounted(() => {
 function togglePause() {
   if (session.value?.status === 'paused') {
     store.resumeWorkoutSession()
+    gps.start()
     return
   }
 
   store.pauseWorkoutSession()
+  gps.stop()
+}
+
+function toggleGps() {
+  if (gps.isTracking.value) {
+    gps.stop()
+    return
+  }
+
+  gps.start()
 }
 
 async function finishWorkout() {
+  gps.stop()
   store.finishActiveSession()
   await router.push('/workout/result')
 }
@@ -41,12 +72,12 @@ async function finishWorkout() {
       <MetricTile label="Зона" :value="store.targetZone?.name ?? '—'" dark />
     </section>
 
-    <Card v-if="session?.visualAlert" class="border-[#463018] bg-[#21160f] p-4">
+    <Card v-if="session?.visualAlert || gps.errorMessage.value" class="border-[#463018] bg-[#21160f] p-4">
       <div class="flex gap-3">
         <Radio class="mt-0.5 h-5 w-5 shrink-0 text-[#ffb071]" />
         <div>
           <h2 class="font-medium text-white">Подсказка</h2>
-          <p class="mt-1 text-sm leading-5 text-[#d9c2b2]">{{ session.visualAlert.message }}</p>
+          <p class="mt-1 text-sm leading-5 text-[#d9c2b2]">{{ gps.errorMessage.value ?? session?.visualAlert?.message }}</p>
         </div>
       </div>
     </Card>
@@ -62,6 +93,35 @@ async function finishWorkout() {
         </div>
       </div>
     </Card>
+
+    <section class="grid grid-cols-2 gap-3">
+      <Card class="p-4">
+        <div class="flex items-center gap-3">
+          <MapPin class="h-5 w-5 text-[var(--screen-muted)]" />
+          <div>
+            <p class="text-xs text-[var(--screen-muted)]">Трекинг</p>
+            <p class="mt-1 font-medium">{{ gpsLabel }}</p>
+          </div>
+        </div>
+        <Button class="mt-4 w-full" variant="outline" @click="toggleGps">
+          {{ gps.isTracking.value ? 'Остановить GPS' : 'Включить GPS' }}
+        </Button>
+      </Card>
+
+      <Card class="p-4">
+        <div class="flex items-center gap-3">
+          <Volume2 v-if="voice.isEnabled.value" class="h-5 w-5 text-[var(--screen-muted)]" />
+          <VolumeX v-else class="h-5 w-5 text-[var(--screen-muted)]" />
+          <div>
+            <p class="text-xs text-[var(--screen-muted)]">Подсказки</p>
+            <p class="mt-1 font-medium">{{ voiceLabel }}</p>
+          </div>
+        </div>
+        <Button class="mt-4 w-full" variant="outline" @click="voice.toggle()">
+          {{ voice.isEnabled.value ? 'Выключить' : 'Включить' }}
+        </Button>
+      </Card>
+    </section>
 
     <section>
       <div class="mb-2 flex items-center justify-between text-sm text-[#b8b8b8]">
