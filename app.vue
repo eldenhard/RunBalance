@@ -1,19 +1,23 @@
 <script setup lang="ts">
 const store = useRunBalanceStore()
-const showSplash = ref(true)
+const appReady = ref(false)
 
 onMounted(async () => {
   store.restoreLocalState()
   store.restorePersistedActiveSession()
-  const minDelay = new Promise((resolve) => window.setTimeout(resolve, 900))
-  await Promise.all([minDelay])
-  showSplash.value = false
+  await new Promise((resolve) => window.setTimeout(resolve, 300))
+  appReady.value = true
+  window.dispatchEvent(new Event('runbalance:ready'))
 })
 </script>
 
 <template>
-  <AppShell>
-    <NuxtPage />
-  </AppShell>
-  <AppSplash :show="showSplash" />
+  <ClientOnly>
+    <AppShell v-if="appReady">
+      <NuxtPage />
+    </AppShell>
+    <template #fallback>
+      <div class="min-h-dvh bg-[#0b0b0c]" />
+    </template>
+  </ClientOnly>
 </template>

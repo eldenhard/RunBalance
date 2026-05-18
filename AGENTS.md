@@ -6,6 +6,8 @@
 
 Проект — mobile-first PWA-приложение для бега, которое помогает пользователю планировать тренировки, контролировать пульсовые зоны, выбирать маршруты, отслеживать восстановление и учитывать ресурс кроссовок.
 
+**Актуальная реализация:** см. [docs/product/implementation-status.md](docs/product/implementation-status.md) — единый источник правды по коду, store, страницам и ограничениям.
+
 ## Роль агента
 
 Ты работаешь как senior frontend/fullstack engineer.
@@ -201,22 +203,34 @@ RunBalance должен выглядеть как строгий mobile-first ru
 
 ## Main Navigation
 
-Bottom navigation:
+Реализовано в `app/components/layout/AppShell.vue`.
 
-- Сегодня
-- План
-- Старт
-- История
-- Профиль
+### Bottom navigation (всегда видна, кроме `/workout/active` и `/welcome`)
 
-Secondary sections:
+Основной ряд (5 пунктов):
 
-- Маршруты
-- Восстановление
-- Кроссовки
-- Пульсовые зоны
-- Голосовые подсказки
-- Настройки
+- **Сегодня** → `/`
+- **План** → `/plan`
+- **Старт** → `/start` (центральная кнопка, выделена)
+- **История** → `/history`
+- **Профиль** → `/profile`
+
+Дополнительный ряд под основным:
+
+- **Маршруты** → `/routes`
+- **Кроссовки** → `/shoes`
+
+### Secondary sections (из Профиля и карточек на «Сегодня»)
+
+- Восстановление → `/recovery`
+- Пульсовые зоны → `/heart-rate-zones`
+- Аналитика → `/analytics`
+- Онбординг → `/welcome` (баннер, если `profile.onboarded === false`)
+
+### Не в bottom nav
+
+- Голосовые подсказки — настройка на экране активной тренировки.
+- Настройки — future scope (частично в Профиле).
 
 ## Architecture Rules
 
@@ -234,66 +248,75 @@ Secondary sections:
 12. Не добавлять тяжёлые социальные функции до завершения MVP.
 13. Live-метрики тренировки должны считаться от фактической сессии, а не подставляться из демонстрационных моков.
 14. Если GPS, пульс или темп ещё недоступны, интерфейс должен показывать честное текущее состояние, а не сгенерированные значения.
+15. **Не добавлять демо-моки в seed.** Пустое приложение — нормальное начальное состояние; данные только от пользователя и завершённых тренировок.
+16. Не ломать bottom navigation и safe-area на iOS PWA без явной задачи.
 
-## Suggested Frontend Structure
+## Data And Persistence
+
+- Store: **один** Pinia-store `app/stores/runBalance.store.ts`.
+- Seed: `app/data/seedRunBalance.ts` — только пустые массивы и пустой профиль (`onboarded: false`).
+- `localStorage`:
+  - `runbalance.appState` — snapshot профиля, recovery, routes, shoes, plan, history, selections.
+  - `runbalance.activeWorkoutSession` — JSON активной сессии (восстанавливается при перезагрузке).
+- Hydrate: `restoreLocalState()` и `restorePersistedActiveSession()` в `app.vue` → `onMounted`.
+- После завершения тренировки: запись в `history`, пробег кроссовок, удаление из `plannedWorkouts` если это была плановая.
+
+## App Shell, Splash, Safe Area
+
+- `app.html` — HTML splash (`#rb-splash`) до гидратации Vue.
+- `app/plugins/splash.client.ts` — скрытие splash после события `runbalance:ready` (мин. ~1,2 с видимости).
+- `app.vue` — `ClientOnly` + `AppShell` только после hydrate store.
+- Safe-area: `calc(env(safe-area-inset-top) + 12px)` на контенте; bottom nav учитывает `env(safe-area-inset-bottom)`.
+- PWA: `public/icons/`, manifest `standalone`, `viewport-fit=cover` в `nuxt.config.ts`.
+
+## Actual Frontend Structure
 
 ```text
 app/
   components/
-    ui/
-    layout/
-    today/
-    workout/
-    recovery/
-    routes/
-    shoes/
-    analytics/
+    ui/           # Button, Card, Badge, Progress, RouteMap
+    layout/       # AppShell, ScreenHeader, MetricTile
 
   composables/
     useGeolocationTracking.ts
-    useWorkoutSession.ts
     useVoiceAlerts.ts
-    useHeartRateZones.ts
-    useShoeMileage.ts
-    useRecoveryScore.ts
-    useRouteBuilder.ts
 
-  features/
-    profile/
-    training-plan/
-    workout/
-    recovery/
-    routes/
-    shoes/
-    history/
-    analytics/
+  data/
+    seedRunBalance.ts    # только empty* — без моков
+
+  services/
+    analytics.ts
+    geolocation.ts
+    heartRateZones.ts
+    recovery.ts
+    routes.ts
+    shoes.ts
+    trainingPlan.ts
+    voiceAlerts.ts
+    workoutSession.ts
+    heart-rate/heartRateSource.ts
 
   stores/
-    profile.store.ts
-    trainingPlan.store.ts
-    workout.store.ts
-    recovery.store.ts
-    routes.store.ts
-    shoes.store.ts
+    runBalance.store.ts  # единый store
 
   types/
-    profile.ts
-    workout.ts
-    route.ts
-    shoe.ts
-    recovery.ts
-    heart-rate.ts
+    profile.ts, workout.ts, route.ts, shoe.ts,
+    recovery.ts, heart-rate.ts, workout-session.ts
 
   pages/
-    index.vue
-    plan.vue
-    start.vue
-    history.vue
-    profile.vue
+    index.vue, plan.vue, start.vue, welcome.vue
+    history.vue, analytics.vue, profile.vue
+    recovery.vue, heart-rate-zones.vue, shoes.vue, routes.vue
+    workout/active.vue, workout/result.vue
 
-  server/
-    api/
+  plugins/
+    splash.client.ts
+
+public/
+  icons/                 # PWA / apple-touch-icon
 ```
+
+Папки `features/` и раздельные `*.store.ts` из ранних планов **не используются** — логика в `services/` + `runBalance.store.ts`.
 
 ## Domain Models
 
@@ -314,6 +337,7 @@ export type UserProfile = {
   maxHeartRate: number
   trainingDays: number[]
   zones: HeartRateZone[]
+  onboarded: boolean
 }
 ```
 
@@ -344,6 +368,8 @@ export type WorkoutType =
 export type Workout = {
   id: string
   type: WorkoutType
+  title: string
+  scheduledDate?: string
   plannedDurationMin?: number
   plannedDistanceKm?: number
   targetZoneId?: string
@@ -356,6 +382,7 @@ export type Workout = {
   avgPaceSecPerKm?: number
   avgHeartRate?: number
   maxHeartRate?: number
+  heartRateSource?: 'unavailable' | ...
 }
 ```
 
@@ -388,6 +415,9 @@ export type Route = {
   type: RouteType
   geojson: GeoJSON.FeatureCollection
   isPrivate: boolean
+  surface: string
+  elevationHint: string
+  notes?: string
 }
 ```
 
@@ -424,9 +454,13 @@ export type RecoveryCheckIn = {
 - расчёта readiness score;
 - расчёта пробега кроссовок;
 - определения статуса кроссовок;
-- итоговой статистики тренировки;
+- итоговой статистики тренировки (дистанция, pace, GPS-фильтр);
 - правил голосовых уведомлений;
-- восстановления активной тренировки из локального хранилища.
+- восстановления активной тренировки из localStorage;
+- подбора маршрута по дистанции (`pickSuggestedRoute`);
+- аналитики по завершённым тренировкам (`buildAnalyticsReport`).
+
+Запуск: `npm test`. Типы: `npm run typecheck`.
 
 ## Product Wording
 
@@ -446,47 +480,36 @@ export type RecoveryCheckIn = {
 
 ## Development Priorities
 
-### Phase 1
+### Phase 1 — done
 
-- Nuxt project setup.
-- Tailwind setup.
-- shadcn-style UI setup.
-- Layout and navigation.
-- Main pages.
-- Mock data.
-- Today screen.
-- Shoes screen.
-- Workout result screen.
+- Nuxt 4, Tailwind, shadcn-style UI, PWA, layout, основные страницы.
+- ~~Mock data~~ → **удалены**, только empty seed.
 
-### Phase 2
+### Phase 2 — done
 
-- Profile.
-- Heart-rate zones.
-- Training plan.
-- Recovery check-in.
-- Readiness score.
-- Shoe mileage logic.
+- Профиль, зоны (ручная правка), план (create/delete/select), recovery check-in + readiness, логика кроссовок в services.
 
-### Phase 3
+### Phase 3 — done
 
-- Workout session.
-- GPS tracking.
-- Local persistence.
-- Active workout screen.
-- Voice alerts.
-- Visual alerts.
+- Workout session, GPS, localStorage сессии, active/result, voice + visual alerts.
+- Live-метрики без подстановки; пульс в iOS PWA помечен unavailable.
 
-### Phase 4
+### Phase 4 — done (MVP)
 
-- Workout planning CRUD.
-- Planned workout scheduling by day.
-- Target zone assignment for planned workouts.
-- Manual heart-rate zone management.
-- Routes.
-- Suggested route flow.
-- Saved routes.
-- History.
-- Basic analytics.
+- CRUD плана с датой, зоной, маршрутом, кроссовками.
+- Маршруты: сохранение, подсказка по дистанции, MapLibre превью.
+- История и `/analytics` по реальным `finishedAt`.
+- Онбординг `/welcome` (пропускаемый).
+- Кроссовки: полный CRUD, ручной пробег, активная пара по умолчанию.
+
+### Следующие приоритеты (future scope)
+
+- Backend + sync queue.
+- Capacitor BLE (Polar H10).
+- Рисование/редактирование маршрута на карте.
+- Редактирование запланированной тренировки (update).
+- Аналитика по зонам пульса при появлении HR.
+- IndexedDB вместо/вместе с localStorage.
 
 ## Final Rule
 

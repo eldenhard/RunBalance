@@ -1,67 +1,193 @@
 <script setup lang="ts">
-import { CalendarDays, History, Home, Play, User } from '@lucide/vue'
+import {
+  CalendarDays,
+  Footprints,
+  History,
+  Home,
+  Map,
+  Play,
+  User
+} from '@lucide/vue'
 
 const route = useRoute()
 
-const primaryItems = [
+const navItems = [
   { label: 'Сегодня', to: '/', icon: Home },
-  { label: 'План', to: '/plan', icon: CalendarDays }
-]
-
-const secondaryItems = [
+  { label: 'План', to: '/plan', icon: CalendarDays },
+  { label: 'Старт', to: '/start', icon: Play, primary: true },
   { label: 'История', to: '/history', icon: History },
   { label: 'Профиль', to: '/profile', icon: User }
 ]
 
+const moreItems = [
+  { label: 'Маршруты', to: '/routes', icon: Map },
+  { label: 'Кроссовки', to: '/shoes', icon: Footprints }
+]
+
 const hideNavRoutes = ['/workout/active', '/welcome']
 const showBottomNav = computed(() => !hideNavRoutes.includes(route.path))
-const isStartActive = computed(() => route.path === '/start' || route.path === '/workout/result')
+
+function isActive(path: string) {
+  if (path === '/') return route.path === '/'
+  return route.path === path || route.path.startsWith(`${path}/`)
+}
 </script>
 
 <template>
-  <div class="min-h-dvh bg-[#f7f7f5]">
-    <main class="app-frame min-h-dvh" :class="showBottomNav ? 'pb-32' : ''">
+  <div class="app-shell min-h-dvh bg-[#f7f7f5]">
+    <main
+      class="app-frame mx-auto min-h-dvh w-full max-w-md"
+      :class="showBottomNav ? 'app-frame--with-nav' : ''"
+    >
       <slot />
     </main>
 
     <nav
-      v-if="showBottomNav"
-      class="fixed inset-x-0 bottom-0 z-40 border-t border-[#deded9] bg-white/95 backdrop-blur"
-      :style="{ paddingBottom: 'env(safe-area-inset-bottom)' }"
+      v-show="showBottomNav"
+      class="bottom-nav"
+      aria-label="Основная навигация"
     >
-      <div class="mx-auto flex h-20 max-w-md items-end justify-between px-4 pb-2 pt-2">
+      <div class="bottom-nav__row">
         <NuxtLink
-          v-for="item in primaryItems"
+          v-for="item in navItems"
           :key="item.to"
           :to="item.to"
-          class="flex w-16 flex-col items-center justify-center gap-1 rounded-2xl py-2 text-[11px] font-medium text-[#767676] transition-colors"
-          active-class="text-[#111111]"
+          class="bottom-nav__item"
+          :class="[
+            item.primary ? 'bottom-nav__item--primary' : '',
+            isActive(item.to) ? 'bottom-nav__item--active' : ''
+          ]"
+          :aria-label="item.label"
         >
-          <component :is="item.icon" class="h-5 w-5" />
-          <span>{{ item.label }}</span>
+          <component :is="item.icon" class="bottom-nav__icon" :class="item.primary ? 'bottom-nav__icon--primary' : ''" />
+          <span class="bottom-nav__label">{{ item.label }}</span>
         </NuxtLink>
+      </div>
 
+      <div class="bottom-nav__more">
         <NuxtLink
-          to="/start"
-          class="-mt-8 flex h-16 w-16 flex-col items-center justify-center gap-0.5 rounded-full border border-[#111111] bg-[#111111] text-[10px] font-medium text-white shadow-[0_10px_24px_rgba(0,0,0,0.18)] transition-transform active:scale-95"
-          :class="isStartActive ? 'ring-4 ring-[#11111122]' : ''"
-          aria-label="Старт тренировки"
-        >
-          <Play class="h-6 w-6 fill-current" />
-          <span>Старт</span>
-        </NuxtLink>
-
-        <NuxtLink
-          v-for="item in secondaryItems"
+          v-for="item in moreItems"
           :key="item.to"
           :to="item.to"
-          class="flex w-16 flex-col items-center justify-center gap-1 rounded-2xl py-2 text-[11px] font-medium text-[#767676] transition-colors"
-          active-class="text-[#111111]"
+          class="bottom-nav__more-link"
+          :class="isActive(item.to) ? 'bottom-nav__more-link--active' : ''"
         >
-          <component :is="item.icon" class="h-5 w-5" />
+          <component :is="item.icon" class="h-4 w-4" />
           <span>{{ item.label }}</span>
         </NuxtLink>
       </div>
     </nav>
   </div>
 </template>
+
+<style scoped>
+.app-shell {
+  position: relative;
+}
+
+.app-frame {
+  box-sizing: border-box;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 12px);
+  padding-left: max(env(safe-area-inset-left, 0px), 0px);
+  padding-right: max(env(safe-area-inset-right, 0px), 0px);
+}
+
+.app-frame--with-nav {
+  padding-bottom: calc(5.75rem + env(safe-area-inset-bottom, 0px));
+}
+
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9990;
+  border-top: 1px solid #deded9;
+  background: #ffffff;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.06);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.bottom-nav__row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 2px;
+  max-width: 430px;
+  margin: 0 auto;
+  padding: 6px 8px 4px;
+}
+
+.bottom-nav__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 52px;
+  border-radius: 14px;
+  color: #767676;
+  font-size: 10px;
+  font-weight: 500;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bottom-nav__item--active {
+  color: #111111;
+  background: #f0f0ed;
+}
+
+.bottom-nav__item--primary {
+  color: #ffffff;
+  background: #111111;
+  min-height: 56px;
+  margin-top: -10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+}
+
+.bottom-nav__item--primary.bottom-nav__item--active {
+  background: #111111;
+  color: #ffffff;
+}
+
+.bottom-nav__icon {
+  width: 20px;
+  height: 20px;
+}
+
+.bottom-nav__icon--primary {
+  width: 22px;
+  height: 22px;
+}
+
+.bottom-nav__label {
+  line-height: 1.1;
+}
+
+.bottom-nav__more {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  max-width: 430px;
+  margin: 0 auto;
+  padding: 0 12px 8px;
+  border-top: 1px solid #f0f0ed;
+}
+
+.bottom-nav__more-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #767676;
+  text-decoration: none;
+}
+
+.bottom-nav__more-link--active {
+  color: #111111;
+  background: #f0f0ed;
+}
+</style>

@@ -1,6 +1,10 @@
 # PROMPT_FOR_DEVELOPMENT.md
 
-Ты — senior frontend/fullstack разработчик и продуктовый инженер. Нужно спроектировать и начать разработку PWA-приложения для бега.
+Ты — senior frontend/fullstack разработчик и продуктовый инженер. Проект **уже в разработке** — local-first PWA RunBalance (Nuxt 4).
+
+**Актуальный код и логика:** [docs/product/implementation-status.md](docs/product/implementation-status.md) и [AGENTS.md](AGENTS.md).
+
+**Важно:** демо-моки в seed **не используются**. Все данные — от пользователя (онбординг, формы, завершённые тренировки) и `localStorage`.
 
 ## Идея продукта
 
@@ -76,22 +80,24 @@
 
 ## Основные разделы приложения
 
-Нижнее меню:
+### Реализованная навигация (`AppShell.vue`)
 
-- Сегодня
-- План
-- Старт
-- История
-- Профиль
+Нижний бар (скрыт только на `/workout/active` и `/welcome`):
 
-Дополнительные разделы:
+- Сегодня → `/`
+- План → `/plan`
+- Старт → `/start` (центр)
+- История → `/history`
+- Профиль → `/profile`
 
-- Маршруты
-- Восстановление
-- Кроссовки
-- Пульсовые зоны
-- Голосовые подсказки
-- Настройки
+Под баром: **Маршруты** (`/routes`), **Кроссовки** (`/shoes`).
+
+Дополнительно из Профиля / карточек:
+
+- Восстановление → `/recovery`
+- Пульсовые зоны → `/heart-rate-zones`
+- Аналитика → `/analytics`
+- Онбординг → `/welcome`
 
 ## Ключевые экраны
 
@@ -190,57 +196,22 @@
 - Интерфейс активной тренировки должен быть читаемым на бегу.
 - Голосовые уведомления должны дублироваться визуальным баннером.
 
-## Предлагаемая архитектура frontend
+## Фактическая архитектура frontend
 
 ```text
 app/
-  components/
-    ui/
-    layout/
-    today/
-    workout/
-    recovery/
-    routes/
-    shoes/
-    analytics/
-
-  composables/
-    useGeolocationTracking.ts
-    useWorkoutSession.ts
-    useVoiceAlerts.ts
-    useHeartRateZones.ts
-    useShoeMileage.ts
-    useRecoveryScore.ts
-    useRouteBuilder.ts
-
-  features/
-    profile/
-    training-plan/
-    workout/
-    recovery/
-    routes/
-    shoes/
-    history/
-    analytics/
-
-  stores/
-    profile.store.ts
-    trainingPlan.store.ts
-    workout.store.ts
-    recovery.store.ts
-    routes.store.ts
-    shoes.store.ts
-
-  pages/
-    index.vue
-    plan.vue
-    start.vue
-    history.vue
-    profile.vue
-
-  server/
-    api/
+  stores/runBalance.store.ts    # единый Pinia store
+  data/seedRunBalance.ts        # только empty* сущности
+  services/                     # вся бизнес-логика
+  composables/                  # GPS, голос
+  components/ui/ + layout/
+  pages/                        # все маршруты см. implementation-status.md
+  plugins/splash.client.ts
+app.html                        # HTML splash до Vue
+public/icons/                   # PWA
 ```
+
+Нет `features/` и отдельных domain-stores — не создавать без рефакторинг-задачи.
 
 ## Базовые доменные сущности
 
@@ -254,6 +225,7 @@ type UserProfile = {
   maxHeartRate: number
   trainingDays: number[]
   zones: HeartRateZone[]
+  onboarded: boolean
 }
 ```
 
@@ -274,6 +246,8 @@ type HeartRateZone = {
 type Workout = {
   id: string
   type: 'easy' | 'recovery' | 'long' | 'tempo' | 'intervals' | 'fartlek' | 'free'
+  title: string
+  scheduledDate?: string
   plannedDurationMin?: number
   plannedDistanceKm?: number
   targetZoneId?: string
@@ -333,25 +307,24 @@ type RecoveryCheckIn = {
 }
 ```
 
-## Первые задачи разработки
+## Статус разработки (Phase 1–4)
 
-1. Инициализировать Nuxt-проект.
-2. Подключить TypeScript.
-3. Подключить Tailwind CSS.
-4. Подключить shadcn-vue/reka-ui компоненты.
-5. Подключить Pinia.
-6. Настроить PWA.
-7. Добавить базовый layout с mobile bottom navigation.
-8. Создать страницы: Today, Plan, Start, History, Profile.
-9. Создать доменные типы.
-10. Создать mock-данные для профиля, тренировки дня, маршрута, кроссовок.
-11. Собрать UI главного экрана «Сегодня».
-12. Собрать UI экрана активной тренировки.
-13. Собрать UI экрана результата.
-14. Собрать UI экрана кроссовок.
-15. Реализовать расчёт пульсовых зон.
-16. Реализовать расчёт пробега кроссовок.
-17. Реализовать локальное сохранение активной тренировки.
-18. Реализовать базовые голосовые уведомления через Web Speech API.
-19. Реализовать визуальные алерты при превышении зоны.
-20. Подготовить основу для GPS-трекинга.
+Сделано: см. [implementation-status.md](docs/product/implementation-status.md).
+
+Кратко:
+
+- Local-first, `localStorage`, без backend.
+- GPS-тренировка, голос/визуал алерты (темп; пульс без BLE).
+- План, маршруты, recovery, аналитика, онбординг, CRUD кроссовок.
+- MapLibre превью маршрутов; splash + iOS PWA standalone.
+
+**Не делать без задачи:** возвращать seed-моки, плодить новые stores, подставлять fake-метрики на active workout.
+
+## Следующие задачи (ориентир)
+
+1. Backend API + sync после offline.
+2. Capacitor + Polar H10 BLE.
+3. Редактирование плановой тренировки (update).
+4. Рисование маршрута на карте.
+5. IndexedDB для больших треков.
+6. E2E (Playwright) для критичных flow.

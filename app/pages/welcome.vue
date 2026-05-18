@@ -71,7 +71,7 @@ function skip() {
 </script>
 
 <template>
-  <div class="theme-light flex min-h-dvh flex-col p-4">
+  <div class="theme-light flex min-h-dvh flex-col p-4" style="padding-top: calc(env(safe-area-inset-top, 0px) + 16px)">
     <div class="flex items-center justify-between pt-2">
       <button class="flex h-10 w-10 items-center justify-center rounded-full text-[#111111] active:bg-[#f0f0ed]" aria-label="Назад" @click="back">
         <ChevronLeft class="h-5 w-5" />
