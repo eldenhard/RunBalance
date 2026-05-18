@@ -1,22 +1,16 @@
 import { defineStore } from 'pinia'
-import { activeWorkout, mockActiveTrackPoints, mockProfile, mockRecovery, mockRoute, mockShoes, todayWorkout, workoutHistory } from '~/data/mockRunBalance'
+import { mockProfile, mockRecovery, mockRoute, mockShoes, todayWorkout, workoutHistory } from '~/data/mockRunBalance'
 import { iosSafariPwaHeartRateUnavailable } from '~/services/heart-rate/heartRateSource'
+import { getHeartRateZoneAppearance } from '~/services/heartRateZones'
 import { getRecoveryRecommendation } from '~/services/recovery'
 import { addWorkoutDistanceToShoe } from '~/services/shoes'
 import { adaptWorkoutForReadiness } from '~/services/trainingPlan'
 import { createWorkoutSession, finishWorkoutSession, restoreWorkoutSession, serializeWorkoutSession, updateWorkoutSessionMetrics } from '~/services/workoutSession'
 import { getWorkoutAlert } from '~/services/voiceAlerts'
+import type { Workout } from '~/types/workout'
 import type { TrackPoint, WorkoutSession } from '~/types/workout-session'
 
 const ACTIVE_SESSION_STORAGE_KEY = 'runbalance.activeWorkoutSession'
-
-const initialActiveSession = updateWorkoutSessionMetrics(
-  {
-    ...createWorkoutSession(activeWorkout, activeWorkout.startedAt ?? '2026-05-18T07:20:00.000Z'),
-    trackPoints: mockActiveTrackPoints
-  },
-  '2026-05-18T07:45:30.000Z'
-)
 
 export const useRunBalanceStore = defineStore('run-balance', () => {
   const profile = ref(mockProfile)
@@ -24,13 +18,14 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
   const route = ref(mockRoute)
   const shoes = ref(mockShoes)
   const workoutOfTheDay = ref(todayWorkout)
-  const currentWorkout = ref(activeWorkout)
+  const currentWorkout = ref<Workout>(todayWorkout)
   const history = ref(workoutHistory)
   const heartRateSource = ref(iosSafariPwaHeartRateUnavailable)
-  const activeSession = ref<WorkoutSession | null>(initialActiveSession)
+  const activeSession = ref<WorkoutSession | null>(null)
 
   const selectedShoe = computed(() => shoes.value.find((shoe) => shoe.id === workoutOfTheDay.value.shoeId))
   const targetZone = computed(() => profile.value.zones.find((zone) => zone.id === workoutOfTheDay.value.targetZoneId))
+  const targetZoneAppearance = computed(() => getHeartRateZoneAppearance(targetZone.value?.id))
   const recoveryRecommendation = computed(() => getRecoveryRecommendation(recovery.value.readinessScore))
   const adaptedWorkout = computed(() => adaptWorkoutForReadiness(workoutOfTheDay.value, recovery.value.readinessScore))
   const sessionProgress = computed(() => {
@@ -48,14 +43,7 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
   function startWorkoutSession(startedAt = new Date().toISOString()) {
     const nextSession = createWorkoutSession(adaptedWorkout.value, startedAt)
     activeSession.value = nextSession
-    currentWorkout.value = {
-      ...adaptedWorkout.value,
-      id: 'workout-active',
-      startedAt,
-      distanceKm: 0,
-      durationSec: 0,
-      avgPaceSecPerKm: undefined
-    }
+    syncCurrentWorkoutFromSession()
     persistActiveSession()
   }
 
@@ -85,6 +73,14 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
       ...activeSession.value,
       trackPoints: [...activeSession.value.trackPoints, point]
     }, now)
+    syncCurrentWorkoutFromSession()
+    persistActiveSession()
+  }
+
+  function refreshActiveSession(now = new Date().toISOString()) {
+    if (!activeSession.value || activeSession.value.status !== 'active') return
+    activeSession.value = updateWorkoutSessionMetrics(activeSession.value, now)
+    syncCurrentWorkoutFromSession()
     persistActiveSession()
   }
 
@@ -109,6 +105,7 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
       },
       visualAlert: alert
     }
+    syncCurrentWorkoutFromSession()
     persistActiveSession()
     return alert
   }
@@ -128,6 +125,7 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
       status: 'finished',
       finishedAt
     }
+    syncCurrentWorkoutFromSession()
     clearPersistedActiveSession()
     return finishedWorkout
   }
@@ -137,6 +135,7 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
     const restored = restoreWorkoutSession(window.localStorage.getItem(ACTIVE_SESSION_STORAGE_KEY))
     if (!restored) return null
     activeSession.value = restored
+    syncCurrentWorkoutFromSession()
     return restored
   }
 
@@ -148,6 +147,20 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
   function clearPersistedActiveSession() {
     if (!import.meta.client) return
     window.localStorage.removeItem(ACTIVE_SESSION_STORAGE_KEY)
+  }
+
+  function syncCurrentWorkoutFromSession() {
+    if (!activeSession.value) return
+
+    currentWorkout.value = {
+      ...adaptedWorkout.value,
+      id: 'workout-active',
+      startedAt: activeSession.value.startedAt,
+      finishedAt: activeSession.value.finishedAt,
+      distanceKm: activeSession.value.distanceKm,
+      durationSec: activeSession.value.durationSec,
+      avgPaceSecPerKm: activeSession.value.avgPaceSecPerKm
+    }
   }
 
   return {
@@ -162,6 +175,7 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
     activeSession,
     selectedShoe,
     targetZone,
+    targetZoneAppearance,
     recoveryRecommendation,
     adaptedWorkout,
     sessionProgress,
@@ -169,6 +183,7 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
     pauseWorkoutSession,
     resumeWorkoutSession,
     appendTrackPoint,
+    refreshActiveSession,
     evaluateWorkoutAlert,
     finishActiveSession,
     restorePersistedActiveSession

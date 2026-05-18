@@ -6,6 +6,8 @@ const router = useRouter()
 const workout = computed(() => store.currentWorkout)
 const session = computed(() => store.activeSession)
 const progress = computed(() => store.sessionProgress)
+const targetZone = computed(() => store.targetZone)
+const targetZoneAppearance = computed(() => store.targetZoneAppearance)
 const voice = useVoiceAlerts()
 const gps = useGeolocationTracking({
   onPoint: (point) => {
@@ -25,9 +27,23 @@ const voiceLabel = computed(() => {
   if (!voice.isSupported.value) return 'Голос недоступен'
   return voice.isEnabled.value ? 'Голос включён' : 'Голос выключен'
 })
+const zoneDetail = computed(() => {
+  if (!targetZone.value) return 'зона не выбрана'
+  return `${targetZone.value.minBpm}-${targetZone.value.maxBpm} уд/мин`
+})
+let runtimeInterval: ReturnType<typeof window.setInterval> | null = null
 
 onMounted(() => {
   store.restorePersistedActiveSession()
+  syncRuntimeTimer()
+})
+
+onBeforeUnmount(() => {
+  stopRuntimeTimer()
+})
+
+watch(() => session.value?.status, () => {
+  syncRuntimeTimer()
 })
 
 function togglePause() {
@@ -55,10 +71,36 @@ async function finishWorkout() {
   store.finishActiveSession()
   await router.push('/workout/result')
 }
+
+function syncRuntimeTimer() {
+  stopRuntimeTimer()
+  if (!session.value || session.value.status !== 'active') return
+
+  runtimeInterval = window.setInterval(() => {
+    store.refreshActiveSession()
+  }, 1000)
+}
+
+function stopRuntimeTimer() {
+  if (runtimeInterval !== null) {
+    window.clearInterval(runtimeInterval)
+    runtimeInterval = null
+  }
+}
 </script>
 
 <template>
   <div class="theme-dark min-h-dvh space-y-5 p-4">
+    <Card v-if="!session" class="p-5">
+      <div class="space-y-4">
+        <ScreenHeader eyebrow="Активная тренировка" title="Сессия ещё не началась" description="Запусти тренировку со стартового экрана, чтобы пошли реальные время, расстояние и темп." />
+        <NuxtLink to="/start" class="block">
+          <Button class="w-full" size="lg">К старту</Button>
+        </NuxtLink>
+      </div>
+    </Card>
+
+    <template v-else>
     <ScreenHeader
       eyebrow="Активная тренировка"
       :title="workout.title"
@@ -69,7 +111,13 @@ async function finishWorkout() {
       <MetricTile label="Дистанция" :value="formatDistance(session?.distanceKm)" dark />
       <MetricTile label="Время" :value="formatDuration(session?.durationSec)" dark />
       <MetricTile label="Темп" :value="formatPace(session?.avgPaceSecPerKm)" dark />
-      <MetricTile label="Зона" :value="store.targetZone?.name ?? '—'" dark />
+      <MetricTile
+        label="Зона"
+        :value="targetZone?.name ?? '—'"
+        :detail="zoneDetail"
+        dark
+        :class="targetZoneAppearance.tileClass"
+      />
     </section>
 
     <Card v-if="session?.visualAlert || gps.errorMessage.value" class="border-[#463018] bg-[#21160f] p-4">
@@ -144,5 +192,6 @@ async function finishWorkout() {
         Завершить
       </Button>
     </div>
+    </template>
   </div>
 </template>

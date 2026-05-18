@@ -232,6 +232,8 @@ Secondary sections:
 10. Health/recovery-тексты не должны звучать как медицинский диагноз.
 11. Голосовые уведомления всегда должны иметь визуальный дубль.
 12. Не добавлять тяжёлые социальные функции до завершения MVP.
+13. Live-метрики тренировки должны считаться от фактической сессии, а не подставляться из демонстрационных моков.
+14. Если GPS, пульс или темп ещё недоступны, интерфейс должен показывать честное текущее состояние, а не сгенерированные значения.
 
 ## Suggested Frontend Structure
 
@@ -323,6 +325,7 @@ export type HeartRateZone = {
   name: string
   minBpm: number
   maxBpm: number
+  color?: string
 }
 ```
 
@@ -475,6 +478,10 @@ export type RecoveryCheckIn = {
 
 ### Phase 4
 
+- Workout planning CRUD.
+- Planned workout scheduling by day.
+- Target zone assignment for planned workouts.
+- Manual heart-rate zone management.
 - Routes.
 - Suggested route flow.
 - Saved routes.
