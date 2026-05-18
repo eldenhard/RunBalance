@@ -39,15 +39,9 @@
 
 State management.
 
-Использовать для:
+**В проекте:** один store `app/stores/runBalance.store.ts` (`useRunBalanceStore`) — профиль, recovery, план, маршруты, кроссовки, история, активная сессия.
 
-- профиля;
-- тренировочного плана;
-- активной тренировки;
-- восстановления;
-- маршрутов;
-- кроссовок;
-- истории тренировок.
+Ранние планы с `profile.store.ts`, `workout.store.ts` и т.д. **не реализованы**.
 
 ### Tailwind CSS
 
@@ -98,15 +92,11 @@ PWA-интеграция.
 
 ### IndexedDB
 
-Локальное хранилище.
+Локальное хранилище (планировалось).
 
-Использовать для:
+**Сейчас:** `localStorage` — ключи `runbalance.appState` и `runbalance.activeWorkoutSession`.
 
-- активной тренировки;
-- GPS-точек;
-- очереди синхронизации;
-- черновиков тренировок;
-- локальной истории до синхронизации.
+IndexedDB — future scope при росте объёма GPS-треков.
 
 ### Service Worker
 
@@ -329,3 +319,21 @@ E2E-тесты.
 - Vitest
 - Playwright
 - Sentry
+
+---
+
+## Implemented In Repository (2026-05-18)
+
+| Область | Реализация |
+|---------|------------|
+| Framework | Nuxt 4, Vue 3, TypeScript, Pinia, Tailwind 4 (`@tailwindcss/vite`) |
+| UI | Собственные `Button`, `Card`, `Badge`, `Progress`, `MetricTile`, `ScreenHeader` |
+| PWA | `@vite-pwa/nuxt`, `app.html` splash, `plugins/splash.client.ts`, `public/icons/` |
+| Maps | MapLibre GL JS — `RouteMap.vue`, OSM raster tiles |
+| GPS | Browser Geolocation + `workoutSession` distance filter |
+| Voice | Web Speech API — `useVoiceAlerts` + visual banner |
+| Tests | Vitest — `tests/unit/*.test.ts` |
+| Persistence | `localStorage` only |
+| HR device | `heartRateSource`: unavailable в iOS Safari PWA |
+
+Подробности: [docs/product/implementation-status.md](docs/product/implementation-status.md).

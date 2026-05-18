@@ -1,5 +1,7 @@
 # RunBalance Visual Direction
 
+> **Реализация в коде:** темы `theme-light` / `theme-dark` в `app/assets/css/tailwind.css`; shell и bottom nav — `AppShell.vue`; токены `--screen-*` / `--workout-*`.
+
 ## Decision
 
 RunBalance uses a combined `Strict Sport` + `Apple Coach` visual language.

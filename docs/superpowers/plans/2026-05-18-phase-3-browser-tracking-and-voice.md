@@ -1,5 +1,7 @@
 # Phase 3 Browser Tracking And Voice Plan
 
+> **STATUS: COMPLETED** (2026-05-18). GPS + voice + visual alerts в `useGeolocationTracking`, `useVoiceAlerts`, `workout/active.vue`.
+
 **Goal:** Add browser-level PWA wrappers for GPS tracking and voice/visual alerts on top of the local-first workout session foundation.
 
 **Scope for this block:**

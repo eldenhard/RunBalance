@@ -71,8 +71,8 @@ function skip() {
 </script>
 
 <template>
-  <div class="theme-light flex min-h-dvh flex-col p-4" style="padding-top: calc(env(safe-area-inset-top, 0px) + 16px)">
-    <div class="flex items-center justify-between pt-2">
+  <div class="theme-light flex min-h-dvh flex-col p-4">
+    <div class="flex items-center justify-between">
       <button class="flex h-10 w-10 items-center justify-center rounded-full text-[#111111] active:bg-[#f0f0ed]" aria-label="Назад" @click="back">
         <ChevronLeft class="h-5 w-5" />
       </button>
@@ -87,26 +87,26 @@ function skip() {
       <button class="text-sm font-medium text-[#767676]" @click="skip">Пропустить</button>
     </div>
 
-    <main class="mt-8 flex-1 space-y-6">
+    <main class="mt-5 flex-1 space-y-5">
       <template v-if="stepIndex === 0">
         <header class="space-y-3">
           <p class="text-xs font-medium uppercase tracking-wider text-[#767676]">RunBalance</p>
-          <h1 class="text-[34px] font-medium leading-tight tracking-tight text-[#111111]">Спокойный беговой ассистент</h1>
-          <p class="text-base leading-6 text-[#62625e]">
+          <h1 class="text-[30px] font-medium leading-tight tracking-tight text-[#111111]">Спокойный беговой ассистент</h1>
+          <p class="text-sm leading-5 text-[#62625e]">
             Расчёт зон, восстановление, маршруты и пробег кроссовок — без шума и без диагнозов.
           </p>
         </header>
 
-        <div class="space-y-3 pt-4">
-          <div class="rounded-3xl border border-[#deded9] bg-white p-4">
+        <div class="space-y-2 pt-2">
+          <div class="rounded-3xl border border-[#deded9] bg-white p-3">
             <p class="text-sm font-medium text-[#111111]">Локально и приватно</p>
             <p class="mt-1 text-sm text-[#62625e]">Тренировки сохраняются только на устройстве. Никаких аккаунтов на старте.</p>
           </div>
-          <div class="rounded-3xl border border-[#deded9] bg-white p-4">
+          <div class="rounded-3xl border border-[#deded9] bg-white p-3">
             <p class="text-sm font-medium text-[#111111]">Честные данные</p>
             <p class="mt-1 text-sm text-[#62625e]">Никаких подстановочных метрик: время и расстояние считаются от реальной сессии.</p>
           </div>
-          <div class="rounded-3xl border border-[#deded9] bg-white p-4">
+          <div class="rounded-3xl border border-[#deded9] bg-white p-3">
             <p class="text-sm font-medium text-[#111111]">Один взгляд — и ясно</p>
             <p class="mt-1 text-sm text-[#62625e]">Готовность, план, маршрут и обувь собираются на одном экране.</p>
           </div>

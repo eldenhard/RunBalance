@@ -10,10 +10,12 @@ const props = withDefaults(defineProps<{
   currentPoint?: TrackPoint | null
   theme?: 'light' | 'dark'
   interactive?: boolean
+  decorativeFallback?: boolean
   class?: string
 }>(), {
   theme: 'light',
-  interactive: false
+  interactive: false,
+  decorativeFallback: false
 })
 
 const container = ref<HTMLDivElement | null>(null)
@@ -46,7 +48,10 @@ const palette = computed(() => {
   }
 })
 
-const fallbackRoadClass = computed(() => props.theme === 'dark' ? 'route-map-fallback--dark' : 'route-map-fallback--light')
+const fallbackClass = computed(() => [
+  props.decorativeFallback ? 'route-map-fallback--decorative' : 'route-map-fallback--plain',
+  props.theme === 'dark' ? 'route-map-fallback--dark' : 'route-map-fallback--light'
+].join(' '))
 
 const placeholderClass = computed(() => props.theme === 'dark'
   ? 'bg-[#101011] text-[#9b9b9b]'
@@ -290,14 +295,16 @@ onBeforeUnmount(() => {
 
 <template>
   <div :class="cn('relative overflow-hidden rounded-2xl', $props.class)">
-    <div :class="cn('route-map-fallback absolute inset-0', fallbackRoadClass)">
-      <div class="route-map-fallback__park route-map-fallback__park--one" />
-      <div class="route-map-fallback__park route-map-fallback__park--two" />
-      <div class="route-map-fallback__water" />
-      <div class="route-map-fallback__road route-map-fallback__road--one" />
-      <div class="route-map-fallback__road route-map-fallback__road--two" />
-      <div class="route-map-fallback__road route-map-fallback__road--three" />
-      <div class="route-map-fallback__road route-map-fallback__road--four" />
+    <div :class="cn('route-map-fallback absolute inset-0', fallbackClass)">
+      <template v-if="decorativeFallback">
+        <div class="route-map-fallback__park route-map-fallback__park--one" />
+        <div class="route-map-fallback__park route-map-fallback__park--two" />
+        <div class="route-map-fallback__water" />
+        <div class="route-map-fallback__road route-map-fallback__road--one" />
+        <div class="route-map-fallback__road route-map-fallback__road--two" />
+        <div class="route-map-fallback__road route-map-fallback__road--three" />
+        <div class="route-map-fallback__road route-map-fallback__road--four" />
+      </template>
       <div v-if="hasCurrentPoint" class="route-map-fallback__dot" />
     </div>
     <div
@@ -333,6 +340,17 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .route-map-fallback {
+  background-color: #eef1ec;
+}
+
+.route-map-fallback--plain {
+  background:
+    radial-gradient(circle at 50% 50%, rgba(185, 255, 56, 0.18), transparent 0 32px),
+    repeating-linear-gradient(0deg, transparent 0 42px, rgba(255, 255, 255, 0.035) 42px 43px),
+    repeating-linear-gradient(90deg, transparent 0 54px, rgba(255, 255, 255, 0.03) 54px 55px);
+}
+
+.route-map-fallback--decorative {
   background:
     linear-gradient(115deg, transparent 0 42%, rgba(255, 255, 255, 0.1) 42% 43%, transparent 43% 100%),
     linear-gradient(25deg, transparent 0 50%, rgba(255, 255, 255, 0.08) 50% 51%, transparent 51% 100%),

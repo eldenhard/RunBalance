@@ -1,5 +1,7 @@
 # Phase 2 Design And Core State Implementation Plan
 
+> **STATUS: COMPLETED** (2026-05-18). См. [implementation-status.md](../../product/implementation-status.md).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Apply the approved RunBalance A+B visual system and implement Phase 2 local-first profile, heart-rate zones, training plan, recovery check-in, readiness score, and shoe mileage state.

@@ -1,5 +1,7 @@
 # Phase 3 Workout Session Foundation Plan
 
+> **STATUS: COMPLETED** (2026-05-18). `workoutSession.ts`, `runBalance.store` session API, localStorage restore.
+
 **Goal:** Move the active workout flow from static mock values to a local-first workout session foundation that can later accept real GPS points, Capacitor BLE heart-rate readings, voice alerts, and offline persistence.
 
 **Scope for this block:**

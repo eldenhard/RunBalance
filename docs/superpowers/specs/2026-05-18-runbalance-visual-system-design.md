@@ -1,5 +1,7 @@
 # RunBalance Visual System Design
 
+> **Implemented:** `app/assets/css/tailwind.css` (theme-light/dark), `AppShell.vue`, компоненты `ui/*`. См. [runbalance-visual-direction.md](../../design/runbalance-visual-direction.md).
+
 ## Goal
 
 Define the approved visual system before Phase 2 implementation.

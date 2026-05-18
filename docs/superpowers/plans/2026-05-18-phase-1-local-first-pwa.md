@@ -1,5 +1,7 @@
 # Phase 1 Local-First PWA Implementation Plan
 
+> **STATUS: COMPLETED** (2026-05-18). Mock data removed later — see [implementation-status.md](../../product/implementation-status.md).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Build the first runnable Nuxt 4 mobile-first PWA shell for RunBalance with shadcn-vue styling, mock product data, core pages, and a future-proof heart-rate source boundary.

@@ -1,5 +1,7 @@
 # Phase 4 Business Requirements
 
+> **Статус реализации (2026-05-18):** MVP Phase 4 закрыт в коде. Детали: [implementation-status.md](./implementation-status.md).
+
 ## Purpose
 
 Phase 4 переводит RunBalance от базового local-first running tracker к продукту, в котором пользователь может заранее собрать свою беговую неделю, выбрать нужную зону под конкретную тренировку и затем пройти её в живом режиме без подстановочных метрик.
@@ -49,3 +51,26 @@ Phase 4 переводит RunBalance от базового local-first running 
 - Глобальные heatmaps.
 - Полный FIT import.
 - Live heart rate via Polar H10 до отдельной Capacitor BLE фазы.
+
+## Implementation Mapping
+
+| Требование | Где в коде |
+|------------|------------|
+| CRUD плана | `pages/plan.vue`, `createPlannedWorkout`, `deletePlannedWorkout`, `selectPlannedWorkout` |
+| Зоны вручную | `pages/heart-rate-zones.vue`, `updateHeartRateZone` |
+| Live integrity | `workoutSession.ts`, `pages/workout/active.vue` |
+| Маршруты | `pages/routes.vue`, `services/routes.ts`, `RouteMap.vue` |
+| Подсказка маршрута | `pickSuggestedRoute`, `suggestedRoute` computed |
+| История / аналитика | `pages/history.vue`, `pages/analytics.vue`, `services/analytics.ts` |
+| iOS PWA standalone | `nuxt.config.ts`, `public/icons/`, viewport + apple meta |
+| Без моков | `data/seedRunBalance.ts` — только empty state |
+| Онбординг | `pages/welcome.vue`, `completeOnboarding` / `skipOnboarding` |
+| Кроссовки CRUD | `pages/shoes.vue`, store shoe actions |
+| Bottom nav | `components/layout/AppShell.vue` |
+| Splash | `app.html`, `plugins/splash.client.ts` |
+
+### Частично / не сделано в Phase 4
+
+- Редактирование существующей плановой тренировки (только create/delete).
+- Нарисованный GeoJSON маршрута на карте (сохраняется имя + км, линия после GPS-трека).
+- Распределение времени по зонам в аналитике (нет live HR).

@@ -12,7 +12,7 @@ const route = useRoute()
 const navItems = [
   { label: 'Сегодня', to: '/', icon: Home },
   { label: 'План', to: '/plan', icon: CalendarDays },
-  { label: 'Старт', to: '/start', icon: Play, primary: true },
+  { label: 'Трекер', to: '/start', icon: Play, primary: true },
   { label: 'История', to: '/history', icon: History },
   { label: 'Профиль', to: '/profile', icon: User }
 ]
