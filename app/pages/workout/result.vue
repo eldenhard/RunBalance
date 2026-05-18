@@ -6,7 +6,7 @@ const store = useRunBalanceStore()
 const workout = computed(() => store.currentWorkout)
 const resultRoute = computed(() => {
   const trackPoints = store.activeSession?.trackPoints ?? []
-  if (trackPoints.length >= 2) {
+  if (trackPoints.length >= 2 && store.activeRoute) {
     return createRouteFromTrack(trackPoints, store.activeRoute)
   }
   return store.activeRoute
@@ -38,12 +38,14 @@ const resultRoute = computed(() => {
       </div>
     </Card>
 
-    <Card class="overflow-hidden p-0">
-      <RouteMap :route="resultRoute" class="h-44 w-full" />
+    <Card v-if="resultRoute" class="overflow-hidden p-0">
+      <ClientOnly>
+        <RouteMap :route="resultRoute" class="h-44 w-full" />
+      </ClientOnly>
       <div class="flex items-center gap-3 p-4">
         <MapPinned class="h-5 w-5 text-slate-500" />
         <div>
-          <h2 class="font-medium">{{ store.activeRoute.name }}</h2>
+          <h2 class="font-medium">{{ resultRoute.name }}</h2>
           <p class="text-sm text-[#767676]">
             {{ store.activeSession?.trackPoints.length ? 'Трек собран из реальных GPS-точек сессии.' : 'GPS-точки не сохранились — показываем плановый маршрут.' }}
           </p>
@@ -51,12 +53,12 @@ const resultRoute = computed(() => {
       </div>
     </Card>
 
-    <Card class="p-4">
+    <Card v-if="store.selectedShoe" class="p-4">
       <div class="flex items-center gap-3">
         <Footprints class="h-5 w-5 text-slate-500" />
         <div>
-          <h2 class="font-medium">{{ store.selectedShoe?.name }}</h2>
-          <p class="text-sm text-[#767676]">+{{ workout.distanceKm?.toFixed(1) }} км к ресурсу пары</p>
+          <h2 class="font-medium">{{ store.selectedShoe.name }}</h2>
+          <p class="text-sm text-[#767676]">+{{ workout.distanceKm?.toFixed(1) ?? '0' }} км к ресурсу пары</p>
         </div>
       </div>
     </Card>

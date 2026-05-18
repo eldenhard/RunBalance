@@ -13,19 +13,23 @@ const secondaryItems = [
   { label: 'Профиль', to: '/profile', icon: User }
 ]
 
-const hideNavRoutes = ['/workout/active']
+const hideNavRoutes = ['/workout/active', '/welcome']
 const showBottomNav = computed(() => !hideNavRoutes.includes(route.path))
 const isStartActive = computed(() => route.path === '/start' || route.path === '/workout/result')
 </script>
 
 <template>
   <div class="min-h-dvh bg-[#f7f7f5]">
-    <main class="app-frame min-h-dvh" :class="showBottomNav ? 'pb-28' : ''">
+    <main class="app-frame min-h-dvh" :class="showBottomNav ? 'pb-32' : ''">
       <slot />
     </main>
 
-    <nav v-if="showBottomNav" class="fixed inset-x-0 bottom-0 z-40 border-t border-[#deded9] bg-white/95 backdrop-blur">
-      <div class="mx-auto flex h-20 max-w-md items-end justify-between px-4 pb-[max(env(safe-area-inset-bottom),8px)] pt-2">
+    <nav
+      v-if="showBottomNav"
+      class="fixed inset-x-0 bottom-0 z-40 border-t border-[#deded9] bg-white/95 backdrop-blur"
+      :style="{ paddingBottom: 'env(safe-area-inset-bottom)' }"
+    >
+      <div class="mx-auto flex h-20 max-w-md items-end justify-between px-4 pb-2 pt-2">
         <NuxtLink
           v-for="item in primaryItems"
           :key="item.to"

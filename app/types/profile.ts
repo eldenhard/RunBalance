@@ -9,5 +9,6 @@ export type UserProfile = {
   maxHeartRate: number
   trainingDays: number[]
   zones: HeartRateZone[]
+  onboarded: boolean
 }
 

@@ -84,5 +84,6 @@ textarea {
   margin-inline: auto;
   min-height: 100dvh;
   overflow-x: hidden;
+  padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
 }

@@ -16,14 +16,14 @@ const props = withDefaults(defineProps<{
 
 const container = ref<HTMLDivElement | null>(null)
 const map = shallowRef<Map | null>(null)
+const isMounted = ref(false)
+const errorMessage = ref<string | null>(null)
 const hasTrack = computed(() => getRouteLineCoordinates(props.route).length >= 2)
 
 const palette = computed(() => {
   if (props.theme === 'dark') {
     return {
       land: '#101011',
-      water: '#1f2937',
-      road: '#252525',
       track: '#ffb071',
       trackCasing: '#000000',
       marker: '#ffffff'
@@ -31,8 +31,6 @@ const palette = computed(() => {
   }
   return {
     land: '#f7f7f5',
-    water: '#e6ecf2',
-    road: '#deded9',
     track: '#111111',
     trackCasing: '#ffffff',
     marker: '#111111'
@@ -46,13 +44,17 @@ const placeholderClass = computed(() => props.theme === 'dark'
 function buildStyle(): StyleSpecification {
   return {
     version: 8,
-    glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
     sources: {
-      'osm-raster': {
+      'osm': {
         type: 'raster',
-        tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+        tiles: [
+          'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
+          'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
+          'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
+        ],
         tileSize: 256,
-        attribution: '© OpenStreetMap'
+        attribution: '© OpenStreetMap',
+        maxzoom: 19
       }
     },
     layers: [
@@ -62,12 +64,12 @@ function buildStyle(): StyleSpecification {
         paint: { 'background-color': palette.value.land }
       },
       {
-        id: 'osm-raster-layer',
+        id: 'osm-layer',
         type: 'raster',
-        source: 'osm-raster',
+        source: 'osm',
         paint: {
-          'raster-opacity': 0.85,
-          'raster-saturation': props.theme === 'dark' ? -0.6 : -0.2
+          'raster-opacity': 1,
+          'raster-saturation': props.theme === 'dark' ? -0.6 : -0.15
         }
       }
     ]
@@ -75,37 +77,48 @@ function buildStyle(): StyleSpecification {
 }
 
 async function ensureMap() {
-  if (!import.meta.client) return
+  if (!import.meta.client || !container.value) return
   if (map.value) {
     applyRoute()
     return
   }
 
-  await nextTick()
-  if (!container.value) return
+  try {
+    const maplibre = await import('maplibre-gl')
+    const bounds = getRouteBounds(props.route)
+    const fallbackCenter: [number, number] = bounds
+      ? [
+          (bounds[0][0] + bounds[1][0]) / 2,
+          (bounds[0][1] + bounds[1][1]) / 2
+        ]
+      : [37.6173, 55.7558]
 
-  const maplibre = await import('maplibre-gl')
-  const bounds = getRouteBounds(props.route)
-  const fallbackCenter: [number, number] = bounds
-    ? [
-        (bounds[0][0] + bounds[1][0]) / 2,
-        (bounds[0][1] + bounds[1][1]) / 2
-      ]
-    : [37.6173, 55.7558]
+    const instance = new maplibre.Map({
+      container: container.value,
+      style: buildStyle(),
+      center: fallbackCenter,
+      zoom: bounds ? 13 : 11,
+      attributionControl: { compact: true },
+      interactive: props.interactive,
+      cooperativeGestures: false,
+      pitchWithRotate: false,
+      dragRotate: false
+    })
 
-  const instance = new maplibre.Map({
-    container: container.value,
-    style: buildStyle(),
-    center: fallbackCenter,
-    zoom: 12,
-    attributionControl: { compact: true },
-    interactive: props.interactive
-  })
+    instance.on('error', (event) => {
+      const message = event?.error?.message
+      if (message && !message.includes('Failed to fetch')) {
+        errorMessage.value = message
+      }
+    })
 
-  instance.on('load', () => {
-    map.value = instance
-    applyRoute()
-  })
+    instance.on('load', () => {
+      map.value = instance
+      applyRoute()
+    })
+  } catch (error) {
+    errorMessage.value = error instanceof Error ? error.message : 'Не удалось загрузить карту'
+  }
 }
 
 function applyRoute() {
@@ -114,10 +127,7 @@ function applyRoute() {
 
   const coordinates = getRouteLineCoordinates(props.route)
   const sourceId = 'route-line'
-  const layerCasingId = 'route-line-casing'
-  const layerLineId = 'route-line-main'
   const startSourceId = 'route-start-marker'
-  const startLayerId = 'route-start-circle'
 
   const geojson = {
     type: 'FeatureCollection' as const,
@@ -139,7 +149,7 @@ function applyRoute() {
   } else {
     instance.addSource(sourceId, { type: 'geojson', data: geojson })
     instance.addLayer({
-      id: layerCasingId,
+      id: 'route-line-casing',
       type: 'line',
       source: sourceId,
       layout: { 'line-cap': 'round', 'line-join': 'round' },
@@ -150,7 +160,7 @@ function applyRoute() {
       }
     })
     instance.addLayer({
-      id: layerLineId,
+      id: 'route-line-main',
       type: 'line',
       source: sourceId,
       layout: { 'line-cap': 'round', 'line-join': 'round' },
@@ -177,7 +187,7 @@ function applyRoute() {
     } else {
       instance.addSource(startSourceId, { type: 'geojson', data: startData })
       instance.addLayer({
-        id: startLayerId,
+        id: 'route-start-circle',
         type: 'circle',
         source: startSourceId,
         paint: {
@@ -194,9 +204,12 @@ function applyRoute() {
   if (bounds && coordinates.length >= 2) {
     instance.fitBounds(bounds, { padding: 32, animate: false, maxZoom: 15 })
   }
+
+  requestAnimationFrame(() => instance.resize())
 }
 
 onMounted(() => {
+  isMounted.value = true
   ensureMap()
 })
 
@@ -214,22 +227,26 @@ onBeforeUnmount(() => {
 
 <template>
   <div :class="cn('relative overflow-hidden rounded-2xl', $props.class)">
-    <ClientOnly>
-      <div ref="container" class="h-full w-full" />
-      <template #fallback>
-        <div :class="cn('flex h-full w-full items-center justify-center text-sm', placeholderClass)">
-          Карта загружается…
-        </div>
-      </template>
-    </ClientOnly>
+    <div v-if="isMounted" ref="container" class="absolute inset-0" />
+    <div
+      v-else
+      :class="cn('flex h-full w-full items-center justify-center text-xs', placeholderClass)"
+    >
+      Карта загружается…
+    </div>
 
     <div
-      v-if="!hasTrack"
-      :class="cn('pointer-events-none absolute inset-0 flex items-center justify-center text-center text-xs', placeholderClass)"
+      v-if="errorMessage"
+      :class="cn('pointer-events-none absolute inset-0 flex items-center justify-center px-4 text-center text-xs leading-snug', placeholderClass)"
     >
-      <span class="max-w-[200px] px-3 leading-snug">
-        Трек этого маршрута ещё не записан. После пробежки линия появится автоматически.
-      </span>
+      Карта не открылась: {{ errorMessage }}
+    </div>
+
+    <div
+      v-else-if="!hasTrack"
+      :class="cn('pointer-events-none absolute inset-x-4 bottom-3 rounded-full px-3 py-1 text-center text-[11px] leading-snug', placeholderClass)"
+    >
+      Трек ещё не записан — после пробежки линия появится автоматически.
     </div>
   </div>
 </template>

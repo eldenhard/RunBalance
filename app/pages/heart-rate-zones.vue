@@ -45,11 +45,17 @@ function updateDraft(zoneId: string, key: 'name' | 'minBpm' | 'maxBpm', value: s
       <div class="flex items-end justify-between">
         <div>
           <p class="text-xs text-[#767676]">Максимальный пульс</p>
-          <p class="mt-1 text-[34px] font-medium leading-none">{{ store.profile.maxHeartRate }}</p>
+          <p class="mt-1 text-[34px] font-medium leading-none">{{ store.profile.maxHeartRate || '—' }}</p>
         </div>
         <span class="text-sm text-[#767676]">уд/мин</span>
       </div>
     </Card>
+
+    <NuxtLink v-if="!store.profile.zones.length" to="/profile" class="block">
+      <Card class="p-4 text-sm text-[#767676]">
+        Сначала укажи максимальный пульс в Профиле — после этого зоны рассчитаются автоматически.
+      </Card>
+    </NuxtLink>
 
     <div class="space-y-3">
       <Card v-for="zone in store.profile.zones" :key="zone.id" class="p-4">

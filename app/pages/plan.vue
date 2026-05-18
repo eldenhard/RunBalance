@@ -20,9 +20,19 @@ const form = reactive({
   scheduledDate: new Date().toISOString().slice(0, 10),
   plannedDistanceKm: '6',
   plannedDurationMin: '42',
-  targetZoneId: 'z2',
-  shoeId: store.shoes[0]?.id ?? '',
-  routeId: store.routes[0]?.id ?? ''
+  targetZoneId: store.profile.zones[1]?.id ?? store.profile.zones[0]?.id ?? '',
+  shoeId: store.activeShoe?.id ?? store.shoes[0]?.id ?? '',
+  routeId: store.activeRoute?.id ?? store.routes[0]?.id ?? ''
+})
+
+watch(() => store.profile.zones, (zones) => {
+  if (!form.targetZoneId && zones.length) form.targetZoneId = zones[1]?.id ?? zones[0]!.id
+})
+watch(() => store.activeShoe, (shoe) => {
+  if (!form.shoeId && shoe) form.shoeId = shoe.id
+})
+watch(() => store.activeRoute, (route) => {
+  if (!form.routeId && route) form.routeId = route.id
 })
 
 function createWorkout() {
@@ -94,6 +104,7 @@ function toOptionalNumber(value: string) {
           <label class="grid gap-1.5">
             <span class="text-sm font-medium">Зона</span>
             <select v-model="form.targetZoneId" class="h-12 rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none">
+              <option value="">Без зоны</option>
               <option v-for="zone in store.profile.zones" :key="zone.id" :value="zone.id">
                 {{ zone.name }} · {{ zone.minBpm }}-{{ zone.maxBpm }}
               </option>
@@ -103,6 +114,7 @@ function toOptionalNumber(value: string) {
           <label class="grid gap-1.5">
             <span class="text-sm font-medium">Кроссовки</span>
             <select v-model="form.shoeId" class="h-12 rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none">
+              <option value="">Без кроссовок</option>
               <option v-for="shoe in store.shoes" :key="shoe.id" :value="shoe.id">
                 {{ shoe.name }}
               </option>

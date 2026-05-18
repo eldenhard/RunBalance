@@ -3,9 +3,14 @@ import { Footprints, Map, Play, Radio } from '@lucide/vue'
 
 const store = useRunBalanceStore()
 const router = useRouter()
+const hasPlan = computed(() => store.plannedWorkouts.length > 0)
 
 async function startWorkout() {
-  store.startWorkoutSession()
+  if (hasPlan.value) {
+    store.startWorkoutSession()
+  } else {
+    store.startFreeWorkoutSession()
+  }
   await router.push('/workout/active')
 }
 
@@ -19,32 +24,34 @@ async function startFreeWorkout() {
   <div class="theme-dark min-h-dvh space-y-4 p-4">
     <ScreenHeader
       eyebrow="Готово к старту"
-      :title="store.adaptedWorkout.title"
-      :description="store.selectedWorkoutId ? 'Проверь маршрут, обувь и начинай без лишних отвлечений.' : 'Если плана нет, можно сразу уйти в свободный бег.'"
+      :title="hasPlan ? store.adaptedWorkout.title : 'Свободный бег'"
+      :description="hasPlan ? 'Проверь маршрут, обувь и начинай без лишних отвлечений.' : 'Плана сегодня нет — стартуй свободно, тренировка сохранится в историю.'"
     />
 
     <Card class="p-4">
       <div class="grid grid-cols-2 gap-4 border-b border-[var(--screen-border)] pb-4">
         <div>
           <p class="text-xs text-[var(--screen-muted)]">Дистанция</p>
-          <p class="mt-1 text-[38px] font-medium leading-none">{{ store.adaptedWorkout.plannedDistanceKm }}</p>
+          <p class="mt-1 text-[38px] font-medium leading-none">{{ hasPlan ? store.adaptedWorkout.plannedDistanceKm ?? '—' : '—' }}</p>
           <p class="mt-1 text-xs text-[var(--screen-muted)]">км</p>
         </div>
         <div>
           <p class="text-xs text-[var(--screen-muted)]">Время</p>
-          <p class="mt-1 text-[38px] font-medium leading-none">{{ store.adaptedWorkout.plannedDurationMin }}</p>
+          <p class="mt-1 text-[38px] font-medium leading-none">{{ hasPlan ? store.adaptedWorkout.plannedDurationMin ?? '—' : '—' }}</p>
           <p class="mt-1 text-xs text-[var(--screen-muted)]">мин</p>
         </div>
       </div>
 
       <div class="mt-4 grid grid-cols-2 gap-3">
         <MetricTile label="Зона" :value="store.adaptedWorkout.targetZoneId?.toUpperCase() ?? '—'" dark />
-        <MetricTile label="Готовность" :value="store.recovery.readinessScore" dark />
+        <MetricTile label="Готовность" :value="store.readinessScore" dark />
       </div>
     </Card>
 
-    <Card class="overflow-hidden p-0">
-      <RouteMap :route="store.activeRoute" theme="dark" class="h-40 w-full" />
+    <Card v-if="store.activeRoute" class="overflow-hidden p-0">
+      <ClientOnly>
+        <RouteMap :route="store.activeRoute" theme="dark" class="h-40 w-full" />
+      </ClientOnly>
       <div class="flex items-start gap-3 p-4">
         <Map class="mt-0.5 h-5 w-5 text-[var(--screen-muted)]" />
         <div class="flex-1">
@@ -57,15 +64,39 @@ async function startFreeWorkout() {
       </div>
     </Card>
 
-    <Card class="p-4">
+    <NuxtLink v-else to="/routes" class="block">
+      <Card class="p-4">
+        <div class="flex items-start gap-3">
+          <Map class="mt-0.5 h-5 w-5 text-[var(--screen-muted)]" />
+          <div class="flex-1">
+            <h2 class="font-medium">Маршрут не выбран</h2>
+            <p class="text-sm text-[var(--screen-muted)]">Можно стартовать без маршрута — трек запишется по GPS.</p>
+          </div>
+        </div>
+      </Card>
+    </NuxtLink>
+
+    <Card v-if="store.selectedShoe" class="p-4">
       <div class="flex items-center gap-3">
         <Footprints class="h-5 w-5 text-[var(--screen-muted)]" />
         <div>
-          <h2 class="font-medium">{{ store.selectedShoe?.name }}</h2>
-          <p class="text-sm text-[var(--screen-muted)]">{{ store.selectedShoe?.brand }} {{ store.selectedShoe?.model }}</p>
+          <h2 class="font-medium">{{ store.selectedShoe.name }}</h2>
+          <p class="text-sm text-[var(--screen-muted)]">{{ store.selectedShoe.brand }} {{ store.selectedShoe.model }}</p>
         </div>
       </div>
     </Card>
+
+    <NuxtLink v-else to="/shoes" class="block">
+      <Card class="p-4">
+        <div class="flex items-center gap-3">
+          <Footprints class="h-5 w-5 text-[var(--screen-muted)]" />
+          <div>
+            <h2 class="font-medium">Кроссовки не указаны</h2>
+            <p class="text-sm text-[var(--screen-muted)]">Добавь пару — будем считать ресурс автоматически.</p>
+          </div>
+        </div>
+      </Card>
+    </NuxtLink>
 
     <Card class="p-4">
       <div class="flex gap-3">
