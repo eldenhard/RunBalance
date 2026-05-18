@@ -6,29 +6,26 @@ const workout = computed(() => store.currentWorkout)
 </script>
 
 <template>
-  <div class="space-y-4 p-4">
-    <header class="space-y-1 pt-3">
-      <p class="text-sm font-medium text-slate-500">Результат</p>
-      <h1 class="text-2xl font-semibold text-slate-950">Пробежка сохранена локально</h1>
-    </header>
+  <div class="theme-light space-y-4 p-4">
+    <ScreenHeader eyebrow="Результат" title="Пробежка сохранена локально" />
 
     <Card class="p-4">
       <div class="grid grid-cols-2 gap-3">
         <div>
-          <p class="text-sm text-slate-500">Дистанция</p>
-          <p class="text-3xl font-semibold">{{ formatDistance(workout.distanceKm) }}</p>
+          <p class="text-sm text-[#767676]">Дистанция</p>
+          <p class="text-3xl font-medium">{{ formatDistance(workout.distanceKm) }}</p>
         </div>
         <div>
-          <p class="text-sm text-slate-500">Время</p>
-          <p class="text-3xl font-semibold">{{ formatDuration(workout.durationSec) }}</p>
+          <p class="text-sm text-[#767676]">Время</p>
+          <p class="text-3xl font-medium">{{ formatDuration(workout.durationSec) }}</p>
         </div>
         <div>
-          <p class="text-sm text-slate-500">Средний темп</p>
-          <p class="text-2xl font-semibold">{{ formatPace(workout.avgPaceSecPerKm) }}</p>
+          <p class="text-sm text-[#767676]">Средний темп</p>
+          <p class="text-2xl font-medium">{{ formatPace(workout.avgPaceSecPerKm) }}</p>
         </div>
         <div>
-          <p class="text-sm text-slate-500">Пульс</p>
-          <p class="text-2xl font-semibold">—</p>
+          <p class="text-sm text-[#767676]">Пульс</p>
+          <p class="text-2xl font-medium">—</p>
         </div>
       </div>
     </Card>
@@ -37,22 +34,21 @@ const workout = computed(() => store.currentWorkout)
       <div class="flex items-center gap-3">
         <MapPinned class="h-5 w-5 text-slate-500" />
         <div>
-          <h2 class="font-semibold">{{ store.route.name }}</h2>
-          <p class="text-sm text-slate-500">Карта маршрута будет подключена через MapLibre.</p>
+          <h2 class="font-medium">{{ store.route.name }}</h2>
+          <p class="text-sm text-[#767676]">Карта маршрута будет подключена через MapLibre.</p>
         </div>
       </div>
-      <div class="mt-4 h-32 rounded-md bg-slate-100" />
+      <div class="mt-4 h-32 rounded-2xl bg-[#f0f0ed]" />
     </Card>
 
     <Card class="p-4">
       <div class="flex items-center gap-3">
         <Footprints class="h-5 w-5 text-slate-500" />
         <div>
-          <h2 class="font-semibold">{{ store.selectedShoe?.name }}</h2>
-          <p class="text-sm text-slate-500">+{{ workout.distanceKm?.toFixed(1) }} км к ресурсу пары</p>
+          <h2 class="font-medium">{{ store.selectedShoe?.name }}</h2>
+          <p class="text-sm text-[#767676]">+{{ workout.distanceKm?.toFixed(1) }} км к ресурсу пары</p>
         </div>
       </div>
     </Card>
   </div>
 </template>
-

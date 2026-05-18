@@ -9,17 +9,16 @@ const props = withDefaults(defineProps<{
 })
 
 const variantClass = computed(() => ({
-  default: 'bg-slate-950 text-white',
-  secondary: 'bg-slate-100 text-slate-700',
-  success: 'bg-emerald-100 text-emerald-800',
-  warning: 'bg-amber-100 text-amber-800',
-  danger: 'bg-red-100 text-red-800'
+  default: 'bg-[#111111] text-white',
+  secondary: 'bg-[#f0f0ed] text-[#555]',
+  success: 'bg-[#e8efe5] text-[#2f6b31]',
+  warning: 'bg-[#fff2d6] text-[#8a5a00]',
+  danger: 'bg-[#f8dddd] text-[#8f1d1d]'
 }[props.variant]))
 </script>
 
 <template>
-  <span :class="cn('inline-flex items-center rounded-md px-2 py-1 text-xs font-medium', variantClass, props.class)">
+  <span :class="cn('inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium', variantClass, props.class)">
     <slot />
   </span>
 </template>
-

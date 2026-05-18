@@ -20,22 +20,19 @@ function statusVariant(status: string) {
 </script>
 
 <template>
-  <div class="space-y-4 p-4">
-    <header class="space-y-1 pt-3">
-      <p class="text-sm font-medium text-slate-500">Кроссовки</p>
-      <h1 class="text-2xl font-semibold text-slate-950">Ресурс обуви</h1>
-    </header>
+  <div class="theme-light space-y-4 p-4">
+    <ScreenHeader eyebrow="Кроссовки" title="Ресурс обуви" description="Следи за пробегом пары и вовремя выводи её из активных." />
 
     <Card v-for="shoe in store.shoes" :key="shoe.id" class="p-4">
       <div class="flex items-start gap-3">
-        <div class="rounded-md bg-slate-100 p-2">
-          <Footprints class="h-5 w-5 text-slate-600" />
+        <div class="rounded-2xl bg-[#f0f0ed] p-2">
+          <Footprints class="h-5 w-5 text-[#62625e]" />
         </div>
         <div class="min-w-0 flex-1">
           <div class="flex items-start justify-between gap-3">
             <div class="min-w-0">
-              <h2 class="truncate font-semibold text-slate-950">{{ shoe.name }}</h2>
-              <p class="text-sm text-slate-500">{{ shoe.brand }} {{ shoe.model }}</p>
+              <h2 class="truncate font-medium text-[#111111]">{{ shoe.name }}</h2>
+              <p class="text-sm text-[#767676]">{{ shoe.brand }} {{ shoe.model }}</p>
             </div>
             <Badge :variant="statusVariant(shoe.status)">{{ statusLabel(shoe.status) }}</Badge>
           </div>
@@ -44,10 +41,9 @@ function statusVariant(status: string) {
             <span>{{ shoe.resourceKm }} км</span>
           </div>
           <Progress class="mt-2" :value="getShoeWearPercent(shoe)" />
-          <p class="mt-2 text-sm text-slate-500">Износ {{ getShoeWearPercent(shoe) }}%</p>
+          <p class="mt-2 text-sm text-[#767676]">Износ {{ getShoeWearPercent(shoe) }}%</p>
         </div>
       </div>
     </Card>
   </div>
 </template>
-

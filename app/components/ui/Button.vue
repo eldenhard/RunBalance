@@ -11,10 +11,10 @@ const props = withDefaults(defineProps<{
 })
 
 const variantClass = computed(() => ({
-  default: 'bg-slate-950 text-white shadow-sm active:bg-slate-800',
-  secondary: 'bg-slate-100 text-slate-950 active:bg-slate-200',
-  outline: 'border border-slate-200 bg-white text-slate-950 active:bg-slate-50',
-  ghost: 'text-slate-700 active:bg-slate-100',
+  default: 'bg-[#111111] text-white active:bg-[#2a2a2a] dark:bg-white dark:text-[#0b0b0c]',
+  secondary: 'bg-[#f0f0ed] text-[#111111] active:bg-[#e7e7e2] dark:bg-[#151515] dark:text-white',
+  outline: 'border border-[#deded9] bg-white text-[#111111] active:bg-[#f7f7f5] dark:border-[#303030] dark:bg-transparent dark:text-white',
+  ghost: 'text-[#444] active:bg-[#f0f0ed] dark:text-[#d8d8d8] dark:active:bg-[#151515]',
   destructive: 'bg-red-600 text-white active:bg-red-700'
 }[props.variant]))
 
@@ -28,9 +28,8 @@ const sizeClass = computed(() => ({
 
 <template>
   <button
-    :class="cn('inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors disabled:pointer-events-none disabled:opacity-50', variantClass, sizeClass, props.class)"
+    :class="cn('inline-flex items-center justify-center gap-2 rounded-[14px] font-medium transition-colors disabled:pointer-events-none disabled:opacity-50', variantClass, sizeClass, props.class)"
   >
     <slot />
   </button>
 </template>
-

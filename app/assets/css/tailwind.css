@@ -2,8 +2,18 @@
 
 :root {
   color-scheme: light;
-  --background: 248 250 252;
-  --foreground: 15 23 42;
+  --app-bg: #f7f7f5;
+  --app-surface: #ffffff;
+  --app-surface-muted: #f0f0ed;
+  --app-foreground: #111111;
+  --app-muted: #767676;
+  --app-border: #deded9;
+  --workout-bg: #0b0b0c;
+  --workout-surface: #151515;
+  --workout-border: #252525;
+  --workout-foreground: #ffffff;
+  --workout-muted: #9b9b9b;
+  --sport-accent: #ff5a00;
 }
 
 * {
@@ -12,9 +22,10 @@
 
 body {
   margin: 0;
-  background: rgb(var(--background));
-  color: rgb(var(--foreground));
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--app-bg);
+  color: var(--app-foreground);
+  font-family: "Helvetica Now Display", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 400;
 }
 
 a {
@@ -22,3 +33,12 @@ a {
   text-decoration: none;
 }
 
+.theme-light {
+  background: var(--app-bg);
+  color: var(--app-foreground);
+}
+
+.theme-dark {
+  background: var(--workout-bg);
+  color: var(--workout-foreground);
+}

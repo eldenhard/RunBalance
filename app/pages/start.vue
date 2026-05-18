@@ -5,18 +5,15 @@ const store = useRunBalanceStore()
 </script>
 
 <template>
-  <div class="space-y-4 p-4">
-    <header class="space-y-1 pt-3">
-      <p class="text-sm font-medium text-slate-500">Старт</p>
-      <h1 class="text-2xl font-semibold text-slate-950">Подготовка к пробежке</h1>
-    </header>
+  <div class="theme-dark min-h-dvh space-y-4 p-4 dark">
+    <ScreenHeader eyebrow="Готово к старту" title="Лёгкий бег" description="Минимум отвлечений перед началом тренировки." />
 
     <Card class="p-4">
       <div class="flex items-center gap-3">
         <Play class="h-5 w-5 text-slate-500" />
         <div>
-          <h2 class="font-semibold">{{ store.workoutOfTheDay.title }}</h2>
-          <p class="text-sm text-slate-500">{{ store.workoutOfTheDay.plannedDistanceKm }} км · {{ store.workoutOfTheDay.plannedDurationMin }} мин · {{ store.targetZone?.name }}</p>
+          <h2 class="font-medium">{{ store.adaptedWorkout.title }}</h2>
+          <p class="text-sm text-[#9b9b9b]">{{ store.adaptedWorkout.plannedDistanceKm }} км · {{ store.adaptedWorkout.plannedDurationMin }} мин · {{ store.adaptedWorkout.targetZoneId?.toUpperCase() }}</p>
         </div>
       </div>
     </Card>
@@ -26,7 +23,7 @@ const store = useRunBalanceStore()
         <Map class="h-5 w-5 text-slate-500" />
         <div>
           <h2 class="font-semibold">{{ store.route.name }}</h2>
-          <p class="text-sm text-slate-500">Мок-маршрут для Phase 1, реальная генерация позже.</p>
+          <p class="text-sm text-[#9b9b9b]">Мок-маршрут для Phase 2, реальная генерация позже.</p>
         </div>
       </div>
     </Card>
@@ -36,17 +33,17 @@ const store = useRunBalanceStore()
         <Footprints class="h-5 w-5 text-slate-500" />
         <div>
           <h2 class="font-semibold">{{ store.selectedShoe?.name }}</h2>
-          <p class="text-sm text-slate-500">{{ store.selectedShoe?.brand }} {{ store.selectedShoe?.model }}</p>
+          <p class="text-sm text-[#9b9b9b]">{{ store.selectedShoe?.brand }} {{ store.selectedShoe?.model }}</p>
         </div>
       </div>
     </Card>
 
     <Card class="border-slate-300 p-4">
       <div class="flex gap-3">
-        <Radio class="mt-0.5 h-5 w-5 text-slate-500" />
+        <Radio class="mt-0.5 h-5 w-5 text-[#9b9b9b]" />
         <div>
-          <h2 class="font-semibold">Пульсометр позже</h2>
-          <p class="mt-1 text-sm leading-5 text-slate-600">{{ store.heartRateSource.message }}</p>
+          <h2 class="font-medium">Пульсометр позже</h2>
+          <p class="mt-1 text-sm leading-5 text-[#b8b8b8]">{{ store.heartRateSource.message }}</p>
         </div>
       </div>
     </Card>
@@ -59,4 +56,3 @@ const store = useRunBalanceStore()
     </div>
   </div>
 </template>
-
