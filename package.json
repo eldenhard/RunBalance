@@ -1,0 +1,39 @@
+{
+  "name": "runbalance",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "test": "vitest run",
+    "typecheck": "nuxt typecheck"
+  },
+  "dependencies": {
+    "@lucide/vue": "^1.16.0",
+    "@pinia/nuxt": "latest",
+    "@vite-pwa/nuxt": "latest",
+    "@vueuse/nuxt": "latest",
+    "class-variance-authority": "latest",
+    "clsx": "latest",
+    "maplibre-gl": "latest",
+    "nuxt": "latest",
+    "pinia": "latest",
+    "reka-ui": "latest",
+    "tailwind-merge": "latest",
+    "vue": "latest",
+    "vue-router": "latest",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "latest",
+    "@vue/test-utils": "latest",
+    "jsdom": "latest",
+    "tailwindcss": "latest",
+    "typescript": "latest",
+    "vitest": "latest",
+    "vue-tsc": "latest"
+  }
+}
