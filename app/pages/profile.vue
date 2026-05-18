@@ -34,6 +34,14 @@ const store = useRunBalanceStore()
           <span class="font-medium">Кроссовки</span>
           <span class="text-[#767676]">{{ store.shoes.length }}</span>
         </NuxtLink>
+        <NuxtLink to="/routes" class="flex justify-between rounded-2xl border border-[#deded9] bg-[#f7f7f5] p-3 text-sm">
+          <span class="font-medium">Маршруты</span>
+          <span class="text-[#767676]">{{ store.routes.length }}</span>
+        </NuxtLink>
+        <NuxtLink to="/analytics" class="flex justify-between rounded-2xl border border-[#deded9] bg-[#f7f7f5] p-3 text-sm">
+          <span class="font-medium">Аналитика</span>
+          <span class="text-[#767676]">{{ store.analyticsReport.summary.totalRuns }}</span>
+        </NuxtLink>
       </div>
     </Card>
   </div>

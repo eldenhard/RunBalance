@@ -11,4 +11,5 @@ export type Route = {
   isPrivate: boolean
   surface: string
   elevationHint: string
+  notes?: string
 }

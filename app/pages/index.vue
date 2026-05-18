@@ -53,15 +53,18 @@ const store = useRunBalanceStore()
       <p class="mt-3 text-sm leading-5 text-[#62625e]">{{ store.adaptedWorkout.adaptationReason }}</p>
     </Card>
 
-    <Card class="p-4">
-      <div class="flex items-center gap-3">
-        <MapPinned class="h-5 w-5 text-slate-500" />
-        <div class="min-w-0 flex-1">
-          <h2 class="font-medium text-[#111111]">{{ store.route.name }}</h2>
-          <p class="text-sm text-[#767676]">{{ store.route.distanceKm }} км · {{ store.route.surface }} · {{ store.route.elevationHint }}</p>
+    <NuxtLink to="/routes" class="block">
+      <Card class="overflow-hidden p-0">
+        <RouteMap :route="store.activeRoute" class="h-40 w-full" />
+        <div class="flex items-center gap-3 p-4">
+          <MapPinned class="h-5 w-5 text-slate-500" />
+          <div class="min-w-0 flex-1">
+            <h2 class="font-medium text-[#111111]">{{ store.activeRoute.name }}</h2>
+            <p class="text-sm text-[#767676]">{{ store.activeRoute.distanceKm }} км · {{ store.activeRoute.surface }} · {{ store.activeRoute.elevationHint }}</p>
+          </div>
         </div>
-      </div>
-    </Card>
+      </Card>
+    </NuxtLink>
 
     <Card class="border-[#deded9] bg-white p-4">
       <div class="flex gap-3">

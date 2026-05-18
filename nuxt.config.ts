@@ -28,7 +28,7 @@ export default defineNuxtConfig({
       pathPrefix: false
     }
   ],
-  css: ['~/assets/css/tailwind.css'],
+  css: ['~/assets/css/tailwind.css', 'maplibre-gl/dist/maplibre-gl.css'],
   pwa: {
     registerType: 'autoUpdate',
     manifest: {

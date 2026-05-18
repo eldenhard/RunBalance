@@ -52,6 +52,22 @@ export const seedShoes: Shoe[] = [
   }
 ]
 
+function makeEmptyRouteGeojson(name: string): Route['geojson'] {
+  return {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        properties: { name },
+        geometry: {
+          type: 'LineString',
+          coordinates: []
+        }
+      }
+    ]
+  }
+}
+
 export const seedRoute: Route = {
   id: 'route-1',
   name: 'Парк и набережная',
@@ -60,6 +76,7 @@ export const seedRoute: Route = {
   surface: 'асфальт + парк',
   elevationHint: 'минимум подъёмов',
   isPrivate: true,
+  notes: 'Любимое петлевое кольцо рядом с домом.',
   geojson: {
     type: 'FeatureCollection',
     features: [
@@ -80,6 +97,32 @@ export const seedRoute: Route = {
     ]
   }
 }
+
+export const seedRoutes: Route[] = [
+  seedRoute,
+  {
+    id: 'route-2',
+    name: 'Короткий кружок',
+    distanceKm: 3.4,
+    type: 'loop',
+    surface: 'парк',
+    elevationHint: 'плоский',
+    isPrivate: true,
+    notes: 'Подходит для восстановительных пробежек.',
+    geojson: makeEmptyRouteGeojson('Короткий кружок')
+  },
+  {
+    id: 'route-3',
+    name: 'Длинная набережная',
+    distanceKm: 12.5,
+    type: 'out_and_back',
+    surface: 'асфальт',
+    elevationHint: 'минимум подъёмов',
+    isPrivate: true,
+    notes: 'Туда-обратно вдоль воды для длинных тренировок.',
+    geojson: makeEmptyRouteGeojson('Длинная набережная')
+  }
+]
 
 export const seedPlannedWorkouts: Workout[] = [
   {

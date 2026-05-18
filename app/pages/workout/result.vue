@@ -1,8 +1,16 @@
 <script setup lang="ts">
 import { Footprints, History, Home, MapPinned, Play } from '@lucide/vue'
+import { createRouteFromTrack } from '~/services/routes'
 
 const store = useRunBalanceStore()
 const workout = computed(() => store.currentWorkout)
+const resultRoute = computed(() => {
+  const trackPoints = store.activeSession?.trackPoints ?? []
+  if (trackPoints.length >= 2) {
+    return createRouteFromTrack(trackPoints, store.activeRoute)
+  }
+  return store.activeRoute
+})
 </script>
 
 <template>
@@ -30,15 +38,17 @@ const workout = computed(() => store.currentWorkout)
       </div>
     </Card>
 
-    <Card class="p-4">
-      <div class="flex items-center gap-3">
+    <Card class="overflow-hidden p-0">
+      <RouteMap :route="resultRoute" class="h-44 w-full" />
+      <div class="flex items-center gap-3 p-4">
         <MapPinned class="h-5 w-5 text-slate-500" />
         <div>
-          <h2 class="font-medium">{{ store.route.name }}</h2>
-          <p class="text-sm text-[#767676]">Карта маршрута будет подключена через MapLibre.</p>
+          <h2 class="font-medium">{{ store.activeRoute.name }}</h2>
+          <p class="text-sm text-[#767676]">
+            {{ store.activeSession?.trackPoints.length ? 'Трек собран из реальных GPS-точек сессии.' : 'GPS-точки не сохранились — показываем плановый маршрут.' }}
+          </p>
         </div>
       </div>
-      <div class="mt-4 h-32 rounded-2xl bg-[#f0f0ed]" />
     </Card>
 
     <Card class="p-4">

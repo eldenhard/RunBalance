@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CalendarDays, CirclePlus, Clock3, Flame, Trash2 } from '@lucide/vue'
+import { CalendarDays, CirclePlus, Clock3, Flame, Map, Trash2 } from '@lucide/vue'
 import type { WorkoutType } from '~/types/workout'
 
 const store = useRunBalanceStore()
@@ -21,7 +21,8 @@ const form = reactive({
   plannedDistanceKm: '6',
   plannedDurationMin: '42',
   targetZoneId: 'z2',
-  shoeId: store.shoes[0]?.id ?? ''
+  shoeId: store.shoes[0]?.id ?? '',
+  routeId: store.routes[0]?.id ?? ''
 })
 
 function createWorkout() {
@@ -33,7 +34,8 @@ function createWorkout() {
     plannedDistanceKm: toOptionalNumber(form.plannedDistanceKm),
     plannedDurationMin: toOptionalNumber(form.plannedDurationMin),
     targetZoneId: form.targetZoneId || undefined,
-    shoeId: form.shoeId || undefined
+    shoeId: form.shoeId || undefined,
+    routeId: form.routeId || undefined
   })
 }
 
@@ -108,6 +110,16 @@ function toOptionalNumber(value: string) {
           </label>
         </div>
 
+        <label class="grid gap-1.5">
+          <span class="text-sm font-medium">Маршрут</span>
+          <select v-model="form.routeId" class="h-12 rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none">
+            <option value="">Без привязки</option>
+            <option v-for="savedRoute in store.routes" :key="savedRoute.id" :value="savedRoute.id">
+              {{ savedRoute.name }} · {{ savedRoute.distanceKm }} км
+            </option>
+          </select>
+        </label>
+
         <Button class="mt-2 w-full" size="lg" @click="createWorkout">
           <CirclePlus class="h-5 w-5" />
           Создать тренировку
@@ -152,6 +164,13 @@ function toOptionalNumber(value: string) {
               <p class="text-xs text-[#767676]">Кроссовки</p>
               <p class="mt-1 font-medium">{{ store.shoes.find((shoe) => shoe.id === workout.shoeId)?.name ?? '—' }}</p>
             </div>
+            <div class="col-span-2 rounded-2xl border border-[#e5e5df] bg-white p-3">
+              <div class="flex items-center gap-2 text-xs text-[#767676]">
+                <Map class="h-3.5 w-3.5" />
+                <span>Маршрут</span>
+              </div>
+              <p class="mt-1 font-medium">{{ store.routes.find((item) => item.id === workout.routeId)?.name ?? '—' }}</p>
+            </div>
           </div>
 
           <div class="mt-4 grid grid-cols-2 gap-3">
@@ -173,11 +192,22 @@ function toOptionalNumber(value: string) {
     </Card>
 
     <Card class="p-4">
+      <NuxtLink to="/routes" class="flex items-start gap-3">
+        <Map class="mt-0.5 h-5 w-5 text-[#111111]" />
+        <div class="flex-1">
+          <h2 class="font-medium">Маршруты</h2>
+          <p class="text-sm text-[#767676]">Сохрани любимые петли и подбирай их к тренировке прямо в плане.</p>
+        </div>
+        <span class="text-sm text-[#767676]">{{ store.routes.length }}</span>
+      </NuxtLink>
+    </Card>
+
+    <Card class="p-4">
       <div class="flex items-center gap-3">
         <Clock3 class="h-5 w-5 text-[#111111]" />
         <div>
           <h2 class="font-medium">Что будет дальше</h2>
-          <p class="text-sm text-[#767676]">Следующий шаг Phase 4: маршруты и связка выбранной тренировки с сохранённым маршрутом.</p>
+          <p class="text-sm text-[#767676]">Дальше — связка маршрута с MapLibre-картой и онбординг новых тренировочных целей.</p>
         </div>
       </div>
     </Card>

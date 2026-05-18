@@ -43,13 +43,17 @@ async function startFreeWorkout() {
       </div>
     </Card>
 
-    <Card class="p-4">
-      <div class="flex items-center gap-3">
-        <Map class="h-5 w-5 text-[var(--screen-muted)]" />
-        <div>
-          <h2 class="font-medium">{{ store.route.name }}</h2>
-          <p class="text-sm text-[var(--screen-muted)]">{{ store.route.distanceKm }} км · {{ store.route.elevationHint }}</p>
+    <Card class="overflow-hidden p-0">
+      <RouteMap :route="store.activeRoute" theme="dark" class="h-40 w-full" />
+      <div class="flex items-start gap-3 p-4">
+        <Map class="mt-0.5 h-5 w-5 text-[var(--screen-muted)]" />
+        <div class="flex-1">
+          <h2 class="font-medium">{{ store.activeRoute.name }}</h2>
+          <p class="text-sm text-[var(--screen-muted)]">{{ store.activeRoute.distanceKm }} км · {{ store.activeRoute.elevationHint }}</p>
         </div>
+        <NuxtLink to="/routes" class="text-xs font-medium text-[var(--screen-muted)] underline-offset-2 hover:underline">
+          Сменить
+        </NuxtLink>
       </div>
     </Card>
 

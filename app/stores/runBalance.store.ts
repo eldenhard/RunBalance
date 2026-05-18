@@ -1,8 +1,10 @@
 import { defineStore } from 'pinia'
-import { seedHistory, seedPlannedWorkouts, seedProfile, seedRecovery, seedRoute, seedShoes } from '~/data/seedRunBalance'
+import { seedHistory, seedPlannedWorkouts, seedProfile, seedRecovery, seedRoute, seedRoutes, seedShoes } from '~/data/seedRunBalance'
+import { buildAnalyticsReport } from '~/services/analytics'
 import { iosSafariPwaHeartRateUnavailable } from '~/services/heart-rate/heartRateSource'
 import { getHeartRateZoneAppearance } from '~/services/heartRateZones'
 import { getRecoveryRecommendation } from '~/services/recovery'
+import { createRoute, pickSuggestedRoute, type RouteDraft } from '~/services/routes'
 import { addWorkoutDistanceToShoe } from '~/services/shoes'
 import { adaptWorkoutForReadiness } from '~/services/trainingPlan'
 import { createWorkoutSession, finishWorkoutSession, restoreWorkoutSession, serializeWorkoutSession, updateWorkoutSessionMetrics } from '~/services/workoutSession'
@@ -21,9 +23,11 @@ type RunBalanceSnapshot = {
   profile: UserProfile
   recovery: RecoveryCheckIn
   route: Route
+  routes: Route[]
   shoes: Shoe[]
   plannedWorkouts: Workout[]
   selectedWorkoutId: string | null
+  selectedRouteId: string | null
   history: Workout[]
 }
 
@@ -31,9 +35,11 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
   const profile = ref(structuredClone(seedProfile))
   const recovery = ref(structuredClone(seedRecovery))
   const route = ref(structuredClone(seedRoute))
+  const routes = ref<Route[]>(structuredClone(seedRoutes))
   const shoes = ref(structuredClone(seedShoes))
   const plannedWorkouts = ref<Workout[]>(structuredClone(seedPlannedWorkouts))
   const selectedWorkoutId = ref<string | null>(plannedWorkouts.value[0]?.id ?? null)
+  const selectedRouteId = ref<string | null>(plannedWorkouts.value[0]?.routeId ?? routes.value[0]?.id ?? null)
   const history = ref<Workout[]>(structuredClone(seedHistory))
   const heartRateSource = ref(iosSafariPwaHeartRateUnavailable)
   const activeSession = ref<WorkoutSession | null>(null)
@@ -55,6 +61,15 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
   })
   const targetZoneAppearance = computed(() => getHeartRateZoneAppearance(targetZone.value?.id))
   const recoveryRecommendation = computed(() => getRecoveryRecommendation(recovery.value.readinessScore))
+  const suggestedRoute = computed(() => {
+    return pickSuggestedRoute(routes.value, adaptedWorkout.value.plannedDistanceKm)
+  })
+  const activeRoute = computed<Route>(() => {
+    const explicitId = workoutOfTheDay.value.routeId ?? selectedRouteId.value
+    const explicitRoute = explicitId ? routes.value.find((item) => item.id === explicitId) : undefined
+    return explicitRoute ?? suggestedRoute.value ?? routes.value[0] ?? route.value
+  })
+  const analyticsReport = computed(() => buildAnalyticsReport(history.value))
   const sessionProgress = computed(() => {
     if (!activeSession.value) return 0
     const distanceProgress = adaptedWorkout.value.plannedDistanceKm
@@ -189,14 +204,16 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
     const snapshot = window.localStorage.getItem(APP_STATE_STORAGE_KEY)
     if (snapshot) {
       try {
-        const parsed = JSON.parse(snapshot) as RunBalanceSnapshot
-        profile.value = parsed.profile
-        recovery.value = parsed.recovery
-        route.value = parsed.route
-        shoes.value = parsed.shoes
-        plannedWorkouts.value = parsed.plannedWorkouts
-        selectedWorkoutId.value = parsed.selectedWorkoutId
-        history.value = parsed.history
+        const parsed = JSON.parse(snapshot) as Partial<RunBalanceSnapshot>
+        if (parsed.profile) profile.value = parsed.profile
+        if (parsed.recovery) recovery.value = parsed.recovery
+        if (parsed.route) route.value = parsed.route
+        if (Array.isArray(parsed.routes) && parsed.routes.length) routes.value = parsed.routes
+        if (parsed.shoes) shoes.value = parsed.shoes
+        if (parsed.plannedWorkouts) plannedWorkouts.value = parsed.plannedWorkouts
+        if (parsed.selectedWorkoutId !== undefined) selectedWorkoutId.value = parsed.selectedWorkoutId
+        if (parsed.selectedRouteId !== undefined) selectedRouteId.value = parsed.selectedRouteId
+        if (parsed.history) history.value = parsed.history
       } catch {
         window.localStorage.removeItem(APP_STATE_STORAGE_KEY)
       }
@@ -214,13 +231,14 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
       plannedDistanceKm: input.plannedDistanceKm,
       plannedDurationMin: input.plannedDurationMin,
       targetZoneId: input.targetZoneId,
-      routeId: route.value.id,
+      routeId: input.routeId ?? selectedRouteId.value ?? routes.value[0]?.id ?? route.value.id,
       shoeId: input.shoeId,
       heartRateSource: 'unavailable'
     }
 
     plannedWorkouts.value = [nextWorkout, ...plannedWorkouts.value]
     selectedWorkoutId.value = nextWorkout.id
+    if (nextWorkout.routeId) selectedRouteId.value = nextWorkout.routeId
     persistState()
   }
 
@@ -245,15 +263,59 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
     persistState()
   }
 
+  function createSavedRoute(draft: RouteDraft) {
+    const nextRoute = createRoute(draft)
+    routes.value = [nextRoute, ...routes.value]
+    selectedRouteId.value = nextRoute.id
+    persistState()
+    return nextRoute
+  }
+
+  function deleteSavedRoute(routeId: string) {
+    routes.value = routes.value.filter((item) => item.id !== routeId)
+    if (selectedRouteId.value === routeId) {
+      selectedRouteId.value = routes.value[0]?.id ?? null
+    }
+    plannedWorkouts.value = plannedWorkouts.value.map((workout) => {
+      if (workout.routeId !== routeId) return workout
+      return { ...workout, routeId: routes.value[0]?.id }
+    })
+    persistState()
+  }
+
+  function selectRouteForToday(routeId: string) {
+    selectedRouteId.value = routeId
+    if (workoutOfTheDay.value && plannedWorkouts.value.some((workout) => workout.id === workoutOfTheDay.value.id)) {
+      plannedWorkouts.value = plannedWorkouts.value.map((workout) => {
+        if (workout.id !== workoutOfTheDay.value.id) return workout
+        return { ...workout, routeId }
+      })
+    }
+    persistState()
+  }
+
+  function assignRouteToPlannedWorkout(workoutId: string, routeId: string | undefined) {
+    plannedWorkouts.value = plannedWorkouts.value.map((workout) => {
+      if (workout.id !== workoutId) return workout
+      return { ...workout, routeId }
+    })
+    if (routeId && workoutId === selectedWorkoutId.value) {
+      selectedRouteId.value = routeId
+    }
+    persistState()
+  }
+
   function persistState() {
     if (!import.meta.client) return
     const snapshot: RunBalanceSnapshot = {
       profile: profile.value,
       recovery: recovery.value,
       route: route.value,
+      routes: routes.value,
       shoes: shoes.value,
       plannedWorkouts: plannedWorkouts.value,
       selectedWorkoutId: selectedWorkoutId.value,
+      selectedRouteId: selectedRouteId.value,
       history: history.value
     }
     window.localStorage.setItem(APP_STATE_STORAGE_KEY, JSON.stringify(snapshot))
@@ -286,6 +348,10 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
     profile,
     recovery,
     route,
+    routes,
+    selectedRouteId,
+    activeRoute,
+    suggestedRoute,
     shoes,
     plannedWorkouts,
     selectedWorkoutId,
@@ -300,6 +366,7 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
     recoveryRecommendation,
     adaptedWorkout,
     sessionProgress,
+    analyticsReport,
     startWorkoutSession,
     startFreeWorkoutSession,
     pauseWorkoutSession,
@@ -313,7 +380,11 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
     createPlannedWorkout,
     selectPlannedWorkout,
     deletePlannedWorkout,
-    updateHeartRateZone
+    updateHeartRateZone,
+    createSavedRoute,
+    deleteSavedRoute,
+    selectRouteForToday,
+    assignRouteToPlannedWorkout
   }
 })
 
@@ -325,6 +396,7 @@ type CreateWorkoutInput = {
   plannedDurationMin?: number
   targetZoneId?: string
   shoeId?: string
+  routeId?: string
 }
 
 function createFreeWorkout(shoeId?: string): Workout {
