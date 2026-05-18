@@ -3,6 +3,7 @@ import type { RecoveryCheckIn } from '~/types/recovery'
 import type { Route } from '~/types/route'
 import type { Shoe } from '~/types/shoe'
 import type { Workout } from '~/types/workout'
+import type { TrackPoint } from '~/types/workout-session'
 import { createDefaultHeartRateZones } from '~/services/heartRateZones'
 
 export const mockProfile: UserProfile = {
@@ -110,6 +111,13 @@ export const activeWorkout: Workout = {
   heartRateSource: 'unavailable'
 }
 
+export const mockActiveTrackPoints: TrackPoint[] = [
+  { latitude: 55.7558, longitude: 37.6173, recordedAt: '2026-05-18T07:20:00.000Z' },
+  { latitude: 55.758, longitude: 37.622, recordedAt: '2026-05-18T07:28:30.000Z' },
+  { latitude: 55.756, longitude: 37.629, recordedAt: '2026-05-18T07:37:00.000Z' },
+  { latitude: 55.752, longitude: 37.624, recordedAt: '2026-05-18T07:45:30.000Z' }
+]
+
 export const workoutHistory: Workout[] = [
   {
     id: 'history-1',
@@ -142,4 +150,3 @@ export const workoutHistory: Workout[] = [
     shoeId: 'shoe-1'
   }
 ]
-

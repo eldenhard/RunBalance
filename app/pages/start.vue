@@ -2,6 +2,12 @@
 import { Footprints, Map, Play, Radio } from '@lucide/vue'
 
 const store = useRunBalanceStore()
+const router = useRouter()
+
+async function startWorkout() {
+  store.startWorkoutSession()
+  await router.push('/workout/active')
+}
 </script>
 
 <template>
@@ -66,14 +72,10 @@ const store = useRunBalanceStore()
       <NuxtLink to="/plan" class="block">
         <Button class="w-full" size="lg" variant="outline">План</Button>
       </NuxtLink>
-      <NuxtLink to="/workout/active" class="mx-auto">
-        <button class="flex h-[84px] w-[84px] items-center justify-center rounded-full bg-white text-[#0b0b0c] active:bg-[#e8e8e8]" aria-label="Старт тренировки">
-          <Play class="h-8 w-8 fill-current" />
-        </button>
-      </NuxtLink>
-      <NuxtLink to="/workout/active" class="block">
-        <Button class="w-full" size="lg" variant="outline">Свободный</Button>
-      </NuxtLink>
+      <button class="mx-auto flex h-[84px] w-[84px] items-center justify-center rounded-full bg-white text-[#0b0b0c] active:bg-[#e8e8e8]" aria-label="Старт тренировки" @click="startWorkout">
+        <Play class="h-8 w-8 fill-current" />
+      </button>
+      <Button class="w-full" size="lg" variant="outline" @click="startWorkout">Свободный</Button>
     </div>
   </div>
 </template>
