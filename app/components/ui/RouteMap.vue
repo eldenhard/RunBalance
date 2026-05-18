@@ -19,6 +19,7 @@ const props = withDefaults(defineProps<{
 const container = ref<HTMLDivElement | null>(null)
 const map = shallowRef<Map | null>(null)
 const isMounted = ref(false)
+const isMapReady = ref(false)
 const errorMessage = ref<string | null>(null)
 const routeCoordinates = computed(() => props.route ? getRouteLineCoordinates(props.route) : [])
 const hasTrack = computed(() => routeCoordinates.value.length >= 2)
@@ -32,7 +33,7 @@ const palette = computed(() => {
   if (props.theme === 'dark') {
     return {
       land: '#101011',
-      track: '#ffb071',
+      track: '#b9ff38',
       trackCasing: '#000000',
       marker: '#ffffff'
     }
@@ -44,6 +45,8 @@ const palette = computed(() => {
     marker: '#111111'
   }
 })
+
+const fallbackRoadClass = computed(() => props.theme === 'dark' ? 'route-map-fallback--dark' : 'route-map-fallback--light')
 
 const placeholderClass = computed(() => props.theme === 'dark'
   ? 'bg-[#101011] text-[#9b9b9b]'
@@ -125,6 +128,9 @@ async function ensureMap() {
     instance.on('load', () => {
       map.value = instance
       applyRoute()
+    })
+    instance.on('idle', () => {
+      isMapReady.value = true
     })
   } catch (error) {
     errorMessage.value = error instanceof Error ? error.message : 'Не удалось загрузить карту'
@@ -233,9 +239,9 @@ function applyRoute() {
         type: 'circle',
         source: currentSourceId,
         paint: {
-          'circle-radius': 12,
+          'circle-radius': 14,
           'circle-color': palette.value.track,
-          'circle-opacity': 0.18
+          'circle-opacity': 0.22
         }
       })
       instance.addLayer({
@@ -284,7 +290,24 @@ onBeforeUnmount(() => {
 
 <template>
   <div :class="cn('relative overflow-hidden rounded-2xl', $props.class)">
-    <div v-if="isMounted" ref="container" class="absolute inset-0" />
+    <div :class="cn('route-map-fallback absolute inset-0', fallbackRoadClass)">
+      <div class="route-map-fallback__park route-map-fallback__park--one" />
+      <div class="route-map-fallback__park route-map-fallback__park--two" />
+      <div class="route-map-fallback__water" />
+      <div class="route-map-fallback__road route-map-fallback__road--one" />
+      <div class="route-map-fallback__road route-map-fallback__road--two" />
+      <div class="route-map-fallback__road route-map-fallback__road--three" />
+      <div class="route-map-fallback__road route-map-fallback__road--four" />
+      <div v-if="hasCurrentPoint" class="route-map-fallback__dot" />
+    </div>
+    <div
+      v-if="isMounted"
+      ref="container"
+      :class="[
+        'absolute inset-0 transition-opacity duration-500',
+        isMapReady ? 'opacity-75' : 'opacity-0'
+      ]"
+    />
     <div
       v-else
       :class="cn('flex h-full w-full items-center justify-center text-xs', placeholderClass)"
@@ -301,9 +324,113 @@ onBeforeUnmount(() => {
 
     <div
       v-else-if="!hasTrack"
-      :class="cn('pointer-events-none absolute inset-x-4 bottom-3 rounded-full px-3 py-1 text-center text-[11px] leading-snug', placeholderClass)"
+      :class="cn('pointer-events-none absolute inset-x-4 bottom-3 rounded-full px-3 py-1 text-center text-[11px] leading-snug backdrop-blur', placeholderClass)"
     >
       {{ hasCurrentPoint ? 'Трек появится после движения.' : 'Ждём первую GPS-точку.' }}
     </div>
   </div>
 </template>
+
+<style scoped>
+.route-map-fallback {
+  background:
+    linear-gradient(115deg, transparent 0 42%, rgba(255, 255, 255, 0.1) 42% 43%, transparent 43% 100%),
+    linear-gradient(25deg, transparent 0 50%, rgba(255, 255, 255, 0.08) 50% 51%, transparent 51% 100%),
+    repeating-linear-gradient(0deg, transparent 0 42px, rgba(255, 255, 255, 0.045) 42px 43px),
+    repeating-linear-gradient(90deg, transparent 0 54px, rgba(255, 255, 255, 0.04) 54px 55px);
+}
+
+.route-map-fallback--light {
+  background-color: #eef1ec;
+}
+
+.route-map-fallback--dark {
+  background-color: #141617;
+}
+
+.route-map-fallback__park,
+.route-map-fallback__water,
+.route-map-fallback__road,
+.route-map-fallback__dot {
+  position: absolute;
+  pointer-events: none;
+}
+
+.route-map-fallback__park {
+  border-radius: 999px;
+  background: rgba(89, 214, 115, 0.22);
+}
+
+.route-map-fallback__park--one {
+  width: 42%;
+  height: 28%;
+  right: -8%;
+  top: 10%;
+  transform: rotate(-18deg);
+}
+
+.route-map-fallback__park--two {
+  width: 34%;
+  height: 24%;
+  left: -10%;
+  bottom: 8%;
+  transform: rotate(20deg);
+}
+
+.route-map-fallback__water {
+  width: 62%;
+  height: 18%;
+  left: 20%;
+  bottom: 24%;
+  border-radius: 999px;
+  background: rgba(67, 169, 255, 0.18);
+  transform: rotate(-10deg);
+}
+
+.route-map-fallback__road {
+  height: 9px;
+  border-radius: 999px;
+  background: rgba(255, 122, 43, 0.75);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.12);
+}
+
+.route-map-fallback__road--one {
+  width: 120%;
+  left: -10%;
+  top: 32%;
+  transform: rotate(14deg);
+}
+
+.route-map-fallback__road--two {
+  width: 90%;
+  left: 12%;
+  top: 58%;
+  transform: rotate(-24deg);
+}
+
+.route-map-fallback__road--three {
+  width: 76%;
+  left: -8%;
+  top: 70%;
+  transform: rotate(8deg);
+}
+
+.route-map-fallback__road--four {
+  width: 74%;
+  right: -18%;
+  top: 42%;
+  transform: rotate(72deg);
+}
+
+.route-map-fallback__dot {
+  left: 50%;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #b9ff38;
+  border: 4px solid #ffffff;
+  box-shadow: 0 0 0 10px rgba(185, 255, 56, 0.18);
+  transform: translate(-50%, -50%);
+}
+</style>

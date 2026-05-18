@@ -16,7 +16,7 @@ withDefaults(defineProps<{
   <div
     :class="cn([
       'rounded-2xl border p-3',
-      dark ? 'border-[#252525] bg-[#151515]' : 'border-[#deded9] bg-white'
+      dark ? 'border-[#2b2b2b] bg-[#151515]' : 'border-[#deded9] bg-white'
     ], $props.class)"
   >
     <p :class="['text-[11px]', dark ? 'text-[#8f8f8f]' : 'text-[#767676]']">{{ label }}</p>

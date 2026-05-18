@@ -90,10 +90,10 @@ function stopRuntimeTimer() {
 }
 
 const gpsStatusClass = computed(() => gps.status.value === 'tracking'
-  ? 'border-white/20 bg-white text-[#0b0b0c]'
+  ? 'border-[#b9ff38]/40 bg-[#b9ff38] text-[#0b0b0c] shadow-[0_0_24px_rgba(185,255,56,0.22)]'
   : 'border-white/10 bg-white/5 text-[#8f8f8f]')
 const voiceStatusClass = computed(() => voice.isEnabled.value && voice.isSupported.value
-  ? 'border-white/20 bg-white text-[#0b0b0c]'
+  ? 'border-[#7cc7ff]/40 bg-[#7cc7ff] text-[#0b0b0c] shadow-[0_0_24px_rgba(124,199,255,0.2)]'
   : 'border-white/10 bg-white/5 text-[#8f8f8f]')
 </script>
 
@@ -142,16 +142,16 @@ const voiceStatusClass = computed(() => voice.isEnabled.value && voice.isSupport
       </div>
     </div>
 
-    <Card class="overflow-hidden p-0">
+    <Card class="overflow-hidden border-[#26301b] bg-[#111411] p-0 shadow-[0_24px_60px_rgba(185,255,56,0.08)]">
       <ClientOnly>
-        <RouteMap :route="liveRoute" :current-point="currentPoint" theme="dark" class="h-56 w-full" />
+        <RouteMap :route="liveRoute" :current-point="currentPoint" theme="dark" class="h-64 w-full" />
       </ClientOnly>
     </Card>
 
     <section class="grid grid-cols-2 gap-4">
-      <MetricTile label="Дистанция" :value="formatDistance(session?.distanceKm)" dark />
-      <MetricTile label="Время" :value="formatDuration(session?.durationSec)" dark />
-      <MetricTile label="Темп" :value="formatPace(session?.avgPaceSecPerKm)" dark />
+      <MetricTile label="Дистанция" :value="formatDistance(session?.distanceKm)" dark class="border-[#b9ff38]/20 bg-[#182010]" />
+      <MetricTile label="Время" :value="formatDuration(session?.durationSec)" dark class="border-[#7cc7ff]/20 bg-[#101820]" />
+      <MetricTile label="Темп" :value="formatPace(session?.avgPaceSecPerKm)" dark class="border-[#ff7a2b]/20 bg-[#21160f]" />
       <MetricTile
         label="Зона"
         :value="targetZone?.name ?? '—'"
@@ -177,7 +177,7 @@ const voiceStatusClass = computed(() => voice.isEnabled.value && voice.isSupport
         <span>{{ progress }}%</span>
       </div>
       <div class="h-1.5 rounded-full bg-[#252525]">
-        <div class="h-full rounded-full bg-white" :style="{ width: `${progress}%` }" />
+        <div class="h-full rounded-full bg-gradient-to-r from-[#b9ff38] via-[#7cc7ff] to-[#ff7a2b]" :style="{ width: `${progress}%` }" />
       </div>
     </section>
 
