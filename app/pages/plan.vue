@@ -74,36 +74,36 @@ function toOptionalNumber(value: string) {
           <input v-model="form.title" class="h-12 rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none" placeholder="Например, темповый 8 км" />
         </label>
 
-        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <label class="grid gap-1.5">
+        <div class="grid grid-cols-1 gap-3">
+          <label class="grid min-w-0 gap-1.5">
             <span class="text-sm font-medium">Тип</span>
-            <select v-model="form.type" class="h-12 rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none">
+            <select v-model="form.type" class="h-12 w-full rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none">
               <option v-for="type in workoutTypes" :key="type.value" :value="type.value">{{ type.label }}</option>
             </select>
           </label>
 
-          <label class="grid gap-1.5">
+          <label class="grid min-w-0 gap-1.5">
             <span class="text-sm font-medium">Дата</span>
-            <input v-model="form.scheduledDate" type="date" class="h-12 rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none" />
+            <input v-model="form.scheduledDate" type="date" class="h-12 w-full rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none" />
           </label>
         </div>
 
-        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <label class="grid gap-1.5">
+        <div class="grid grid-cols-1 gap-3">
+          <label class="grid min-w-0 gap-1.5">
             <span class="text-sm font-medium">Дистанция, км</span>
-            <input v-model="form.plannedDistanceKm" inputmode="decimal" class="h-12 rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none" />
+            <input v-model="form.plannedDistanceKm" inputmode="decimal" class="h-12 w-full rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none" />
           </label>
 
-          <label class="grid gap-1.5">
+          <label class="grid min-w-0 gap-1.5">
             <span class="text-sm font-medium">Время, мин</span>
-            <input v-model="form.plannedDurationMin" inputmode="numeric" class="h-12 rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none" />
+            <input v-model="form.plannedDurationMin" inputmode="numeric" class="h-12 w-full rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none" />
           </label>
         </div>
 
-        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <label class="grid gap-1.5">
+        <div class="grid grid-cols-1 gap-3">
+          <label class="grid min-w-0 gap-1.5">
             <span class="text-sm font-medium">Зона</span>
-            <select v-model="form.targetZoneId" class="h-12 rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none">
+            <select v-model="form.targetZoneId" class="h-12 w-full rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none">
               <option value="">Без зоны</option>
               <option v-for="zone in store.profile.zones" :key="zone.id" :value="zone.id">
                 {{ zone.name }} · {{ zone.minBpm }}-{{ zone.maxBpm }}
@@ -111,9 +111,9 @@ function toOptionalNumber(value: string) {
             </select>
           </label>
 
-          <label class="grid gap-1.5">
+          <label class="grid min-w-0 gap-1.5">
             <span class="text-sm font-medium">Кроссовки</span>
-            <select v-model="form.shoeId" class="h-12 rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none">
+            <select v-model="form.shoeId" class="h-12 w-full rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none">
               <option value="">Без кроссовок</option>
               <option v-for="shoe in store.shoes" :key="shoe.id" :value="shoe.id">
                 {{ shoe.name }}
@@ -122,9 +122,9 @@ function toOptionalNumber(value: string) {
           </label>
         </div>
 
-        <label class="grid gap-1.5">
+        <label class="grid min-w-0 gap-1.5">
           <span class="text-sm font-medium">Маршрут</span>
-          <select v-model="form.routeId" class="h-12 rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none">
+          <select v-model="form.routeId" class="h-12 w-full rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none">
             <option value="">Без привязки</option>
             <option v-for="savedRoute in store.routes" :key="savedRoute.id" :value="savedRoute.id">
               {{ savedRoute.name }} · {{ savedRoute.distanceKm }} км
@@ -176,7 +176,7 @@ function toOptionalNumber(value: string) {
               <p class="text-xs text-[#767676]">Кроссовки</p>
               <p class="mt-1 font-medium">{{ store.shoes.find((shoe) => shoe.id === workout.shoeId)?.name ?? '—' }}</p>
             </div>
-            <div class="col-span-2 rounded-2xl border border-[#e5e5df] bg-white p-3">
+            <div class="rounded-2xl border border-[#e5e5df] bg-white p-3 sm:col-span-2">
               <div class="flex items-center gap-2 text-xs text-[#767676]">
                 <Map class="h-3.5 w-3.5" />
                 <span>Маршрут</span>

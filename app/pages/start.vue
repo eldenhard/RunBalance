@@ -4,9 +4,24 @@ import { Footprints, Map, Play, Radio } from '@lucide/vue'
 const store = useRunBalanceStore()
 const router = useRouter()
 const hasPlan = computed(() => store.plannedWorkouts.length > 0)
+const countdownValue = ref<number | null>(null)
+const isCountingDown = computed(() => countdownValue.value !== null)
+let countdownTimer: ReturnType<typeof window.setTimeout> | null = null
 
 async function startWorkout() {
-  if (hasPlan.value) {
+  await startWithCountdown(hasPlan.value ? 'planned' : 'free')
+}
+
+async function startFreeWorkout() {
+  await startWithCountdown('free')
+}
+
+async function startWithCountdown(mode: 'planned' | 'free') {
+  if (isCountingDown.value) return
+
+  await runCountdown()
+
+  if (mode === 'planned') {
     store.startWorkoutSession()
   } else {
     store.startFreeWorkoutSession()
@@ -14,10 +29,24 @@ async function startWorkout() {
   await router.push('/workout/active')
 }
 
-async function startFreeWorkout() {
-  store.startFreeWorkoutSession()
-  await router.push('/workout/active')
+async function runCountdown() {
+  for (const value of [3, 2, 1]) {
+    countdownValue.value = value
+    window.navigator.vibrate?.(35)
+    await wait(820)
+  }
+  countdownValue.value = null
 }
+
+function wait(ms: number) {
+  return new Promise<void>((resolve) => {
+    countdownTimer = window.setTimeout(resolve, ms)
+  })
+}
+
+onBeforeUnmount(() => {
+  if (countdownTimer) window.clearTimeout(countdownTimer)
+})
 </script>
 
 <template>
@@ -112,10 +141,35 @@ async function startFreeWorkout() {
       <NuxtLink to="/plan" class="block">
         <Button class="w-full" size="lg" variant="outline">План</Button>
       </NuxtLink>
-      <button class="mx-auto flex h-[84px] w-[84px] items-center justify-center rounded-full bg-white text-[#0b0b0c] active:bg-[#e8e8e8]" aria-label="Старт тренировки" @click="startWorkout">
+      <button
+        class="mx-auto flex h-[84px] w-[84px] items-center justify-center rounded-full bg-white text-[#0b0b0c] active:bg-[#e8e8e8] disabled:opacity-60"
+        aria-label="Старт тренировки"
+        :disabled="isCountingDown"
+        @click="startWorkout"
+      >
         <Play class="h-8 w-8 fill-current" />
       </button>
-      <Button class="w-full" size="lg" variant="outline" @click="startFreeWorkout">Свободный</Button>
+      <Button class="w-full" size="lg" variant="outline" :disabled="isCountingDown" @click="startFreeWorkout">Свободный</Button>
     </div>
+
+    <Transition name="countdown">
+      <div v-if="isCountingDown" class="fixed inset-0 z-[10000] flex items-center justify-center bg-[#0b0b0c] text-white">
+        <div class="flex h-44 w-44 items-center justify-center rounded-full border border-white/15 bg-white/[0.03]">
+          <span class="text-[96px] font-medium leading-none">{{ countdownValue }}</span>
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
+
+<style scoped>
+.countdown-enter-active,
+.countdown-leave-active {
+  transition: opacity 0.18s ease;
+}
+
+.countdown-enter-from,
+.countdown-leave-to {
+  opacity: 0;
+}
+</style>
