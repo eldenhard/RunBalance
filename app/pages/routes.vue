@@ -46,7 +46,6 @@ function saveRoute() {
     <ScreenHeader
       eyebrow="Маршруты"
       title="Свои петли и маршруты"
-      description="Сохрани петли и быстро привязывай их к тренировкам."
     />
 
     <Card v-if="suggested" class="overflow-hidden p-0">
@@ -61,12 +60,12 @@ function saveRoute() {
           </p>
         </div>
         <Button
-          :variant="activeRouteId === suggested.id ? 'destructive' : 'outline'"
-          :class="activeRouteId === suggested.id ? 'bg-[#ef4444] text-white active:bg-[#dc2626]' : ''"
+          :variant="activeRouteId === suggested.id ? 'default' : 'outline'"
+          :class="activeRouteId === suggested.id ? 'bg-[#111111] text-white active:bg-[#111111]' : ''"
           size="sm"
           @click="store.selectRouteForToday(suggested.id)"
         >
-          <Flame class="h-4 w-4" />
+          <Flame class="h-4 w-4" :class="activeRouteId === suggested.id ? 'text-red-500' : ''" />
           {{ activeRouteId === suggested.id ? 'Сегодня' : 'На сегодня' }}
         </Button>
       </div>
@@ -77,7 +76,6 @@ function saveRoute() {
         <CirclePlus class="h-5 w-5 text-[#111111]" />
         <div>
           <h2 class="font-medium">Новый маршрут</h2>
-          <p class="text-sm text-[#767676]">Имя и километраж достаточно для старта.</p>
         </div>
       </div>
 
@@ -129,7 +127,6 @@ function saveRoute() {
         <Map class="h-5 w-5 text-[#111111]" />
         <div>
           <h2 class="font-medium">Сохранённые маршруты</h2>
-          <p class="text-sm text-[#767676]">Выбранный маршрут подставляется на «Сегодня» и на старт.</p>
         </div>
       </div>
 
@@ -156,11 +153,11 @@ function saveRoute() {
           <div class="mt-4 grid grid-cols-2 gap-3">
             <Button
               class="w-full"
-              :class="activeRouteId === savedRoute.id ? 'bg-[#ef4444] text-white active:bg-[#dc2626]' : ''"
-              :variant="activeRouteId === savedRoute.id ? 'destructive' : 'outline'"
+              :class="activeRouteId === savedRoute.id ? 'bg-[#111111] text-white active:bg-[#111111]' : ''"
+              :variant="activeRouteId === savedRoute.id ? 'default' : 'outline'"
               @click="store.selectRouteForToday(savedRoute.id)"
             >
-              <Flame class="h-4 w-4" />
+              <Flame class="h-4 w-4" :class="activeRouteId === savedRoute.id ? 'text-red-500' : ''" />
               {{ activeRouteId === savedRoute.id ? 'Сегодня' : 'На сегодня' }}
             </Button>
             <Button class="w-full" variant="outline" @click="store.deleteSavedRoute(savedRoute.id)">

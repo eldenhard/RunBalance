@@ -48,11 +48,7 @@ function saveCheckIn() {
 
 <template>
   <div class="theme-light min-h-dvh space-y-4 p-4">
-    <ScreenHeader
-      eyebrow="Восстановление"
-      title="Ориентир по нагрузке"
-      description="Короткий check-in помогает адаптировать тренировку без медицинских выводов."
-    />
+    <ScreenHeader eyebrow="Восстановление" title="Ориентир по нагрузке" />
 
     <Card v-if="store.recovery && !isEditing" class="p-4">
       <div class="space-y-3">

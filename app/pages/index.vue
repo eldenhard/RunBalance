@@ -11,7 +11,6 @@ const hasPlan = computed(() => store.plannedWorkouts.length > 0)
     <ScreenHeader
       eyebrow="Сегодня"
       :title="store.profile.displayName ? `Привет, ${store.profile.displayName}` : 'Готов к пробежке'"
-      description="Что бежать, где бежать и готов ли ты сегодня."
     />
 
     <NuxtLink v-if="store.needsOnboarding" to="/welcome" class="block">
@@ -21,7 +20,6 @@ const hasPlan = computed(() => store.plannedWorkouts.length > 0)
           <div class="flex-1">
             <p class="text-xs text-[#767676]">Знакомство</p>
             <h2 class="mt-1 font-medium">Настрой профиль за минуту</h2>
-            <p class="mt-1 text-sm text-[#767676]">Имя, цель и max HR.</p>
           </div>
           <ChevronRight class="mt-1 h-5 w-5 text-[#767676]" />
         </div>
@@ -47,7 +45,6 @@ const hasPlan = computed(() => store.plannedWorkouts.length > 0)
           <div class="flex-1">
             <p class="text-xs text-[#767676]">Восстановление</p>
             <h2 class="mt-1 font-medium">Сделай check-in за 20 секунд</h2>
-            <p class="mt-1 text-sm text-[#767676]">Короткий ориентир по нагрузке.</p>
           </div>
           <ChevronRight class="mt-1 h-5 w-5 text-[#767676]" />
         </div>
@@ -115,7 +112,6 @@ const hasPlan = computed(() => store.plannedWorkouts.length > 0)
           <div class="flex-1">
             <p class="text-xs text-[#767676]">Маршрут</p>
             <h2 class="mt-1 font-medium">Добавь первый маршрут</h2>
-            <p class="mt-1 text-sm text-[#767676]">Сохрани любимую петлю — будет подставляться на старте.</p>
           </div>
           <ChevronRight class="mt-1 h-5 w-5 text-[#767676]" />
         </div>

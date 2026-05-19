@@ -52,6 +52,11 @@ body.rb-body-dark {
   background: var(--workout-bg);
 }
 
+body.rb-body-locked {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 a {
   color: inherit;
   text-decoration: none;

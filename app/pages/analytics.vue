@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BarChart3, CalendarRange, Flame } from '@lucide/vue'
+import { CalendarRange, Flame } from '@lucide/vue'
 
 const store = useRunBalanceStore()
 const report = computed(() => store.analyticsReport)
@@ -15,7 +15,6 @@ const maxWeeklyDistance = computed(() => {
     <ScreenHeader
       eyebrow="Аналитика"
       title="Локальные показатели"
-      description="Цифры собираются из реально завершённых тренировок и хранятся локально."
     />
 
     <Card class="p-4">
@@ -54,7 +53,6 @@ const maxWeeklyDistance = computed(() => {
         <CalendarRange class="h-5 w-5 text-[#111111]" />
         <div>
           <h2 class="font-medium">Последние 4 недели</h2>
-          <p class="text-sm text-[#767676]">Сравнение объёмов недели за неделей.</p>
         </div>
       </div>
 
@@ -70,16 +68,6 @@ const maxWeeklyDistance = computed(() => {
               :style="{ width: `${Math.round((bucket.distanceKm / maxWeeklyDistance) * 100)}%` }"
             />
           </div>
-        </div>
-      </div>
-    </Card>
-
-    <Card class="p-4">
-      <div class="flex items-center gap-3">
-        <BarChart3 class="h-5 w-5 text-[#111111]" />
-        <div>
-          <h2 class="font-medium">Что дальше</h2>
-          <p class="text-sm text-[#767676]">Позже добавим распределение по зонам и сравнение пробега кроссовок.</p>
         </div>
       </div>
     </Card>

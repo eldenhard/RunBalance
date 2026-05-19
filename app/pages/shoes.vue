@@ -90,13 +90,12 @@ function toggleRetire(shoe: Shoe) {
 
 <template>
   <div class="theme-light space-y-4 p-4">
-    <ScreenHeader eyebrow="Кроссовки" title="Ресурс обуви" description="Добавляй пары, обновляй ресурс и фактический пробег. Активные подставляются на старт автоматически." />
+    <ScreenHeader eyebrow="Кроссовки" title="Ресурс обуви" />
 
     <Card class="p-4">
       <div class="flex items-center justify-between gap-3">
         <div>
           <h2 class="font-medium">Своя пара</h2>
-          <p class="text-sm text-[#767676]">{{ isCreating ? 'Заполни, чтобы добавить новую пару.' : 'Можно завести сколько угодно пар.' }}</p>
         </div>
         <Button v-if="!isCreating" variant="outline" size="sm" @click="isCreating = true">
           <CirclePlus class="h-4 w-4" />

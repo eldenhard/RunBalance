@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Footprints, Map, Maximize2, Play, Radio, X } from '@lucide/vue'
+import { Maximize2, Play, X } from '@lucide/vue'
 
 const store = useRunBalanceStore()
 const router = useRouter()
@@ -56,8 +56,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="theme-dark min-h-dvh p-0">
-    <section class="relative min-h-[calc(100dvh-5.15rem-env(safe-area-inset-bottom,0px))] overflow-hidden">
+  <div class="theme-dark start-tracker-screen p-0">
+    <section class="relative h-full overflow-hidden">
       <ClientOnly>
         <RouteMap
           :route="store.activeRoute"
@@ -67,17 +67,17 @@ onMounted(() => {
           class="absolute inset-0 h-full w-full rounded-none"
         />
       </ClientOnly>
-      <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#0b0b0c]/80 via-[#0b0b0c]/28 to-[#0b0b0c]" />
+      <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#0b0b0c]/82 via-[#0b0b0c]/20 to-[#0b0b0c]/82" />
 
-      <div class="pointer-events-none relative z-10 flex min-h-[calc(100dvh-5.15rem-env(safe-area-inset-bottom,0px))] flex-col justify-between p-4">
-        <div class="pointer-events-auto space-y-4 pt-2">
-          <div class="flex items-start justify-between gap-3">
+      <div class="pointer-events-none relative z-10 flex h-full flex-col justify-between p-4">
+        <div class="space-y-4 pt-2">
+          <div class="pointer-events-auto flex items-start justify-between gap-3">
             <div class="min-w-0">
               <p class="text-sm font-medium text-white/55">Готово к старту</p>
               <h1 class="mt-1 truncate text-[38px] font-medium leading-none text-white">{{ hasPlan ? store.adaptedWorkout.title : 'Свободный бег' }}</h1>
             </div>
             <button
-              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/15 bg-black/45 text-white backdrop-blur"
+              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/15 bg-black/45 text-white backdrop-blur active:bg-black/65"
               aria-label="Развернуть карту"
               @click="isMapExpanded = true"
             >
@@ -105,28 +105,10 @@ onMounted(() => {
           </div>
         </div>
 
-        <div class="pointer-events-auto space-y-4 pb-4">
-          <div class="grid grid-cols-3 gap-2 rounded-[28px] border border-white/10 bg-black/55 p-3 backdrop-blur">
-            <NuxtLink to="/routes" class="min-w-0 rounded-2xl border border-white/10 bg-white/[0.06] p-3 active:bg-white/10">
-              <Map class="h-5 w-5 text-[#9cff38]" />
-              <p class="mt-2 truncate text-xs text-white/50">Маршрут</p>
-              <p class="truncate text-sm font-medium">{{ store.activeRoute?.name ?? 'Без маршрута' }}</p>
-            </NuxtLink>
-            <NuxtLink to="/shoes" class="min-w-0 rounded-2xl border border-white/10 bg-white/[0.06] p-3 active:bg-white/10">
-              <Footprints class="h-5 w-5 text-[#6ecbff]" />
-              <p class="mt-2 truncate text-xs text-white/50">Обувь</p>
-              <p class="truncate text-sm font-medium">{{ store.selectedShoe?.name ?? 'Не указана' }}</p>
-            </NuxtLink>
-            <div class="min-w-0 rounded-2xl border border-white/10 bg-white/[0.06] p-3">
-              <Radio class="h-5 w-5 text-[#ff985c]" />
-              <p class="mt-2 truncate text-xs text-white/50">Датчики</p>
-              <p class="truncate text-sm font-medium">GPS</p>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-[1fr_104px_1fr] items-center gap-3">
+        <div class="pointer-events-auto pb-2">
+          <div class="grid grid-cols-[1fr_104px_1fr] items-end gap-3">
             <NuxtLink to="/plan" class="block">
-              <Button class="h-14 w-full rounded-[22px] border-white/15 bg-black/35 text-white backdrop-blur" size="lg" variant="outline">План</Button>
+              <Button class="h-14 w-full rounded-[22px] border-white/15 bg-black/45 text-white backdrop-blur" size="lg" variant="outline">План</Button>
             </NuxtLink>
             <button
               class="mx-auto flex h-[104px] w-[104px] items-center justify-center rounded-full bg-white text-[#0b0b0c] shadow-[0_18px_54px_rgba(255,255,255,0.24)] active:bg-[#e8e8e8] disabled:opacity-60"
@@ -154,7 +136,7 @@ onMounted(() => {
           />
         </ClientOnly>
         <button
-          class="absolute right-4 top-[calc(env(safe-area-inset-top,0px)+16px)] flex h-12 w-12 items-center justify-center rounded-full bg-black/70 text-white backdrop-blur"
+          class="absolute right-4 top-[calc(env(safe-area-inset-top,0px)+16px)] flex h-12 w-12 items-center justify-center rounded-full bg-black/70 text-white backdrop-blur active:bg-black/85"
           aria-label="Закрыть карту"
           @click="isMapExpanded = false"
         >
@@ -174,6 +156,12 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.start-tracker-screen {
+  height: calc(100dvh - env(safe-area-inset-top, 0px) - 20px - 5.15rem - env(safe-area-inset-bottom, 0px));
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 .countdown-enter-active,
 .countdown-leave-active {
   transition: opacity 0.18s ease;

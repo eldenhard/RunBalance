@@ -84,8 +84,9 @@ function buildStyle(): StyleSpecification {
         type: 'raster',
         source: 'osm',
         paint: {
-          'raster-opacity': 1,
-          'raster-saturation': props.theme === 'dark' ? -0.6 : -0.15
+          'raster-opacity': props.theme === 'dark' ? 0.82 : 0.92,
+          'raster-saturation': -1,
+          'raster-contrast': props.theme === 'dark' ? -0.24 : -0.14
         }
       }
     ]
@@ -345,9 +346,10 @@ onBeforeUnmount(() => {
 
 .route-map-fallback--plain {
   background:
-    radial-gradient(circle at 50% 50%, rgba(185, 255, 56, 0.18), transparent 0 32px),
-    repeating-linear-gradient(0deg, transparent 0 42px, rgba(255, 255, 255, 0.035) 42px 43px),
-    repeating-linear-gradient(90deg, transparent 0 54px, rgba(255, 255, 255, 0.03) 54px 55px);
+    linear-gradient(18deg, transparent 0 44%, rgba(255, 255, 255, 0.1) 44% 45%, transparent 45% 100%),
+    linear-gradient(112deg, transparent 0 52%, rgba(255, 255, 255, 0.08) 52% 53%, transparent 53% 100%),
+    repeating-linear-gradient(0deg, transparent 0 38px, rgba(255, 255, 255, 0.05) 38px 39px),
+    repeating-linear-gradient(90deg, transparent 0 46px, rgba(255, 255, 255, 0.045) 46px 47px);
 }
 
 .route-map-fallback--decorative {
@@ -376,7 +378,7 @@ onBeforeUnmount(() => {
 
 .route-map-fallback__park {
   border-radius: 999px;
-  background: rgba(89, 214, 115, 0.22);
+  background: rgba(177, 195, 176, 0.2);
 }
 
 .route-map-fallback__park--one {
@@ -401,15 +403,15 @@ onBeforeUnmount(() => {
   left: 20%;
   bottom: 24%;
   border-radius: 999px;
-  background: rgba(67, 169, 255, 0.18);
+  background: rgba(151, 169, 178, 0.18);
   transform: rotate(-10deg);
 }
 
 .route-map-fallback__road {
   height: 9px;
   border-radius: 999px;
-  background: rgba(255, 122, 43, 0.75);
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.12);
+  background: rgba(240, 240, 237, 0.38);
+  box-shadow: 0 0 0 2px rgba(10, 10, 10, 0.08);
 }
 
 .route-map-fallback__road--one {

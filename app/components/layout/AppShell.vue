@@ -20,10 +20,14 @@ const navItems = [
 const hideNavRoutes = ['/workout/active', '/welcome']
 const showBottomNav = computed(() => !hideNavRoutes.includes(route.path))
 const isDarkShell = computed(() => route.path === '/start' || route.path.startsWith('/workout/active'))
+const isLockedShell = computed(() => route.path === '/start')
 
 useHead({
   bodyAttrs: {
-    class: computed(() => isDarkShell.value ? 'rb-body-dark' : 'rb-body-light')
+    class: computed(() => [
+      isDarkShell.value ? 'rb-body-dark' : 'rb-body-light',
+      isLockedShell.value ? 'rb-body-locked' : ''
+    ].filter(Boolean).join(' '))
   }
 })
 
@@ -36,7 +40,13 @@ function isActive(item: typeof navItems[number]) {
 </script>
 
 <template>
-  <div class="app-shell min-h-dvh" :class="isDarkShell ? 'app-shell--dark' : 'app-shell--light'">
+  <div
+    class="app-shell min-h-dvh"
+    :class="[
+      isDarkShell ? 'app-shell--dark' : 'app-shell--light',
+      isLockedShell ? 'app-shell--locked' : ''
+    ]"
+  >
     <main
       class="app-frame mx-auto min-h-dvh w-full max-w-md"
       :class="showBottomNav ? 'app-frame--with-nav' : ''"
@@ -74,6 +84,15 @@ function isActive(item: typeof navItems[number]) {
   position: relative;
 }
 
+.app-shell--locked {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
 .app-shell--light {
   background: #f7f7f5;
 }
@@ -88,6 +107,12 @@ function isActive(item: typeof navItems[number]) {
   padding-top: calc(env(safe-area-inset-top, 0px) + 20px);
   padding-left: max(env(safe-area-inset-left, 0px), 0px);
   padding-right: max(env(safe-area-inset-right, 0px), 0px);
+}
+
+.app-shell--locked .app-frame {
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .app-frame--with-nav {

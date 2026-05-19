@@ -180,7 +180,6 @@ function toOptionalNumber(value: string) {
         <CalendarDays class="h-5 w-5 text-[#111111]" />
         <div>
           <h2 class="font-medium">Запланированные</h2>
-          <p class="text-sm text-[#767676]">Одна из них может быть выбрана на сегодня.</p>
         </div>
       </div>
 
@@ -224,11 +223,11 @@ function toOptionalNumber(value: string) {
           <div class="mt-4 grid grid-cols-2 gap-3">
             <Button
               class="w-full"
-              :class="store.selectedWorkoutId === workout.id ? 'bg-[#ef4444] text-white active:bg-[#dc2626]' : ''"
-              :variant="store.selectedWorkoutId === workout.id ? 'destructive' : 'outline'"
+              :class="store.selectedWorkoutId === workout.id ? 'bg-[#111111] text-white active:bg-[#111111]' : ''"
+              :variant="store.selectedWorkoutId === workout.id ? 'default' : 'outline'"
               @click="store.selectPlannedWorkout(workout.id)"
             >
-              <Flame class="h-4 w-4" />
+              <Flame class="h-4 w-4" :class="store.selectedWorkoutId === workout.id ? 'text-red-500' : ''" />
               {{ store.selectedWorkoutId === workout.id ? 'Сегодня' : 'На сегодня' }}
             </Button>
             <Button class="w-full" variant="outline" @click="store.deletePlannedWorkout(workout.id)">
@@ -250,7 +249,6 @@ function toOptionalNumber(value: string) {
           <Map class="mt-0.5 h-5 w-5 text-[#111111]" />
           <div class="flex-1">
             <h2 class="font-medium">Управление маршрутами</h2>
-            <p class="text-sm text-[#767676]">Создание и удаление маршрутов остаётся в отдельном экране.</p>
           </div>
           <span class="text-sm font-medium text-[#111111]">{{ store.routes.length }}</span>
         </NuxtLink>
@@ -261,7 +259,6 @@ function toOptionalNumber(value: string) {
           <Map class="h-5 w-5 text-[#111111]" />
           <div>
             <h2 class="font-medium">Маршруты в плане</h2>
-            <p class="text-sm text-[#767676]">Выбери маршрут дня или открой полный список.</p>
           </div>
         </div>
 
@@ -287,11 +284,11 @@ function toOptionalNumber(value: string) {
             <div class="mt-4 grid grid-cols-2 gap-3">
               <Button
                 class="w-full"
-                :class="activeRouteId === savedRoute.id ? 'bg-[#ef4444] text-white active:bg-[#dc2626]' : ''"
-                :variant="activeRouteId === savedRoute.id ? 'destructive' : 'outline'"
+                :class="activeRouteId === savedRoute.id ? 'bg-[#111111] text-white active:bg-[#111111]' : ''"
+                :variant="activeRouteId === savedRoute.id ? 'default' : 'outline'"
                 @click="store.selectRouteForToday(savedRoute.id)"
               >
-                <Flame class="h-4 w-4" />
+                <Flame class="h-4 w-4" :class="activeRouteId === savedRoute.id ? 'text-red-500' : ''" />
                 {{ activeRouteId === savedRoute.id ? 'Сегодня' : 'На сегодня' }}
               </Button>
               <NuxtLink to="/routes" class="block">
@@ -313,7 +310,6 @@ function toOptionalNumber(value: string) {
           <Target class="h-5 w-5 text-[#111111]" />
           <div>
             <h2 class="font-medium">Цель и ориентиры</h2>
-            <p class="text-sm text-[#767676]">Цель влияет на план, зоны и подсказки нагрузки.</p>
           </div>
         </div>
 
@@ -343,14 +339,6 @@ function toOptionalNumber(value: string) {
           <NuxtLink to="/heart-rate-zones" class="block">
             <Button class="w-full">Зоны</Button>
           </NuxtLink>
-        </div>
-      </Card>
-
-      <Card class="p-4">
-        <h2 class="font-medium">Как это используется</h2>
-        <div class="mt-3 space-y-2 text-sm text-[#62625e]">
-          <p class="rounded-2xl border border-[#deded9] bg-white p-3">Цель задаёт тип нагрузки: база, возврат, 5 км, 10 км или полумарафон.</p>
-          <p class="rounded-2xl border border-[#deded9] bg-white p-3">Зоны помогают подсветить интенсивность в тренировке и в будущих подсказках.</p>
         </div>
       </Card>
     </template>

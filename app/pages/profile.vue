@@ -39,7 +39,7 @@ function saveProfile() {
 
 <template>
   <div class="theme-light space-y-4 p-4">
-    <ScreenHeader eyebrow="Профиль" :title="store.profile.displayName || 'Профиль не заполнен'" description="Цель, зоны, восстановление и настройки локального профиля." />
+    <ScreenHeader eyebrow="Профиль" :title="store.profile.displayName || 'Профиль не заполнен'" />
 
     <NuxtLink v-if="store.needsOnboarding" to="/welcome" class="block">
       <Card class="p-4">
@@ -48,7 +48,6 @@ function saveProfile() {
           <div class="flex-1">
             <p class="text-xs text-[#767676]">Онбординг</p>
             <h2 class="mt-1 font-medium">Пройти знакомство</h2>
-            <p class="mt-1 text-sm text-[#767676]">Имя, цель и максимальный пульс — за минуту.</p>
           </div>
           <ChevronRight class="mt-1 h-5 w-5 text-[#767676]" />
         </div>

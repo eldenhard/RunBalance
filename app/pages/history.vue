@@ -72,7 +72,7 @@ function cancelDelete() {
 
 <template>
   <div class="theme-light space-y-4 p-4">
-    <ScreenHeader eyebrow="История" title="Последние пробежки" description="Только реально завершённые тренировки и их собственные метрики." />
+    <ScreenHeader eyebrow="История" title="Последние пробежки" />
 
     <Card class="p-4">
       <div class="grid grid-cols-3 gap-3">
