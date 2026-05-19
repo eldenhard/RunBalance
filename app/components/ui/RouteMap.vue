@@ -12,12 +12,14 @@ const props = withDefaults(defineProps<{
   interactive?: boolean
   decorativeFallback?: boolean
   showStatusHint?: boolean
+  showAttribution?: boolean
   class?: string
 }>(), {
   theme: 'light',
   interactive: false,
   decorativeFallback: false,
-  showStatusHint: true
+  showStatusHint: true,
+  showAttribution: true
 })
 
 const container = ref<HTMLDivElement | null>(null)
@@ -90,8 +92,8 @@ function buildStyle(): StyleSpecification {
         source: 'osm',
         paint: {
           'raster-opacity': 1,
-          'raster-saturation': -1,
-          'raster-contrast': props.theme === 'dark' ? -0.08 : -0.04
+          'raster-saturation': props.theme === 'dark' ? -0.18 : 0,
+          'raster-contrast': props.theme === 'dark' ? -0.02 : 0
         }
       }
     ]
@@ -122,7 +124,7 @@ async function ensureMap() {
       style: buildStyle(),
       center: fallbackCenter,
       zoom: bounds ? 13 : 11,
-      attributionControl: { compact: true },
+      attributionControl: props.showAttribution ? { compact: true } : false,
       interactive: props.interactive,
       cooperativeGestures: false,
       pitchWithRotate: false,

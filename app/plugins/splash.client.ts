@@ -1,5 +1,5 @@
 export default defineNuxtPlugin(() => {
-  const minVisibleMs = 1200
+  const minVisibleMs = 220
   const startedAt = performance.now()
   let hidden = false
 
@@ -9,7 +9,7 @@ export default defineNuxtPlugin(() => {
     const splash = document.getElementById('rb-splash')
     if (!splash) return
     splash.classList.add('rb-splash--hide')
-    window.setTimeout(() => splash.remove(), 400)
+    window.setTimeout(() => splash.remove(), 240)
   }
 
   const scheduleHide = () => {
@@ -22,5 +22,5 @@ export default defineNuxtPlugin(() => {
 
   window.setTimeout(() => {
     if (!hidden) scheduleHide()
-  }, 3500)
+  }, 900)
 })

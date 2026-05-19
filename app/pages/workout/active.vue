@@ -94,7 +94,7 @@ function toggleGps() {
 
 async function finishWorkout() {
   gps.stop()
-  announceWorkoutEvent('Финиш', { vibrationPattern: [100, 60, 100] })
+  announceWorkoutEvent('Тренировка завершена', { vibrationPattern: [100, 60, 100] })
   store.finishActiveSession()
   await router.push('/workout/result')
 }

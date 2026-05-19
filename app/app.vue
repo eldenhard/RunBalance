@@ -9,7 +9,7 @@ onMounted(async () => {
   store.restoreLocalState()
   store.restorePersistedActiveSession()
   const elapsed = performance.now() - startedAt
-  await new Promise((resolve) => window.setTimeout(resolve, Math.max(0, 1100 - elapsed)))
+  await new Promise((resolve) => window.setTimeout(resolve, Math.max(0, 180 - elapsed)))
   appReady.value = true
   window.dispatchEvent(new Event('runbalance:ready'))
 })
@@ -66,7 +66,7 @@ onMounted(async () => {
 }
 
 .rb-splash-leave-active {
-  transition: opacity 0.35s ease;
+  transition: opacity 0.2s ease;
 }
 
 .rb-splash-leave-to {

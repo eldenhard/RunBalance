@@ -65,6 +65,7 @@ onMounted(() => {
           theme="dark"
           interactive
           :show-status-hint="false"
+          :show-attribution="false"
           class="absolute inset-0 h-full w-full rounded-none"
         />
       </ClientOnly>
@@ -134,6 +135,7 @@ onMounted(() => {
             theme="dark"
             interactive
             :show-status-hint="false"
+            :show-attribution="false"
             class="h-full w-full rounded-none"
           />
         </ClientOnly>
@@ -150,7 +152,9 @@ onMounted(() => {
     <Transition name="countdown">
       <div v-if="isCountingDown" class="fixed inset-0 z-[10000] flex items-center justify-center bg-[#0b0b0c] text-white">
         <div class="flex h-44 w-44 items-center justify-center rounded-full border border-white/15 bg-white/[0.03]">
-          <span class="text-[96px] font-medium leading-none">{{ countdownValue }}</span>
+          <Transition name="countdown-number" mode="out-in">
+            <span :key="countdownValue ?? 'idle'" class="text-[96px] font-medium leading-none">{{ countdownValue }}</span>
+          </Transition>
         </div>
       </div>
     </Transition>
@@ -166,11 +170,27 @@ onMounted(() => {
 
 .countdown-enter-active,
 .countdown-leave-active {
-  transition: opacity 0.18s ease;
+  transition: opacity 0.18s ease, transform 0.18s ease;
 }
 
 .countdown-enter-from,
 .countdown-leave-to {
   opacity: 0;
+  transform: scale(0.88);
+}
+
+.countdown-number-enter-active,
+.countdown-number-leave-active {
+  transition: opacity 0.18s ease, transform 0.22s ease;
+}
+
+.countdown-number-enter-from {
+  opacity: 0;
+  transform: scale(0.68);
+}
+
+.countdown-number-leave-to {
+  opacity: 0;
+  transform: scale(1.18);
 }
 </style>
