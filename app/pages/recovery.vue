@@ -137,8 +137,7 @@ function saveCheckIn() {
     </Card>
 
     <Card v-if="store.recovery" class="p-4">
-      <h2 class="text-lg font-medium">Как адаптирован план</h2>
-      <p class="mt-2 text-sm leading-5 text-[#62625e]">{{ store.adaptedWorkout.adaptationReason }}</p>
+      <h2 class="text-lg font-medium">План обновлён</h2>
     </Card>
   </div>
 </template>

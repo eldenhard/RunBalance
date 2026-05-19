@@ -14,6 +14,7 @@ export function useVoiceAlerts() {
   function speak(alert: WorkoutAlert | null) {
     if (!alert || !isEnabled.value || !isSupported.value) return false
 
+    window.speechSynthesis.resume?.()
     window.speechSynthesis.cancel()
     const utterance = new SpeechSynthesisUtterance(alert.message)
     utterance.lang = 'ru-RU'
@@ -35,9 +36,22 @@ export function useVoiceAlerts() {
     isEnabled.value = typeof enabled === 'boolean' ? enabled : !isEnabled.value
   }
 
+  function prime() {
+    if (!isEnabled.value || !isSupported.value) return false
+
+    window.speechSynthesis.resume?.()
+    const utterance = new SpeechSynthesisUtterance(' ')
+    utterance.lang = 'ru-RU'
+    utterance.volume = 0
+    utterance.rate = 1
+    window.speechSynthesis.speak(utterance)
+    return true
+  }
+
   function speakMessage(message: string) {
     if (!message || !isEnabled.value || !isSupported.value) return false
 
+    window.speechSynthesis.resume?.()
     window.speechSynthesis.cancel()
     const utterance = new SpeechSynthesisUtterance(message)
     utterance.lang = 'ru-RU'
@@ -60,6 +74,7 @@ export function useVoiceAlerts() {
     lastSpokenAlert,
     speak,
     announceEvent,
+    prime,
     vibrate,
     toggle
   }

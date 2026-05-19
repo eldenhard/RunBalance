@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Footprints, Gauge, HeartPulse, History, Home, MapPinned, Play, Save, StickyNote, Timer } from '@lucide/vue'
+import { CheckCircle2, Footprints, Gauge, HeartPulse, History, Home, MapPinned, Maximize2, Play, Save, StickyNote, Timer, X } from '@lucide/vue'
 import type { Workout, WorkoutSplit } from '~/types/workout'
 
 type WorkoutWithSplits = Workout & {
@@ -14,6 +14,7 @@ const resultShoe = computed(() => store.shoes.find((shoe) => shoe.id === workout
 const effort = ref<'easy' | 'steady' | 'hard'>('steady')
 const note = ref('')
 const routeSaved = ref(false)
+const isMapExpanded = ref(false)
 
 const effortOptions = [
   { value: 'easy', label: 'Легко', class: 'border-[#7cc7ff] bg-[#eef8ff] text-[#0f5c82]' },
@@ -44,7 +45,7 @@ function saveRouteFromResult() {
             <p class="text-sm text-white/60">{{ workout.title }}</p>
             <h1 class="mt-3 text-[52px] font-medium leading-none tracking-normal">{{ formatDistance(workout.distanceKm) }}</h1>
           </div>
-          <Badge variant="secondary" class="border-white/10 bg-white/10 text-white">Финиш</Badge>
+          <Badge variant="secondary" class="border-white/10 bg-white/10 text-white">Тренировка завершена</Badge>
         </div>
 
         <div class="mt-6 grid grid-cols-2 gap-3">
@@ -75,10 +76,23 @@ function saveRouteFromResult() {
     </section>
 
     <Card class="overflow-hidden p-0">
-      <div v-if="resultRoute">
+      <div v-if="resultRoute" class="relative">
         <ClientOnly>
-          <RouteMap :route="resultRoute" class="h-56 w-full" />
+          <RouteMap
+            :route="resultRoute"
+            interactive
+            :show-status-hint="false"
+            class="h-56 w-full"
+          />
         </ClientOnly>
+        <button
+          type="button"
+          class="absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-[#111111] shadow-[0_10px_24px_rgba(0,0,0,0.16)] backdrop-blur active:bg-white"
+          aria-label="Открыть трек на весь экран"
+          @click="isMapExpanded = true"
+        >
+          <Maximize2 class="h-5 w-5" />
+        </button>
       </div>
       <div v-else class="flex h-44 items-center justify-center bg-[#ecebe6] text-sm text-[#767676]">
         Трек недоступен
@@ -97,12 +111,44 @@ function saveRouteFromResult() {
           </div>
         </div>
 
-        <Button class="w-full" :variant="routeSaved ? 'default' : 'outline'" :disabled="!resultRoute || routeSaved" @click="saveRouteFromResult">
+        <Button
+          v-if="!routeSaved"
+          class="w-full"
+          variant="outline"
+          :disabled="!resultRoute"
+          @click="saveRouteFromResult"
+        >
           <Save class="h-4 w-4" />
-          {{ routeSaved ? 'Маршрут сохранён' : 'Сохранить маршрут' }}
+          Сохранить маршрут
         </Button>
+        <NuxtLink v-else to="/routes" class="block">
+          <Button class="w-full border-[#b9ff38] bg-[#b9ff38] text-[#111111] active:bg-[#a9f424]">
+            <CheckCircle2 class="h-4 w-4" />
+            Маршрут сохранён
+          </Button>
+        </NuxtLink>
       </div>
     </Card>
+
+    <Teleport to="body">
+      <div v-if="isMapExpanded && resultRoute" class="fixed inset-0 z-[10001] bg-white">
+        <ClientOnly>
+          <RouteMap
+            :route="resultRoute"
+            interactive
+            :show-status-hint="false"
+            class="h-full w-full rounded-none"
+          />
+        </ClientOnly>
+        <button
+          class="absolute right-4 top-[calc(env(safe-area-inset-top,0px)+16px)] flex h-12 w-12 items-center justify-center rounded-full bg-white/90 text-[#111111] shadow-[0_12px_30px_rgba(0,0,0,0.18)] backdrop-blur active:bg-white"
+          aria-label="Закрыть карту"
+          @click="isMapExpanded = false"
+        >
+          <X class="h-6 w-6" />
+        </button>
+      </div>
+    </Teleport>
 
     <Card class="p-4">
       <div class="mb-4 flex items-center gap-3">

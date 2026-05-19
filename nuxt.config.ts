@@ -18,6 +18,8 @@ export default defineNuxtConfig({
         { name: 'apple-mobile-web-app-status-bar-style', content: 'default' },
         { name: 'apple-mobile-web-app-title', content: 'RunBalance' },
         { name: 'mobile-web-app-capable', content: 'yes' },
+        { name: 'screen-orientation', content: 'portrait' },
+        { name: 'x5-orientation', content: 'portrait' },
         { name: 'format-detection', content: 'telephone=no' },
         { name: 'theme-color', content: '#0b0b0c' }
       ],

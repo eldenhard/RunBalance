@@ -57,10 +57,6 @@ const hasPlan = computed(() => store.plannedWorkouts.length > 0)
         <div class="min-w-0">
           <p class="text-xs text-[#767676]">Тренировка дня</p>
           <h2 class="text-xl font-medium text-[#111111]">{{ hasPlan ? store.adaptedWorkout.title : 'План пуст' }}</h2>
-          <p class="mt-1 text-sm text-[#767676]">
-            <template v-if="hasPlan">{{ store.selectedWorkoutId ? `Запланирована на ${store.workoutOfTheDay.scheduledDate ?? 'сегодня'}` : 'Базовый шаблон без даты' }}</template>
-            <template v-else>Создай первую тренировку или сразу беги свободным.</template>
-          </p>
         </div>
         <Activity class="h-6 w-6 shrink-0 text-[#ff7a2b]" />
       </div>
@@ -90,8 +86,6 @@ const hasPlan = computed(() => store.plannedWorkouts.length > 0)
           Перейти в План
         </Button>
       </NuxtLink>
-
-      <p v-if="hasPlan" class="mt-3 text-sm text-[#62625e]">{{ store.adaptedWorkout.adaptationReason }}</p>
     </Card>
 
     <NuxtLink to="/routes" class="block">

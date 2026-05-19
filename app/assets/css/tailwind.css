@@ -112,3 +112,31 @@ body {
   min-height: 100dvh;
   overflow-x: hidden;
 }
+
+@media screen and (orientation: landscape) and (max-height: 560px) {
+  body {
+    overflow: hidden;
+    background: #0b0b0c;
+  }
+
+  body::before {
+    content: "Поверни телефон вертикально";
+    position: fixed;
+    inset: 0;
+    z-index: 2147483647;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(185, 255, 56, 0.18), transparent 0 220px),
+      #0b0b0c;
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 500;
+    text-align: center;
+  }
+
+  .app-frame {
+    display: none;
+  }
+}

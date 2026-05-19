@@ -43,7 +43,7 @@ onMounted(() => {
   store.restorePersistedActiveSession()
   lastHandledKilometer = Math.floor(trackedDistanceKm.value)
   if (session.value) {
-    announceWorkoutEvent('Тренировка началась', { vibrate: false })
+    workoutEvent.value = 'Тренировка началась'
   }
   syncRuntimeTimer()
   if (session.value?.status === 'active' && !gps.isTracking.value) {
@@ -102,6 +102,7 @@ async function finishWorkout() {
   gps.stop()
   announceWorkoutEvent('Тренировка завершена', { vibrationPattern: [100, 60, 100] })
   store.refreshActiveSession()
+  await wait(900)
   store.finishActiveSession()
   await router.push('/workout/result')
 }
@@ -109,6 +110,7 @@ async function finishWorkout() {
 function startFinishHold() {
   if (finishHoldFrame !== null) return
 
+  voice.prime()
   const startedAt = performance.now()
   const tick = () => {
     const elapsed = performance.now() - startedAt
@@ -166,6 +168,10 @@ function getCurrentPaceFromGps() {
   if (!speedMps || speedMps < 0.7) return undefined
 
   return Math.round(1000 / speedMps)
+}
+
+function wait(ms: number) {
+  return new Promise<void>((resolve) => window.setTimeout(resolve, ms))
 }
 
 const gpsStatusClass = computed(() => gps.status.value === 'tracking'
