@@ -60,9 +60,14 @@ function saveRoute() {
             {{ suggested.distanceKm }} км · {{ getRouteTypeLabel(suggested.type) }} · {{ suggested.surface }}
           </p>
         </div>
-        <Button variant="outline" size="sm" @click="store.selectRouteForToday(suggested.id)">
+        <Button
+          :variant="activeRouteId === suggested.id ? 'destructive' : 'outline'"
+          :class="activeRouteId === suggested.id ? 'bg-[#ef4444] text-white active:bg-[#dc2626]' : ''"
+          size="sm"
+          @click="store.selectRouteForToday(suggested.id)"
+        >
           <Flame class="h-4 w-4" />
-          На сегодня
+          {{ activeRouteId === suggested.id ? 'Сегодня' : 'На сегодня' }}
         </Button>
       </div>
     </Card>
@@ -149,9 +154,14 @@ function saveRoute() {
           </div>
 
           <div class="mt-4 grid grid-cols-2 gap-3">
-            <Button class="w-full" :variant="activeRouteId === savedRoute.id ? 'default' : 'outline'" @click="store.selectRouteForToday(savedRoute.id)">
+            <Button
+              class="w-full"
+              :class="activeRouteId === savedRoute.id ? 'bg-[#ef4444] text-white active:bg-[#dc2626]' : ''"
+              :variant="activeRouteId === savedRoute.id ? 'destructive' : 'outline'"
+              @click="store.selectRouteForToday(savedRoute.id)"
+            >
               <Flame class="h-4 w-4" />
-              На сегодня
+              {{ activeRouteId === savedRoute.id ? 'Сегодня' : 'На сегодня' }}
             </Button>
             <Button class="w-full" variant="outline" @click="store.deleteSavedRoute(savedRoute.id)">
               <Trash2 class="h-4 w-4" />

@@ -184,7 +184,7 @@ function saveRouteFromResult() {
       <NuxtLink to="/" class="block">
         <Button class="w-full" size="lg">
           <Home class="h-5 w-5" />
-          На сегодня
+          Сегодня
         </Button>
       </NuxtLink>
       <div class="grid grid-cols-2 gap-3">

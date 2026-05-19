@@ -222,9 +222,14 @@ function toOptionalNumber(value: string) {
           </div>
 
           <div class="mt-4 grid grid-cols-2 gap-3">
-            <Button class="w-full" :variant="store.selectedWorkoutId === workout.id ? 'default' : 'outline'" @click="store.selectPlannedWorkout(workout.id)">
+            <Button
+              class="w-full"
+              :class="store.selectedWorkoutId === workout.id ? 'bg-[#ef4444] text-white active:bg-[#dc2626]' : ''"
+              :variant="store.selectedWorkoutId === workout.id ? 'destructive' : 'outline'"
+              @click="store.selectPlannedWorkout(workout.id)"
+            >
               <Flame class="h-4 w-4" />
-              На сегодня
+              {{ store.selectedWorkoutId === workout.id ? 'Сегодня' : 'На сегодня' }}
             </Button>
             <Button class="w-full" variant="outline" @click="store.deletePlannedWorkout(workout.id)">
               <Trash2 class="h-4 w-4" />
@@ -280,9 +285,14 @@ function toOptionalNumber(value: string) {
             </div>
 
             <div class="mt-4 grid grid-cols-2 gap-3">
-              <Button class="w-full" :variant="activeRouteId === savedRoute.id ? 'default' : 'outline'" @click="store.selectRouteForToday(savedRoute.id)">
+              <Button
+                class="w-full"
+                :class="activeRouteId === savedRoute.id ? 'bg-[#ef4444] text-white active:bg-[#dc2626]' : ''"
+                :variant="activeRouteId === savedRoute.id ? 'destructive' : 'outline'"
+                @click="store.selectRouteForToday(savedRoute.id)"
+              >
                 <Flame class="h-4 w-4" />
-                На сегодня
+                {{ activeRouteId === savedRoute.id ? 'Сегодня' : 'На сегодня' }}
               </Button>
               <NuxtLink to="/routes" class="block">
                 <Button class="w-full" variant="outline">Открыть</Button>

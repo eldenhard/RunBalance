@@ -24,33 +24,33 @@ export function getHeartRateZoneAppearance(zoneId?: string): HeartRateZoneAppear
   switch (zoneId) {
     case 'z1':
       return {
-        accent: '#7dd3fc',
-        tileClass: 'border-[#204a63] bg-[#0f1d27] text-[#d7f2ff]',
-        badgeClass: 'bg-[#123247] text-[#8fdcff]'
+        accent: '#38bdf8',
+        tileClass: 'border-[#38bdf8]/45 bg-[#082333] text-[#e0f7ff]',
+        badgeClass: 'bg-[#e0f7ff] text-[#075985]'
       }
     case 'z2':
       return {
-        accent: '#4ade80',
-        tileClass: 'border-[#1d4d32] bg-[#0d1f16] text-[#dcffe8]',
-        badgeClass: 'bg-[#163522] text-[#70ee9a]'
+        accent: '#86efac',
+        tileClass: 'border-[#86efac]/45 bg-[#0b2516] text-[#ecfdf3]',
+        badgeClass: 'bg-[#dcfce7] text-[#166534]'
       }
     case 'z3':
       return {
-        accent: '#facc15',
-        tileClass: 'border-[#5a4612] bg-[#251b07] text-[#fff5cc]',
-        badgeClass: 'bg-[#3a2a08] text-[#ffd95a]'
+        accent: '#fde047',
+        tileClass: 'border-[#fde047]/45 bg-[#2b2508] text-[#fff9c7]',
+        badgeClass: 'bg-[#fef9c3] text-[#854d0e]'
       }
     case 'z4':
       return {
-        accent: '#fb923c',
-        tileClass: 'border-[#5d2d10] bg-[#261307] text-[#ffe4d2]',
-        badgeClass: 'bg-[#3d1d09] text-[#ffb07a]'
+        accent: '#fdba74',
+        tileClass: 'border-[#fdba74]/45 bg-[#2d1608] text-[#fff1e6]',
+        badgeClass: 'bg-[#ffedd5] text-[#9a3412]'
       }
     case 'z5':
       return {
-        accent: '#f87171',
-        tileClass: 'border-[#5b1f24] bg-[#240d11] text-[#ffe0e3]',
-        badgeClass: 'bg-[#3b1116] text-[#ff9aa2]'
+        accent: '#fda4af',
+        tileClass: 'border-[#fda4af]/45 bg-[#2d1117] text-[#fff1f3]',
+        badgeClass: 'bg-[#ffe4e6] text-[#9f1239]'
       }
     default:
       return {

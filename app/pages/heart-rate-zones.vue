@@ -59,17 +59,19 @@ function updateDraft(zoneId: string, key: 'name' | 'minBpm' | 'maxBpm', value: s
 
     <div class="space-y-3">
       <Card v-for="zone in store.profile.zones" :key="zone.id" class="p-4">
-        <div class="flex items-center justify-between gap-4">
-          <div>
-            <p class="font-medium">{{ zone.id.toUpperCase() }}</p>
-            <p class="mt-1 text-sm text-[#767676]">Цвет зоны уже используется на экране бега.</p>
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-2">
+              <p class="font-medium">{{ zone.id.toUpperCase() }}</p>
+              <span
+                class="inline-flex shrink-0 whitespace-nowrap rounded-full px-3 py-1 text-xs font-medium"
+                :class="getHeartRateZoneAppearance(zone.id).badgeClass"
+              >
+                {{ zone.minBpm }}-{{ zone.maxBpm }}
+              </span>
+            </div>
+            <p class="mt-1 text-sm text-[#767676]">Цвет зоны используется на экране бега.</p>
           </div>
-          <span
-            class="inline-flex rounded-full px-3 py-1 text-xs font-medium"
-            :class="getHeartRateZoneAppearance(zone.id).badgeClass"
-          >
-            {{ zone.minBpm }}-{{ zone.maxBpm }}
-          </span>
         </div>
 
         <div v-if="drafts[zone.id]" class="mt-4 grid grid-cols-1 gap-3">
