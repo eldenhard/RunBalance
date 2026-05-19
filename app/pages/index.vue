@@ -51,14 +51,15 @@ const hasPlan = computed(() => store.plannedWorkouts.length > 0)
       </Card>
     </NuxtLink>
 
-    <Card class="overflow-hidden border-[#d9e8ff] bg-white p-4">
-      <div class="-mx-4 -mt-4 mb-4 h-1.5 bg-gradient-to-r from-[#b9ff38] via-[#64c7ff] to-[#ff7a2b]" />
+    <Card class="border-[#deded9] bg-white p-4">
       <div class="mb-4 flex items-center justify-between">
         <div class="min-w-0">
           <p class="text-xs text-[#767676]">Тренировка дня</p>
           <h2 class="text-xl font-medium text-[#111111]">{{ hasPlan ? store.adaptedWorkout.title : 'План пуст' }}</h2>
         </div>
-        <Activity class="h-6 w-6 shrink-0 text-[#ff7a2b]" />
+        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#fff1e8] text-[#c95000]">
+          <Activity class="h-5 w-5" />
+        </div>
       </div>
 
       <div v-if="hasPlan" class="grid grid-cols-2 gap-3">

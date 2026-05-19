@@ -34,30 +34,28 @@ function saveRouteFromResult() {
 </script>
 
 <template>
-  <div class="theme-light min-h-dvh space-y-4 bg-[#f7f6f2] p-4">
-    <ScreenHeader eyebrow="Результат" title="Пробежка сохранена локально" />
-
-    <section class="overflow-hidden rounded-[28px] bg-[#111111] text-white">
+  <div class="theme-light min-h-dvh space-y-4 bg-[#f7f6f2] pb-4">
+    <section class="overflow-hidden rounded-b-[34px] bg-gradient-to-br from-[#f3ffd8] via-[#eaf8ff] to-[#fff0e6] text-[#111111] shadow-[0_18px_50px_rgba(0,0,0,0.08)]">
       <div class="relative p-5">
-        <div class="absolute inset-x-5 top-0 h-1.5 rounded-full bg-gradient-to-r from-[#b9ff38] via-[#7cc7ff] to-[#ff7a2b]" />
+        <div class="absolute inset-x-5 top-0 h-1.5 rounded-full bg-gradient-to-r from-[#b9ff38] via-[#64c7ff] to-[#ff7a2b]" />
         <div class="flex items-start justify-between gap-4">
           <div>
-            <p class="text-sm text-white/60">{{ workout.title }}</p>
-            <h1 class="mt-3 text-[52px] font-medium leading-none tracking-normal">{{ formatDistance(workout.distanceKm) }}</h1>
+            <p class="text-sm text-[#62625e]">{{ workout.title }}</p>
+            <h1 class="mt-3 text-[72px] font-medium leading-[0.86] tracking-normal">{{ formatDistance(workout.distanceKm) }}</h1>
           </div>
-          <Badge variant="secondary" class="border-white/10 bg-white/10 text-white">Тренировка завершена</Badge>
+          <Badge variant="secondary" class="border-white/60 bg-white/70 text-[#111111] backdrop-blur">Тренировка завершена</Badge>
         </div>
 
         <div class="mt-6 grid grid-cols-2 gap-3">
-          <div class="rounded-3xl border border-white/10 bg-white/[0.06] p-4">
-            <div class="flex items-center gap-2 text-sm text-[#7cc7ff]">
+          <div class="rounded-3xl border border-white/70 bg-white/68 p-4 shadow-[0_12px_30px_rgba(0,0,0,0.06)] backdrop-blur">
+            <div class="flex items-center gap-2 text-sm text-[#0f6f9c]">
               <Timer class="h-4 w-4" />
               Время
             </div>
             <p class="mt-2 text-2xl font-medium">{{ formatDuration(workout.durationSec) }}</p>
           </div>
-          <div class="rounded-3xl border border-white/10 bg-white/[0.06] p-4">
-            <div class="flex items-center gap-2 text-sm text-[#ffad72]">
+          <div class="rounded-3xl border border-white/70 bg-white/68 p-4 shadow-[0_12px_30px_rgba(0,0,0,0.06)] backdrop-blur">
+            <div class="flex items-center gap-2 text-sm text-[#c95000]">
               <Gauge class="h-4 w-4" />
               Темп
             </div>
@@ -65,9 +63,9 @@ function saveRouteFromResult() {
           </div>
         </div>
 
-        <div class="mt-3 flex items-center justify-between rounded-3xl border border-[#b9ff38]/20 bg-[#b9ff38]/10 px-4 py-3">
-          <div class="flex items-center gap-2 text-sm text-white/70">
-            <HeartPulse class="h-4 w-4 text-[#b9ff38]" />
+        <div class="mt-3 flex items-center justify-between rounded-3xl border border-[#b9ff38]/70 bg-white/58 px-4 py-3 shadow-[0_12px_30px_rgba(0,0,0,0.05)] backdrop-blur">
+          <div class="flex items-center gap-2 text-sm text-[#62625e]">
+            <HeartPulse class="h-4 w-4 text-[#5c7f00]" />
             Пульс
           </div>
           <p class="font-medium">{{ workout.avgHeartRate ? `${workout.avgHeartRate} уд/мин` : 'нет данных' }}</p>
@@ -75,7 +73,7 @@ function saveRouteFromResult() {
       </div>
     </section>
 
-    <Card class="overflow-hidden p-0">
+    <Card class="mx-4 overflow-hidden p-0">
       <div v-if="resultRoute" class="relative">
         <ClientOnly>
           <RouteMap
@@ -150,7 +148,7 @@ function saveRouteFromResult() {
       </div>
     </Teleport>
 
-    <Card class="p-4">
+    <Card class="mx-4 p-4">
       <div class="mb-4 flex items-center gap-3">
         <div class="rounded-2xl bg-[#fff1e8] p-2 text-[#8a3900]">
           <StickyNote class="h-5 w-5" />
@@ -181,7 +179,7 @@ function saveRouteFromResult() {
       />
     </Card>
 
-    <Card v-if="resultShoe" class="p-4">
+    <Card v-if="resultShoe" class="mx-4 p-4">
       <div class="flex items-center gap-3">
         <div class="rounded-2xl bg-[#f3ffd8] p-2 text-[#3f5f00]">
           <Footprints class="h-5 w-5" />
@@ -193,7 +191,7 @@ function saveRouteFromResult() {
       </div>
     </Card>
 
-    <Card class="p-4">
+    <Card class="mx-4 p-4">
       <div class="mb-4 flex items-center justify-between gap-3">
         <div>
           <h2 class="font-medium">Сплиты</h2>
@@ -226,7 +224,7 @@ function saveRouteFromResult() {
       </div>
     </Card>
 
-    <div class="grid gap-3 pt-2">
+    <div class="mx-4 grid gap-3 pt-2">
       <NuxtLink to="/" class="block">
         <Button class="w-full" size="lg">
           <Home class="h-5 w-5" />

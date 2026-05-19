@@ -30,10 +30,14 @@ const hasSetInitialCamera = ref(false)
 const errorMessage = ref<string | null>(null)
 const routeCoordinates = computed(() => props.route ? getRouteLineCoordinates(props.route) : [])
 const hasTrack = computed(() => routeCoordinates.value.length >= 2)
-const hasCurrentPoint = computed(() => Boolean(props.currentPoint))
+const mapPoint = computed<[number, number] | null>(() => {
+  if (props.currentPoint) return [props.currentPoint.longitude, props.currentPoint.latitude]
+  return routeCoordinates.value[0] ?? null
+})
+const hasCurrentPoint = computed(() => Boolean(mapPoint.value))
 const routeSignature = computed(() => JSON.stringify({
   route: routeCoordinates.value,
-  point: props.currentPoint ? [props.currentPoint.longitude, props.currentPoint.latitude] : null
+  point: mapPoint.value
 }))
 
 const palette = computed(() => {
@@ -43,15 +47,15 @@ const palette = computed(() => {
       track: '#b9ff38',
       trackCasing: '#000000',
       marker: '#ffffff',
-      current: '#64c7ff'
+      current: '#ff3b30'
     }
   }
   return {
     land: '#f7f7f5',
     track: '#111111',
     trackCasing: '#ffffff',
-    marker: '#111111',
-    current: '#0ea5e9'
+    marker: '#ffffff',
+    current: '#ff3b30'
   }
 })
 
@@ -115,8 +119,8 @@ async function ensureMap() {
           (bounds[0][0] + bounds[1][0]) / 2,
           (bounds[0][1] + bounds[1][1]) / 2
         ]
-      : props.currentPoint
-        ? [props.currentPoint.longitude, props.currentPoint.latitude]
+      : mapPoint.value
+        ? mapPoint.value
       : [37.6173, 55.7558]
 
     const instance = new maplibre.Map({
@@ -230,7 +234,8 @@ function applyRoute() {
     }
   }
 
-  if (props.currentPoint) {
+  const point = mapPoint.value
+  if (point) {
     const currentData = {
       type: 'FeatureCollection' as const,
       features: [{
@@ -238,7 +243,7 @@ function applyRoute() {
         properties: {},
         geometry: {
           type: 'Point' as const,
-          coordinates: [props.currentPoint.longitude, props.currentPoint.latitude]
+          coordinates: point
         }
       }]
     }
@@ -252,9 +257,9 @@ function applyRoute() {
         type: 'circle',
         source: currentSourceId,
         paint: {
-          'circle-radius': 14,
+          'circle-radius': 18,
           'circle-color': palette.value.current,
-          'circle-opacity': 0.22
+          'circle-opacity': 0.2
         }
       })
       instance.addLayer({
@@ -262,10 +267,10 @@ function applyRoute() {
         type: 'circle',
         source: currentSourceId,
         paint: {
-          'circle-radius': 6,
-          'circle-color': palette.value.marker,
-          'circle-stroke-color': palette.value.current,
-          'circle-stroke-width': 3
+          'circle-radius': 7,
+          'circle-color': palette.value.current,
+          'circle-stroke-color': palette.value.marker,
+          'circle-stroke-width': 4
         }
       })
     }
@@ -275,9 +280,9 @@ function applyRoute() {
   if (!hasSetInitialCamera.value && bounds && coordinates.length >= 2) {
     instance.fitBounds(bounds, { padding: 32, animate: false, maxZoom: 15 })
     hasSetInitialCamera.value = true
-  } else if (!hasSetInitialCamera.value && props.currentPoint) {
+  } else if (!hasSetInitialCamera.value && point) {
     instance.jumpTo({
-      center: [props.currentPoint.longitude, props.currentPoint.latitude],
+      center: point,
       zoom: 16
     })
     hasSetInitialCamera.value = true
@@ -348,7 +353,7 @@ onBeforeUnmount(() => {
       v-else-if="showStatusHint && !hasTrack"
       :class="cn('pointer-events-none absolute inset-x-4 bottom-3 rounded-full px-3 py-1 text-center text-[11px] leading-snug backdrop-blur', placeholderClass)"
     >
-      {{ hasCurrentPoint ? 'Трек появится после движения.' : 'Ждём первую GPS-точку.' }}
+      {{ hasCurrentPoint ? 'Стартовая точка записана.' : 'Ждём первую GPS-точку.' }}
     </div>
   </div>
 </template>
@@ -455,12 +460,12 @@ onBeforeUnmount(() => {
 .route-map-fallback__dot {
   left: 50%;
   top: 50%;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border-radius: 999px;
-  background: #64c7ff;
+  background: #ff3b30;
   border: 4px solid #ffffff;
-  box-shadow: 0 0 0 10px rgba(100, 199, 255, 0.18);
+  box-shadow: 0 0 0 12px rgba(255, 59, 48, 0.2);
   transform: translate(-50%, -50%);
 }
 </style>

@@ -113,6 +113,7 @@ function isActive(item: typeof navItems[number]) {
   height: 100dvh;
   min-height: 0;
   overflow: hidden;
+  padding-top: 0;
 }
 
 .app-frame--with-nav {

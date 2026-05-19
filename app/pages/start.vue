@@ -72,10 +72,10 @@ onMounted(() => {
           class="absolute inset-0 h-full w-full rounded-none"
         />
       </ClientOnly>
-      <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/80 via-white/5 to-[#f7fff0]/72" />
-      <div class="pointer-events-none absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-[#f7fff0] via-[#f7fff0]/72 to-transparent" />
+      <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/56 via-white/0 to-[#f4ffd9]/58" />
+      <div class="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-[#f4ffd9] via-[#f4ffd9]/62 to-transparent" />
 
-      <div class="pointer-events-none relative z-10 flex h-full flex-col justify-between p-4">
+      <div class="pointer-events-none start-content relative z-10 flex h-full flex-col justify-between px-4 pb-4">
         <div class="space-y-4 pt-2">
           <div class="pointer-events-auto flex items-start justify-between gap-3">
             <div class="min-w-0">
@@ -152,16 +152,21 @@ onMounted(() => {
       </div>
     </Teleport>
 
-    <Transition name="countdown">
-      <div v-if="isCountingDown" class="fixed inset-0 z-[10000] flex items-center justify-center overflow-hidden bg-[#080909] text-white">
-        <div class="countdown-orbit countdown-orbit--one" />
-        <div class="countdown-orbit countdown-orbit--two" />
-        <div class="relative flex flex-col items-center">
-          <p class="mb-6 text-sm font-medium uppercase tracking-[0.22em] text-[#b9ff38]">Старт через</p>
-          <div class="countdown-ring flex h-52 w-52 items-center justify-center rounded-full">
+    <Transition name="launch">
+      <div v-if="isCountingDown" class="launch-overlay fixed inset-0 z-[10000] flex items-center justify-center overflow-hidden bg-[#070808] text-white">
+        <div class="launch-grid" />
+        <div class="launch-streak launch-streak--one" />
+        <div class="launch-streak launch-streak--two" />
+        <div class="launch-streak launch-streak--three" />
+        <div class="launch-panel">
+          <p class="launch-eyebrow">RunBalance</p>
           <Transition name="countdown-number" mode="out-in">
-            <span :key="countdownValue ?? 'idle'" class="text-[96px] font-medium leading-none">{{ countdownValue }}</span>
+            <span :key="countdownValue ?? 'idle'" class="launch-number">{{ countdownValue }}</span>
           </Transition>
+          <div class="launch-progress" aria-hidden="true">
+            <span :class="countdownValue === 3 ? 'is-active' : ''" />
+            <span :class="countdownValue === 2 ? 'is-active' : ''" />
+            <span :class="countdownValue === 1 ? 'is-active' : ''" />
           </div>
         </div>
       </div>
@@ -171,94 +176,172 @@ onMounted(() => {
 
 <style scoped>
 .start-tracker-screen {
-  height: calc(100dvh - env(safe-area-inset-top, 0px) - 20px - 5.15rem - env(safe-area-inset-bottom, 0px));
+  height: calc(100dvh - 5.15rem - env(safe-area-inset-bottom, 0px));
   overflow: hidden;
   overscroll-behavior: none;
 }
 
-.countdown-enter-active,
-.countdown-leave-active {
-  transition: opacity 0.18s ease, transform 0.18s ease;
+.start-content {
+  padding-top: calc(env(safe-area-inset-top, 0px) + 16px);
 }
 
-.countdown-enter-from,
-.countdown-leave-to {
+.launch-enter-active,
+.launch-leave-active {
+  transition: opacity 0.22s ease;
+}
+
+.launch-enter-from,
+.launch-leave-to {
   opacity: 0;
-  transform: scale(0.88);
 }
 
 .countdown-number-enter-active,
 .countdown-number-leave-active {
-  transition: opacity 0.2s ease, transform 0.34s cubic-bezier(0.2, 0.95, 0.2, 1.12);
+  transition: opacity 0.18s ease, transform 0.32s cubic-bezier(0.18, 0.92, 0.2, 1.16), filter 0.32s ease;
 }
 
 .countdown-number-enter-from {
   opacity: 0;
-  transform: scale(0.38) rotate(-6deg);
+  filter: blur(8px);
+  transform: translateY(64px) scale(0.64) skewY(-5deg);
 }
 
 .countdown-number-leave-to {
   opacity: 0;
-  transform: scale(1.48) rotate(4deg);
+  filter: blur(10px);
+  transform: translateY(-72px) scale(1.18) skewY(4deg);
 }
 
-.countdown-ring {
-  position: relative;
+.launch-overlay {
+  isolation: isolate;
+}
+
+.launch-grid {
+  position: absolute;
+  inset: -10%;
   background:
-    radial-gradient(circle, rgba(255, 255, 255, 0.1) 0 47%, transparent 48%),
-    conic-gradient(from 210deg, #b9ff38, #64c7ff, #ff7a2b, #b9ff38);
-  box-shadow: 0 0 64px rgba(185, 255, 56, 0.22);
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(circle, black 0 42%, transparent 78%);
+  transform: perspective(420px) rotateX(58deg) translateY(110px);
+  animation: launch-grid-move 1.1s linear infinite;
 }
 
-.countdown-ring::before {
+.launch-streak {
+  position: absolute;
+  left: -18%;
+  width: 136%;
+  height: 16px;
+  border-radius: 999px;
+  filter: blur(0.2px);
+  opacity: 0.82;
+  transform: rotate(-16deg);
+  animation: launch-streak 0.72s cubic-bezier(0.3, 0, 0.2, 1) infinite;
+}
+
+.launch-streak--one {
+  top: 34%;
+  background: linear-gradient(90deg, transparent, #b9ff38, transparent);
+}
+
+.launch-streak--two {
+  top: 49%;
+  height: 10px;
+  background: linear-gradient(90deg, transparent, #64c7ff, transparent);
+  animation-delay: 0.1s;
+}
+
+.launch-streak--three {
+  top: 62%;
+  height: 12px;
+  background: linear-gradient(90deg, transparent, #ff7a2b, transparent);
+  animation-delay: 0.2s;
+}
+
+.launch-panel {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: min(78vw, 340px);
+  aspect-ratio: 1;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.11) 0 43%, transparent 44%),
+    conic-gradient(from 180deg, #b9ff38, #64c7ff, #ff7a2b, #b9ff38);
+  box-shadow: 0 0 82px rgba(185, 255, 56, 0.24), inset 0 0 0 12px rgba(255, 255, 255, 0.05);
+}
+
+.launch-panel::before {
   content: "";
   position: absolute;
-  inset: 11px;
+  inset: 13px;
   border-radius: inherit;
-  background: #080909;
+  background: #070808;
 }
 
-.countdown-ring span {
+.launch-eyebrow,
+.launch-number,
+.launch-progress {
   position: relative;
   z-index: 1;
 }
 
-.countdown-orbit {
-  position: absolute;
+.launch-eyebrow {
+  align-self: end;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.launch-number {
+  align-self: center;
+  font-size: 132px;
+  font-weight: 500;
+  line-height: 0.82;
+  color: #ffffff;
+  text-shadow: 0 0 34px rgba(255, 255, 255, 0.22);
+}
+
+.launch-progress {
+  align-self: start;
+  display: flex;
+  gap: 8px;
+}
+
+.launch-progress span {
+  width: 32px;
+  height: 5px;
   border-radius: 999px;
-  filter: blur(2px);
-  opacity: 0.22;
+  background: rgba(255, 255, 255, 0.18);
 }
 
-.countdown-orbit--one {
-  --countdown-x: -92px;
-  --countdown-y: -120px;
-  width: 280px;
-  height: 280px;
+.launch-progress span.is-active {
   background: #b9ff38;
-  transform: translate(var(--countdown-x), var(--countdown-y));
-  animation: countdown-pulse 1.1s ease-in-out infinite;
+  box-shadow: 0 0 20px rgba(185, 255, 56, 0.56);
 }
 
-.countdown-orbit--two {
-  --countdown-x: 104px;
-  --countdown-y: 118px;
-  width: 230px;
-  height: 230px;
-  background: #64c7ff;
-  transform: translate(var(--countdown-x), var(--countdown-y));
-  animation: countdown-pulse 1.1s ease-in-out infinite 0.18s;
-}
-
-@keyframes countdown-pulse {
-  0%,
-  100% {
-    transform: translate(var(--countdown-x), var(--countdown-y)) scale(0.95);
-    opacity: 0.16;
+@keyframes launch-grid-move {
+  to {
+    background-position: 0 42px, 42px 0;
   }
-  50% {
-    transform: translate(var(--countdown-x), var(--countdown-y)) scale(1.08);
-    opacity: 0.3;
+}
+
+@keyframes launch-streak {
+  from {
+    opacity: 0;
+    transform: translateX(-34%) rotate(-16deg);
+  }
+  35% {
+    opacity: 0.86;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(34%) rotate(-16deg);
   }
 }
 </style>
