@@ -81,13 +81,13 @@ function toOptionalNumber(value: string) {
   <div class="theme-light min-h-dvh space-y-4 p-4">
     <ScreenHeader eyebrow="План" title="Свои тренировки" />
 
-    <div class="sticky top-[calc(env(safe-area-inset-top,0px)+8px)] z-20 rounded-[22px] border border-[#deded9] bg-white/90 p-1 shadow-[0_10px_30px_rgba(0,0,0,0.05)] backdrop-blur">
+    <div class="sticky top-[calc(env(safe-area-inset-top,0px)+8px)] z-20 rounded-[22px] border border-[#d8ead1] bg-white/90 p-1 shadow-[0_10px_30px_rgba(34,197,94,0.08)] backdrop-blur">
       <div class="grid grid-cols-3 gap-1">
         <button
           v-for="section in sections"
           :key="section.value"
           class="h-11 rounded-[18px] text-sm font-medium text-[#767676] transition"
-          :class="activeSection === section.value ? 'bg-[#111111] text-white shadow-sm' : 'active:bg-[#f0f0ed]'"
+          :class="activeSection === section.value ? 'bg-[#111111] text-white shadow-sm' : 'active:bg-[#f3ffd8]'"
           @click="activeSection = section.value"
         >
           {{ section.label }}
@@ -95,9 +95,9 @@ function toOptionalNumber(value: string) {
       </div>
     </div>
 
-    <Card v-if="activeSection === 'workouts'" class="p-4">
+    <Card v-if="activeSection === 'workouts'" class="border-[#e8dcff] bg-[#fdfbff] p-4">
       <div class="mb-4 flex items-center gap-3">
-        <CirclePlus class="h-5 w-5 text-[#111111]" />
+        <CirclePlus class="h-5 w-5 text-[#7c3aed]" />
         <div>
           <h2 class="font-medium">Новая тренировка</h2>
          

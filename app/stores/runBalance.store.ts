@@ -207,7 +207,7 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
   function finishActiveSession(finishedAt = new Date().toISOString()) {
     if (!activeSession.value) return currentWorkout.value
 
-    const routeSnapshot = activeSession.value.trackPoints.length >= 2
+    const routeSnapshot = activeSession.value.trackPoints.length >= 1
       ? createRouteFromTrack(activeSession.value.trackPoints, activeRoute.value, activeSession.value.distanceKm)
       : activeRoute.value
 

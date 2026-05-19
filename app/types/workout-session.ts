@@ -7,6 +7,7 @@ export type TrackPoint = {
   longitude: number
   recordedAt: string
   accuracyM?: number
+  speedMps?: number
 }
 
 export type WorkoutSession = {

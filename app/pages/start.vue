@@ -3,6 +3,7 @@ import { Maximize2, Play, X } from '@lucide/vue'
 
 const store = useRunBalanceStore()
 const router = useRouter()
+const voice = useVoiceAlerts()
 const hasPlan = computed(() => store.plannedWorkouts.length > 0)
 const countdownValue = ref<number | null>(null)
 const isCountingDown = computed(() => countdownValue.value !== null)
@@ -27,6 +28,7 @@ async function startWithCountdown(mode: 'planned' | 'free') {
   } else {
     store.startFreeWorkoutSession()
   }
+  voice.announceEvent('Тренировка началась', { vibrate: false })
   await router.push('/workout/active')
 }
 

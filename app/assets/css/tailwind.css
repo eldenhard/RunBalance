@@ -21,6 +21,10 @@
   --workout-foreground: #ffffff;
   --workout-muted: #9b9b9b;
   --sport-accent: #ff5a00;
+  --sport-green: #b9ff38;
+  --sport-blue: #64c7ff;
+  --sport-orange: #ff7a2b;
+  --sport-red: #ef4444;
 }
 
 html {
@@ -77,7 +81,10 @@ textarea {
   --screen-muted: var(--app-muted);
   --screen-border: var(--app-border);
   --screen-shadow: 0 12px 30px rgba(0, 0, 0, 0.045);
-  background: var(--app-bg);
+  background:
+    radial-gradient(circle at 18% -10%, rgba(185, 255, 56, 0.16), transparent 0 220px),
+    radial-gradient(circle at 95% 6%, rgba(100, 199, 255, 0.14), transparent 0 210px),
+    linear-gradient(180deg, #fbfaf6 0%, var(--app-bg) 42%, #f5f7f1 100%);
   color: var(--app-foreground);
 }
 

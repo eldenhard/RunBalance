@@ -24,15 +24,20 @@ const zoneDetail = computed(() => {
 })
 const trackedDistanceKm = computed(() => session.value?.distanceKm ?? 0)
 const currentPoint = computed(() => gps.latestPoint.value ?? session.value?.trackPoints.at(-1) ?? null)
+const displayPaceSecPerKm = computed(() => session.value?.avgPaceSecPerKm ?? getCurrentPaceFromGps())
 const liveRoute = computed(() => {
-  if (session.value?.trackPoints.length) {
+  if (session.value?.trackPoints.length && session.value.trackPoints.length >= 2) {
     return createRouteFromTrack(session.value.trackPoints, store.activeRoute, session.value.distanceKm)
   }
 
   return store.activeRoute
 })
 let runtimeInterval: ReturnType<typeof window.setInterval> | null = null
+let finishHoldFrame: number | null = null
 let lastHandledKilometer = 0
+const finishHoldMs = 7000
+const finishHoldProgress = ref(0)
+const isHoldingFinish = computed(() => finishHoldProgress.value > 0)
 
 onMounted(() => {
   store.restorePersistedActiveSession()
@@ -48,6 +53,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   stopRuntimeTimer()
+  cancelFinishHold()
 })
 
 watch(() => session.value?.status, () => {
@@ -95,8 +101,38 @@ function toggleGps() {
 async function finishWorkout() {
   gps.stop()
   announceWorkoutEvent('Тренировка завершена', { vibrationPattern: [100, 60, 100] })
+  store.refreshActiveSession()
   store.finishActiveSession()
   await router.push('/workout/result')
+}
+
+function startFinishHold() {
+  if (finishHoldFrame !== null) return
+
+  const startedAt = performance.now()
+  const tick = () => {
+    const elapsed = performance.now() - startedAt
+    finishHoldProgress.value = Math.min(100, (elapsed / finishHoldMs) * 100)
+
+    if (elapsed >= finishHoldMs) {
+      finishHoldFrame = null
+      finishHoldProgress.value = 0
+      void finishWorkout()
+      return
+    }
+
+    finishHoldFrame = window.requestAnimationFrame(tick)
+  }
+
+  finishHoldFrame = window.requestAnimationFrame(tick)
+}
+
+function cancelFinishHold() {
+  if (finishHoldFrame !== null) {
+    window.cancelAnimationFrame(finishHoldFrame)
+    finishHoldFrame = null
+  }
+  finishHoldProgress.value = 0
 }
 
 function syncRuntimeTimer() {
@@ -123,6 +159,13 @@ function announceWorkoutEvent(message: string, options?: Parameters<typeof voice
 function getKilometerEventMessage(kilometer: number) {
   if (kilometer === 1) return 'Первый километр'
   return `${kilometer} километр`
+}
+
+function getCurrentPaceFromGps() {
+  const speedMps = currentPoint.value?.speedMps
+  if (!speedMps || speedMps < 0.7) return undefined
+
+  return Math.round(1000 / speedMps)
 }
 
 const gpsStatusClass = computed(() => gps.status.value === 'tracking'
@@ -189,14 +232,21 @@ const voiceStatusClass = computed(() => voice.isEnabled.value && voice.isSupport
 
     <Card class="overflow-hidden border-[#26301b] bg-[#111411] p-0 shadow-[0_24px_60px_rgba(185,255,56,0.08)]">
       <ClientOnly>
-        <RouteMap :route="liveRoute" :current-point="currentPoint" theme="dark" class="h-64 w-full" />
+        <RouteMap
+          :route="liveRoute"
+          :current-point="currentPoint"
+          theme="dark"
+          interactive
+          :show-status-hint="false"
+          class="h-64 w-full"
+        />
       </ClientOnly>
     </Card>
 
     <section class="grid grid-cols-2 gap-4">
       <MetricTile label="Дистанция" :value="formatDistance(session?.distanceKm)" dark class="border-[#b9ff38]/20 bg-[#182010]" />
       <MetricTile label="Время" :value="formatDuration(session?.durationSec)" dark class="border-[#7cc7ff]/20 bg-[#101820]" />
-      <MetricTile label="Темп" :value="formatPace(session?.avgPaceSecPerKm)" dark class="border-[#ff7a2b]/20 bg-[#21160f]" />
+      <MetricTile label="Темп" :value="formatPace(displayPaceSecPerKm)" dark class="border-[#ff7a2b]/20 bg-[#21160f]" />
       <MetricTile
         label="Зона"
         :value="targetZone?.name ?? '—'"
@@ -232,11 +282,32 @@ const voiceStatusClass = computed(() => voice.isEnabled.value && voice.isSupport
         <Pause v-else class="h-5 w-5" />
         {{ session?.status === 'paused' ? 'Продолжить' : 'Пауза' }}
       </Button>
-      <Button class="w-full" variant="destructive" size="lg" @click="finishWorkout">
-        <Square class="h-5 w-5" />
-        Завершить
-      </Button>
+      <button
+        type="button"
+        class="relative h-12 touch-none select-none overflow-hidden rounded-[14px] bg-red-600 px-5 text-base font-medium text-white transition-colors active:bg-red-700"
+        :style="{ '--finish-progress': `${finishHoldProgress}%` }"
+        @pointerdown.prevent="startFinishHold"
+        @pointerup.prevent="cancelFinishHold"
+        @pointercancel.prevent="cancelFinishHold"
+        @pointerleave.prevent="cancelFinishHold"
+      >
+        <span class="finish-hold-fill" />
+        <span class="relative z-10 inline-flex items-center justify-center gap-2">
+          <Square class="h-5 w-5" />
+          {{ isHoldingFinish ? 'Удерживай' : 'Завершить' }}
+        </span>
+      </button>
     </div>
     </template>
   </div>
 </template>
+
+<style scoped>
+.finish-hold-fill {
+  position: absolute;
+  inset: 0;
+  width: var(--finish-progress);
+  background: rgba(255, 255, 255, 0.24);
+  transition: width 0.08s linear;
+}
+</style>

@@ -26,7 +26,7 @@ const hasPlan = computed(() => store.plannedWorkouts.length > 0)
       </Card>
     </NuxtLink>
 
-    <Card v-if="hasRecovery" class="p-4">
+    <Card v-if="hasRecovery" class="border-[#d7edc6] bg-[#fbfff2] p-4">
       <div class="flex items-start justify-between gap-4">
         <div>
           <p class="text-xs text-[#767676]">Готовность</p>
@@ -51,7 +51,8 @@ const hasPlan = computed(() => store.plannedWorkouts.length > 0)
       </Card>
     </NuxtLink>
 
-    <Card class="p-4">
+    <Card class="overflow-hidden border-[#d9e8ff] bg-white p-4">
+      <div class="-mx-4 -mt-4 mb-4 h-1.5 bg-gradient-to-r from-[#b9ff38] via-[#64c7ff] to-[#ff7a2b]" />
       <div class="mb-4 flex items-center justify-between">
         <div class="min-w-0">
           <p class="text-xs text-[#767676]">Тренировка дня</p>
@@ -61,7 +62,7 @@ const hasPlan = computed(() => store.plannedWorkouts.length > 0)
             <template v-else>Создай первую тренировку или сразу беги свободным.</template>
           </p>
         </div>
-        <Activity class="h-6 w-6 shrink-0 text-[#767676]" />
+        <Activity class="h-6 w-6 shrink-0 text-[#ff7a2b]" />
       </div>
 
       <div v-if="hasPlan" class="grid grid-cols-2 gap-3">
@@ -99,7 +100,7 @@ const hasPlan = computed(() => store.plannedWorkouts.length > 0)
           <RouteMap :route="store.activeRoute" class="h-40 w-full" />
         </ClientOnly>
         <div class="flex items-center gap-3 p-4">
-          <MapPinned class="h-5 w-5 text-slate-500" />
+          <MapPinned class="h-5 w-5 text-[#22c55e]" />
           <div class="min-w-0 flex-1">
             <h2 class="font-medium text-[#111111]">{{ store.activeRoute.name }}</h2>
             <p class="text-sm text-[#767676]">{{ store.activeRoute.distanceKm }} км · {{ store.activeRoute.surface }} · {{ store.activeRoute.elevationHint }}</p>

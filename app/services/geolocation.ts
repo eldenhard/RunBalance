@@ -1,11 +1,13 @@
 import type { TrackPoint } from '~/types/workout-session'
 
 export function positionToTrackPoint(position: GeolocationPosition): TrackPoint {
+  const speedMps = position.coords.speed
   return {
     latitude: position.coords.latitude,
     longitude: position.coords.longitude,
     accuracyM: Math.round(position.coords.accuracy),
-    recordedAt: new Date(position.timestamp).toISOString()
+    recordedAt: new Date(position.timestamp).toISOString(),
+    speedMps: typeof speedMps === 'number' && Number.isFinite(speedMps) && speedMps > 0 ? speedMps : undefined
   }
 }
 
