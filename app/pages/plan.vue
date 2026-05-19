@@ -1,8 +1,13 @@
 <script setup lang="ts">
-import { CalendarDays, CirclePlus, Clock3, Flame, Map, Trash2 } from '@lucide/vue'
+import { CalendarDays, CirclePlus, Flame, Map, Target, Trash2 } from '@lucide/vue'
+import { getRouteTypeLabel } from '~/services/routes'
+import type { UserGoal } from '~/types/profile'
 import type { WorkoutType } from '~/types/workout'
 
 const store = useRunBalanceStore()
+type PlanSection = 'workouts' | 'routes' | 'goal'
+
+const activeSection = ref<PlanSection>('workouts')
 
 const workoutTypes: { value: WorkoutType, label: string }[] = [
   { value: 'easy', label: 'Лёгкий бег' },
@@ -13,6 +18,23 @@ const workoutTypes: { value: WorkoutType, label: string }[] = [
   { value: 'fartlek', label: 'Фартлек' },
   { value: 'free', label: 'Свободный бег' }
 ]
+
+const goalOptions: { value: UserGoal, label: string }[] = [
+  { value: 'base', label: 'Базовая форма' },
+  { value: 'return_to_running', label: 'Возвращение' },
+  { value: '5k', label: '5 км' },
+  { value: '10k', label: '10 км' },
+  { value: 'half_marathon', label: 'Полумарафон' }
+]
+
+const sections: { value: PlanSection, label: string }[] = [
+  { value: 'workouts', label: 'Тренировки' },
+  { value: 'routes', label: 'Маршруты' },
+  { value: 'goal', label: 'Цель' }
+]
+
+const currentGoalLabel = computed(() => goalOptions.find((option) => option.value === store.profile.goal)?.label ?? '—')
+const activeRouteId = computed(() => store.activeRoute?.id ?? null)
 
 const form = reactive({
   title: '',
@@ -57,9 +79,23 @@ function toOptionalNumber(value: string) {
 
 <template>
   <div class="theme-light min-h-dvh space-y-4 p-4">
-    <ScreenHeader eyebrow="План" title="Свои тренировки" description="Создай тренировку, привяжи зону, обувь и маршрут." />
+    <ScreenHeader eyebrow="План" title="Свои тренировки" description="Тренировки, маршруты и цель — без длинной ленты." />
 
-    <Card class="p-4">
+    <div class="sticky top-[calc(env(safe-area-inset-top,0px)+8px)] z-20 rounded-[22px] border border-[#deded9] bg-white/90 p-1 shadow-[0_10px_30px_rgba(0,0,0,0.05)] backdrop-blur">
+      <div class="grid grid-cols-3 gap-1">
+        <button
+          v-for="section in sections"
+          :key="section.value"
+          class="h-11 rounded-[18px] text-sm font-medium text-[#767676] transition"
+          :class="activeSection === section.value ? 'bg-[#111111] text-white shadow-sm' : 'active:bg-[#f0f0ed]'"
+          @click="activeSection = section.value"
+        >
+          {{ section.label }}
+        </button>
+      </div>
+    </div>
+
+    <Card v-if="activeSection === 'workouts'" class="p-4">
       <div class="mb-4 flex items-center gap-3">
         <CirclePlus class="h-5 w-5 text-[#111111]" />
         <div>
@@ -139,7 +175,7 @@ function toOptionalNumber(value: string) {
       </div>
     </Card>
 
-    <Card class="p-4">
+    <Card v-if="activeSection === 'workouts'" class="p-4">
       <div class="mb-4 flex items-center gap-3">
         <CalendarDays class="h-5 w-5 text-[#111111]" />
         <div>
@@ -203,25 +239,110 @@ function toOptionalNumber(value: string) {
       </div>
     </Card>
 
-    <Card class="p-4">
-      <NuxtLink to="/routes" class="flex items-start gap-3">
-        <Map class="mt-0.5 h-5 w-5 text-[#111111]" />
-        <div class="flex-1">
-          <h2 class="font-medium">Маршруты</h2>
-          <p class="text-sm text-[#767676]">Сохрани любимые петли и подбирай их к тренировке прямо в плане.</p>
-        </div>
-        <span class="text-sm text-[#767676]">{{ store.routes.length }}</span>
-      </NuxtLink>
-    </Card>
+    <template v-else-if="activeSection === 'routes'">
+      <Card class="p-4">
+        <NuxtLink to="/routes" class="flex items-start gap-3">
+          <Map class="mt-0.5 h-5 w-5 text-[#111111]" />
+          <div class="flex-1">
+            <h2 class="font-medium">Управление маршрутами</h2>
+            <p class="text-sm text-[#767676]">Создание и удаление маршрутов остаётся в отдельном экране.</p>
+          </div>
+          <span class="text-sm font-medium text-[#111111]">{{ store.routes.length }}</span>
+        </NuxtLink>
+      </Card>
 
-    <Card class="p-4">
-      <div class="flex items-center gap-3">
-        <Clock3 class="h-5 w-5 text-[#111111]" />
-        <div>
-          <h2 class="font-medium">Маршруты и цели</h2>
-          <p class="text-sm text-[#767676]">Маршруты доступны отдельно и могут привязываться к тренировкам.</p>
+      <Card class="p-4">
+        <div class="mb-4 flex items-center gap-3">
+          <Map class="h-5 w-5 text-[#111111]" />
+          <div>
+            <h2 class="font-medium">Маршруты в плане</h2>
+            <p class="text-sm text-[#767676]">Выбери маршрут дня или открой полный список.</p>
+          </div>
         </div>
-      </div>
-    </Card>
+
+        <div v-if="store.routes.length" class="space-y-3">
+          <div
+            v-for="savedRoute in store.routes"
+            :key="savedRoute.id"
+            class="rounded-3xl border border-[#deded9] bg-[#fbfbf9] p-4"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                  <h3 class="truncate font-medium">{{ savedRoute.name }}</h3>
+                  <Badge v-if="activeRouteId === savedRoute.id" variant="secondary">Сегодня</Badge>
+                </div>
+                <p class="mt-1 text-sm text-[#767676]">
+                  {{ savedRoute.distanceKm }} км · {{ getRouteTypeLabel(savedRoute.type) }} · {{ savedRoute.surface }}
+                </p>
+              </div>
+              <Badge variant="secondary">{{ getRouteTypeLabel(savedRoute.type) }}</Badge>
+            </div>
+
+            <div class="mt-4 grid grid-cols-2 gap-3">
+              <Button class="w-full" :variant="activeRouteId === savedRoute.id ? 'default' : 'outline'" @click="store.selectRouteForToday(savedRoute.id)">
+                <Flame class="h-4 w-4" />
+                На сегодня
+              </Button>
+              <NuxtLink to="/routes" class="block">
+                <Button class="w-full" variant="outline">Открыть</Button>
+              </NuxtLink>
+            </div>
+          </div>
+        </div>
+
+        <div v-else class="rounded-3xl border border-dashed border-[#deded9] bg-white p-4 text-sm text-[#767676]">
+          Маршрутов пока нет. Открой раздел маршрутов и сохрани первую петлю.
+        </div>
+      </Card>
+    </template>
+
+    <template v-else>
+      <Card class="p-4">
+        <div class="mb-4 flex items-center gap-3">
+          <Target class="h-5 w-5 text-[#111111]" />
+          <div>
+            <h2 class="font-medium">Цель и ориентиры</h2>
+            <p class="text-sm text-[#767676]">Цель влияет на план, зоны и подсказки нагрузки.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="rounded-2xl border border-[#e5e5df] bg-[#fbfbf9] p-3">
+            <p class="text-xs text-[#767676]">Цель</p>
+            <p class="mt-1 text-lg font-medium">{{ currentGoalLabel }}</p>
+          </div>
+          <div class="rounded-2xl border border-[#e5e5df] bg-[#fbfbf9] p-3">
+            <p class="text-xs text-[#767676]">Макс. пульс</p>
+            <p class="mt-1 text-lg font-medium">{{ store.profile.maxHeartRate || '—' }}</p>
+          </div>
+          <div class="rounded-2xl border border-[#e5e5df] bg-[#fbfbf9] p-3">
+            <p class="text-xs text-[#767676]">Зон</p>
+            <p class="mt-1 text-lg font-medium">{{ store.profile.zones.length }}</p>
+          </div>
+          <div class="rounded-2xl border border-[#e5e5df] bg-[#fbfbf9] p-3">
+            <p class="text-xs text-[#767676]">Готовность</p>
+            <p class="mt-1 text-lg font-medium">{{ store.readinessScore }}</p>
+          </div>
+        </div>
+
+        <div class="mt-4 grid grid-cols-2 gap-3">
+          <NuxtLink to="/profile" class="block">
+            <Button class="w-full" variant="outline">Профиль</Button>
+          </NuxtLink>
+          <NuxtLink to="/heart-rate-zones" class="block">
+            <Button class="w-full">Зоны</Button>
+          </NuxtLink>
+        </div>
+      </Card>
+
+      <Card class="p-4">
+        <h2 class="font-medium">Как это используется</h2>
+        <div class="mt-3 space-y-2 text-sm text-[#62625e]">
+          <p class="rounded-2xl border border-[#deded9] bg-white p-3">Цель задаёт тип нагрузки: база, возврат, 5 км, 10 км или полумарафон.</p>
+          <p class="rounded-2xl border border-[#deded9] bg-white p-3">Зоны помогают подсветить интенсивность в тренировке и в будущих подсказках.</p>
+        </div>
+      </Card>
+    </template>
   </div>
 </template>
