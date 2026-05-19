@@ -176,6 +176,9 @@ RunBalance должен выглядеть как строгий mobile-first ru
 - Тёмная тема не должна быть декоративной. Она нужна для контраста, читаемости на бегу и снижения отвлечения.
 - Светлая тема должна быть строгой: тёплый off-white фон, белые поверхности, тонкие границы, минимум теней.
 - В интерфейсе сразу предусматривать light/dark tokens, даже если часть экранов принудительно использует конкретную тему по контексту.
+- Цветовая палитра приложения выбирается в Профиле и хранится в `profile.colorThemeId`.
+- Палитра меняет только accent/hero/map-marker tokens; нейтральные поверхности, контраст, типографика и semantic colors пульсовых зон не должны ломаться.
+- Доступные палитры: `runbalance`, `velocity`, `aero`, `ember`, `volt`, `graphite`.
 
 ### Typography Rules
 
@@ -193,7 +196,9 @@ RunBalance должен выглядеть как строгий mobile-first ru
 - Action color использовать дозировано. Основной строгий action — чёрный/белый контраст. Оранжевый допускается только как спортивный акцент, не как доминирующая тема.
 - Для планирования использовать плотные информационные блоки, тонкие divider lines и компактные статусы.
 - Для активной тренировки использовать тёмный фон, крупные значения дистанции/времени/темпа, минимум текста и крупные безопасные touch targets.
-- Map-first подход не является основной визуальной моделью Phase 2. Карта остаётся функциональным экраном маршрута, а не главным стилем приложения.
+- Map-first подход разрешён для `/start`, потому что это трекер перед запуском тренировки. Для планирования, истории, профиля и аналитики карта остаётся функциональным блоком, а не главным стилем приложения.
+- `/start` должен быть locked viewport: без вертикального overscroll, без белых зон сверху/снизу, с картой-подложкой, одной кнопкой «План» и центральным play.
+- Результат тренировки должен показывать GPS-трек. Если записана только стартовая точка, карта показывает эту точку, а не пустую поверхность.
 
 ### Product Tone
 
@@ -255,6 +260,7 @@ RunBalance должен выглядеть как строгий mobile-first ru
 
 - Store: **один** Pinia-store `app/stores/runBalance.store.ts`.
 - Seed: `app/data/seedRunBalance.ts` — только пустые массивы и пустой профиль (`onboarded: false`).
+- Цветовая палитра профиля хранится в `profile.colorThemeId`; старые localStorage snapshots получают default через merge с `emptyProfile`.
 - `localStorage`:
   - `runbalance.appState` — snapshot профиля, recovery, routes, shoes, plan, history, selections.
   - `runbalance.activeWorkoutSession` — JSON активной сессии (восстанавливается при перезагрузке).
@@ -263,9 +269,9 @@ RunBalance должен выглядеть как строгий mobile-first ru
 
 ## App Shell, Splash, Safe Area
 
-- `app.html` — HTML splash (`#rb-splash`) до гидратации Vue.
-- `app/plugins/splash.client.ts` — скрытие splash после события `runbalance:ready` (мин. ~1,2 с видимости).
-- `app.vue` — `ClientOnly` + `AppShell` только после hydrate store.
+- `app.vue` — SSR-visible splash (`#rb-vue-splash`) до гидратации и применения store.
+- `app.vue` — hydrate store, восстановление активной сессии, применение CSS-переменных выбранной палитры на `body`.
+- `app/plugins/splash.client.ts` — legacy fallback для `#rb-splash`, если статический splash присутствует.
 - Safe-area: `calc(env(safe-area-inset-top) + 12px)` на контенте; bottom nav учитывает `env(safe-area-inset-bottom)`.
 - PWA: `public/icons/`, manifest `standalone`, `viewport-fit=cover` в `nuxt.config.ts`.
 
@@ -292,6 +298,7 @@ app/
     routes.ts
     shoes.ts
     trainingPlan.ts
+    themePalettes.ts
     voiceAlerts.ts
     workoutSession.ts
     heart-rate/heartRateSource.ts
@@ -330,10 +337,19 @@ export type UserGoal =
   | 'base'
   | 'return_to_running'
 
+export type AppColorThemeId =
+  | 'runbalance'
+  | 'velocity'
+  | 'aero'
+  | 'ember'
+  | 'volt'
+  | 'graphite'
+
 export type UserProfile = {
   id: string
   displayName: string
   goal: UserGoal
+  colorThemeId: AppColorThemeId
   maxHeartRate: number
   trainingDays: number[]
   zones: HeartRateZone[]

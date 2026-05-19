@@ -13,10 +13,11 @@ import { createDefaultHeartRateZones, getHeartRateZoneAppearance } from '~/servi
 import { getRecoveryRecommendation } from '~/services/recovery'
 import { createRoute, createRouteFromTrack, pickSuggestedRoute, type RouteDraft } from '~/services/routes'
 import { addWorkoutDistanceToShoe, getShoeStatus } from '~/services/shoes'
+import { getAppThemePalette } from '~/services/themePalettes'
 import { adaptWorkoutForReadiness } from '~/services/trainingPlan'
 import { createWorkoutSession, finishWorkoutSession, restoreWorkoutSession, serializeWorkoutSession, updateWorkoutSessionMetrics } from '~/services/workoutSession'
 import { getWorkoutAlert } from '~/services/voiceAlerts'
-import type { UserGoal, UserProfile } from '~/types/profile'
+import type { AppColorThemeId, UserGoal, UserProfile } from '~/types/profile'
 import type { RecoveryCheckIn } from '~/types/recovery'
 import type { Route } from '~/types/route'
 import type { Shoe } from '~/types/shoe'
@@ -52,6 +53,7 @@ type UpdateShoeInput = Partial<CreateShoeInput> & { status?: Shoe['status'] }
 type ProfileUpdateInput = {
   displayName?: string
   goal?: UserGoal
+  colorThemeId?: AppColorThemeId
   maxHeartRate?: number
   trainingDays?: number[]
 }
@@ -72,6 +74,7 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
   const hasHydrated = ref(false)
 
   const readinessScore = computed(() => recovery.value?.readinessScore ?? 100)
+  const appThemePalette = computed(() => getAppThemePalette(profile.value.colorThemeId))
 
   const workoutOfTheDay = computed<Workout>(() => {
     const selectedWorkout = plannedWorkouts.value.find((workout) => workout.id === selectedWorkoutId.value)
@@ -531,6 +534,7 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
     sessionProgress,
     analyticsReport,
     readinessScore,
+    appThemePalette,
     needsOnboarding,
     startWorkoutSession,
     startFreeWorkoutSession,

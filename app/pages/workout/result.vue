@@ -35,9 +35,9 @@ function saveRouteFromResult() {
 
 <template>
   <div class="theme-light min-h-dvh space-y-4 bg-[#f7f6f2] pb-4">
-    <section class="overflow-hidden rounded-b-[34px] bg-gradient-to-br from-[#f3ffd8] via-[#eaf8ff] to-[#fff0e6] text-[#111111] shadow-[0_18px_50px_rgba(0,0,0,0.08)]">
+    <section class="overflow-hidden rounded-b-[34px] bg-gradient-to-br from-[var(--theme-hero-from)] via-[var(--theme-hero-via)] to-[var(--theme-hero-to)] text-[#111111] shadow-[0_18px_50px_rgba(0,0,0,0.08)]">
       <div class="relative p-5">
-        <div class="absolute inset-x-5 top-0 h-1.5 rounded-full bg-gradient-to-r from-[#b9ff38] via-[#64c7ff] to-[#ff7a2b]" />
+        <div class="absolute inset-x-5 top-0 h-1.5 rounded-full bg-gradient-to-r from-[var(--theme-primary)] via-[var(--theme-secondary)] to-[var(--theme-sport)]" />
         <div class="flex items-start justify-between gap-4">
           <div>
             <p class="text-sm text-[#62625e]">{{ workout.title }}</p>
@@ -63,9 +63,9 @@ function saveRouteFromResult() {
           </div>
         </div>
 
-        <div class="mt-3 flex items-center justify-between rounded-3xl border border-[#b9ff38]/70 bg-white/58 px-4 py-3 shadow-[0_12px_30px_rgba(0,0,0,0.05)] backdrop-blur">
+        <div class="mt-3 flex items-center justify-between rounded-3xl border border-[color:color-mix(in_srgb,var(--theme-primary)_70%,white)] bg-white/58 px-4 py-3 shadow-[0_12px_30px_rgba(0,0,0,0.05)] backdrop-blur">
           <div class="flex items-center gap-2 text-sm text-[#62625e]">
-            <HeartPulse class="h-4 w-4 text-[#5c7f00]" />
+            <HeartPulse class="h-4 w-4 text-[var(--theme-primary)]" />
             Пульс
           </div>
           <p class="font-medium">{{ workout.avgHeartRate ? `${workout.avgHeartRate} уд/мин` : 'нет данных' }}</p>
@@ -120,7 +120,7 @@ function saveRouteFromResult() {
           Сохранить маршрут
         </Button>
         <NuxtLink v-else to="/routes" class="block">
-          <Button class="w-full border-[#b9ff38] bg-[#b9ff38] text-[#111111] active:bg-[#a9f424]">
+          <Button class="w-full border-[var(--theme-primary)] bg-[var(--theme-primary)] text-[#111111] active:brightness-95">
             <CheckCircle2 class="h-4 w-4" />
             Маршрут сохранён
           </Button>

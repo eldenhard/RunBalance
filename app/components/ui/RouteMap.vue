@@ -22,6 +22,7 @@ const props = withDefaults(defineProps<{
   showAttribution: true
 })
 
+const store = useRunBalanceStore()
 const container = ref<HTMLDivElement | null>(null)
 const map = shallowRef<Map | null>(null)
 const isMounted = ref(false)
@@ -47,7 +48,7 @@ const palette = computed(() => {
       track: '#b9ff38',
       trackCasing: '#000000',
       marker: '#ffffff',
-      current: '#ff3b30'
+      current: store.appThemePalette.marker
     }
   }
   return {
@@ -55,7 +56,7 @@ const palette = computed(() => {
     track: '#111111',
     trackCasing: '#ffffff',
     marker: '#ffffff',
-    current: '#ff3b30'
+    current: store.appThemePalette.marker
   }
 })
 

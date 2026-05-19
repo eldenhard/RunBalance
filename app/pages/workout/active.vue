@@ -35,7 +35,7 @@ const liveRoute = computed(() => {
 let runtimeInterval: ReturnType<typeof window.setInterval> | null = null
 let finishHoldFrame: number | null = null
 let lastHandledKilometer = 0
-const finishHoldMs = 7000
+const finishHoldMs = 5000
 const finishHoldProgress = ref(0)
 const isHoldingFinish = computed(() => finishHoldProgress.value > 0)
 

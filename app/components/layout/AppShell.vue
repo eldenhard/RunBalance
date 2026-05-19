@@ -158,15 +158,15 @@ function isActive(item: typeof navItems[number]) {
 
 .bottom-nav__item--active {
   color: #111111;
-  background: #f3ffd8;
+  background: var(--theme-primary-soft);
 }
 
 .bottom-nav__item--primary {
   color: #ffffff;
-  background: linear-gradient(135deg, #111111 0%, #1c2415 62%, #34460c 100%);
+  background: linear-gradient(135deg, #111111 0%, #1c2415 58%, color-mix(in srgb, var(--theme-primary) 34%, #111111) 100%);
   min-height: 56px;
   margin-top: -10px;
-  box-shadow: 0 10px 26px rgba(185, 255, 56, 0.18), 0 8px 20px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 10px 26px var(--theme-dark-glow), 0 8px 20px rgba(0, 0, 0, 0.18);
 }
 
 .bottom-nav__item--primary.bottom-nav__item--active {

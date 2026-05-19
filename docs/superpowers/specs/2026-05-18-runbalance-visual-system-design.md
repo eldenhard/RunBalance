@@ -23,6 +23,38 @@ The rejected direction is `Map-First Runner` as a global visual model. Maps rema
 - UI scale is restrained, not oversized.
 - Orange is a limited sport accent, not the dominant brand color.
 - All components must support light and dark tokens.
+- User-selected profile palettes may recolor accent tokens, but must not change layout density, typography, neutral surfaces, or semantic heart-rate zone colors.
+- Map-first is allowed for the tracker start screen, where the user needs location context immediately; it is not the default model for planning/profile/history screens.
+
+## Palette Personalization
+
+Profile exposes 6 palette options:
+
+- `RunBalance`: lime, sky, orange.
+- `Velocity`: red, ice, graphite.
+- `Aero`: blue, mint, lime.
+- `Ember`: orange, amber, cream.
+- `Volt`: acid lime, turquoise.
+- `Graphite`: black, lime, grey.
+
+Implementation rules:
+
+- Store the chosen palette as `profile.colorThemeId`.
+- Keep definitions in `app/services/themePalettes.ts`.
+- Apply palette through runtime CSS variables on `body`.
+- Use `--theme-primary`, `--theme-primary-soft`, `--theme-secondary`, `--theme-sport`, `--theme-marker`, hero gradient tokens, and `--theme-dark-glow`.
+- Keep app surfaces readable in both light and dark contexts.
+- GPS/current-position marker follows `--theme-marker`.
+- Heart-rate zones remain independent semantic colors.
+
+## Current Tracker Decisions
+
+- `/start` is a tracker entry screen, not a generic start button. Bottom nav label is `Трекер`.
+- Tracker start is map-first with a visible current-position point, a compact metric overlay, one plan action and one centered play action.
+- The page must not overscroll or expose white gaps above/below the PWA viewport.
+- Workout launch animation should be dynamic and immediate: no blank pre-delay, no double splash.
+- Active workout and result must preserve recorded GPS points. If only one point exists, show the start point instead of an empty map.
+- Finish copy is `Тренировка завершена`.
 
 ## Implementation Boundary
 

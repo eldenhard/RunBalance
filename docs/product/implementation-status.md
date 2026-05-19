@@ -1,4 +1,4 @@
-# RunBalance — статус реализации (актуально на 2026-05-18)
+# RunBalance — статус реализации (актуально на 2026-05-19)
 
 Документ фиксирует **фактическую** логику в репозитории после Phase 1–4 и UX-доработок. Использовать вместе с `AGENTS.md` при любых новых задачах.
 
@@ -17,7 +17,7 @@
 
 | Домен | Состояние | Действия |
 |-------|-----------|----------|
-| Профиль | `profile`, флаг `onboarded` | `completeOnboarding`, `skipOnboarding`, `updateProfile` |
+| Профиль | `profile`, флаг `onboarded`, `colorThemeId` | `completeOnboarding`, `skipOnboarding`, `updateProfile` |
 | Recovery | `recovery \| null` | `saveRecoveryCheckIn`; без check-in readiness = 100 |
 | План | `plannedWorkouts`, `selectedWorkoutId` | `createPlannedWorkout`, `selectPlannedWorkout`, `deletePlannedWorkout` |
 | Маршруты | `routes`, `selectedRouteId` | `createSavedRoute`, `deleteSavedRoute`, `selectRouteForToday`, `assignRouteToPlannedWorkout` |
@@ -25,7 +25,7 @@
 | Тренировка | `activeSession`, `currentWorkout` | `startWorkoutSession`, `startFreeWorkoutSession`, pause/resume, `appendTrackPoint`, `finishActiveSession` |
 | История | `history` | пополняется при `finishActiveSession` |
 
-Computed: `adaptedWorkout`, `activeRoute`, `suggestedRoute`, `analyticsReport`, `needsOnboarding`, `readinessScore`, `targetZone`, `sessionProgress`.
+Computed: `adaptedWorkout`, `activeRoute`, `suggestedRoute`, `analyticsReport`, `needsOnboarding`, `readinessScore`, `targetZone`, `sessionProgress`, `appThemePalette`.
 
 ## Сервисы (бизнес-логика)
 
@@ -41,6 +41,7 @@ Computed: `adaptedWorkout`, `activeRoute`, `suggestedRoute`, `analyticsReport`, 
 | `services/routes.ts` | CRUD-черновик маршрута, `pickSuggestedRoute`, bounds, `createRouteFromTrack` |
 | `services/analytics.ts` | `buildAnalyticsReport` — суммы и недельные бакеты по `finishedAt` |
 | `services/heart-rate/heartRateSource.ts` | iOS Safari PWA: пульс `unavailable` |
+| `services/themePalettes.ts` | 6 профилей цвета, CSS variables для recolor приложения |
 
 ## Composables
 
@@ -58,23 +59,25 @@ Computed: `adaptedWorkout`, `activeRoute`, `suggestedRoute`, `analyticsReport`, 
 | `/workout/result` | `pages/workout/result.vue` | light — итог + карта трека |
 | `/history` | `pages/history.vue` | light |
 | `/analytics` | `pages/analytics.vue` | light |
-| `/profile` | `pages/profile.vue` | light |
+| `/profile` | `pages/profile.vue` | light — профиль + выбор палитры приложения |
 | `/welcome` | `pages/welcome.vue` | light — онбординг (4 шага, можно пропустить) |
 | `/recovery` | `pages/recovery.vue` | light — форма check-in |
 | `/heart-rate-zones` | `pages/heart-rate-zones.vue` | light |
 | `/shoes` | `pages/shoes.vue` | light — полный CRUD + ручной пробег |
 | `/routes` | `pages/routes.vue` | light — CRUD + подсказка по дистанции |
 
-## Shell, навигация, splash
+## Shell, навигация, splash, цвет
 
-- `app.vue` — после `onMounted`: hydrate store → `appReady` → `ClientOnly` + `AppShell`.
-- `app.html` — inline splash (`#rb-splash`) до загрузки Vue.
-- `plugins/splash.client.ts` — скрывает splash минимум ~1,2 с после `runbalance:ready`.
+- `app.vue` — SSR-visible splash (`#rb-vue-splash`) сразу в HTML; после `onMounted`: hydrate store → restore active session → `appReady`.
+- `app.vue` также применяет CSS-переменные выбранной палитры на `body`.
+- `plugins/splash.client.ts` — fallback для legacy/static splash `#rb-splash`, если он есть в HTML.
 - `components/layout/AppShell.vue`:
-  - **Bottom nav:** Сегодня · План · Старт · История · Профиль + строка «Маршруты» / «Кроссовки».
+  - **Bottom nav:** Сегодня · План · Трекер · История · Профиль + строка «Маршруты» / «Кроссовки».
   - Скрыт на `/workout/active` и `/welcome`.
   - `z-index: 9990`, safe-area снизу.
 - Safe-area сверху: `padding-top: calc(env(safe-area-inset-top) + 12px)` на `.app-frame`.
+- `/start` использует locked shell: без верхнего padding, без overscroll, карта под статусной областью.
+- Профиль хранит `colorThemeId`. Доступные палитры: `runbalance`, `velocity`, `aero`, `ember`, `volt`, `graphite`.
 
 ## PWA (iOS)
 
@@ -84,7 +87,9 @@ Computed: `adaptedWorkout`, `activeRoute`, `suggestedRoute`, `analyticsReport`, 
 ## Карты (MapLibre)
 
 - `components/ui/RouteMap.vue` — OSM tiles, линия маршрута, fitBounds.
-- Используется на: Сегодня, Старт, Маршруты, Результат (трек из GPS при ≥2 точках).
+- Используется на: Сегодня, Старт, Маршруты, Результат.
+- Если GPS-трек содержит ≥2 точки, показывается линия. Если есть только 1 точка, показывается стартовая точка, чтобы результат не выглядел пустым.
+- Маркер текущей/стартовой позиции берёт цвет из активной палитры профиля.
 - Новые маршруты без нарисованного GeoJSON показывают подпись «трек ещё не записан».
 
 ## Live-тренировка

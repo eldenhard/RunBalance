@@ -57,7 +57,7 @@ const hasPlan = computed(() => store.plannedWorkouts.length > 0)
           <p class="text-xs text-[#767676]">Тренировка дня</p>
           <h2 class="text-xl font-medium text-[#111111]">{{ hasPlan ? store.adaptedWorkout.title : 'План пуст' }}</h2>
         </div>
-        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[#fff1e8] text-[#c95000]">
+        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[var(--theme-primary-soft)] text-[var(--theme-sport)]">
           <Activity class="h-5 w-5" />
         </div>
       </div>

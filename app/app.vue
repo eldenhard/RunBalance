@@ -1,8 +1,16 @@
 <script setup lang="ts">
 import AppShell from '~/components/layout/AppShell.vue'
+import { getAppThemeCssVars } from '~/services/themePalettes'
 
 const store = useRunBalanceStore()
 const appReady = ref(false)
+const themeCssVars = computed(() => getAppThemeCssVars(store.appThemePalette))
+
+useHead({
+  bodyAttrs: {
+    style: computed(() => themeCssVars.value)
+  }
+})
 
 onMounted(async () => {
   store.restoreLocalState()

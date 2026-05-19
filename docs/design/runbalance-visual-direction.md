@@ -117,6 +117,40 @@ Accent:
 - Orange can be used as a small sport accent.
 - Orange must not dominate the visual system.
 - Primary action is black/white contrast.
+- User palettes recolor accents only; neutral surfaces, typography scale, safe-area behavior and core contrast stay stable.
+
+### Profile Palettes
+
+The user can choose the app accent palette in Profile. The selected id is stored in `profile.colorThemeId`; palette definitions live in `app/services/themePalettes.ts`.
+
+Runtime CSS variables:
+
+- `--theme-primary`
+- `--theme-primary-soft`
+- `--theme-secondary`
+- `--theme-sport`
+- `--theme-marker`
+- `--theme-hero-from`
+- `--theme-hero-via`
+- `--theme-hero-to`
+- `--theme-dark-glow`
+
+Approved palettes:
+
+- `RunBalance` — lime, sky, orange. Default energetic running palette.
+- `Velocity` — red, ice, graphite. Sharper sport accent without making the UI aggressive.
+- `Aero` — blue, mint, lime. Lighter technical palette for map and GPS-heavy use.
+- `Ember` — orange, amber, cream. Warm sport palette, still limited to accents.
+- `Volt` — acid lime, turquoise. Most energetic palette, useful for high-contrast start states.
+- `Graphite` — black, lime, grey. Strict monochrome base with a controlled running accent.
+
+Rules:
+
+- Palette changes must be instant and local-first.
+- Palette choice must persist with the profile snapshot.
+- Do not recolor heart-rate zones with profile palettes; zones keep their own semantic colors.
+- Map current-position marker uses `--theme-marker`.
+- Completed workout cards and route/result highlights can use palette hero tokens.
 
 ## Screen Mapping
 

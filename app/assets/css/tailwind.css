@@ -25,6 +25,15 @@
   --sport-blue: #64c7ff;
   --sport-orange: #ff7a2b;
   --sport-red: #ef4444;
+  --theme-primary: #b9ff38;
+  --theme-primary-soft: #f3ffd8;
+  --theme-secondary: #64c7ff;
+  --theme-sport: #ff7a2b;
+  --theme-marker: #ff3b30;
+  --theme-hero-from: #f3ffd8;
+  --theme-hero-via: #eaf8ff;
+  --theme-hero-to: #fff0e6;
+  --theme-dark-glow: rgba(185, 255, 56, 0.24);
 }
 
 html {
@@ -82,8 +91,8 @@ textarea {
   --screen-border: var(--app-border);
   --screen-shadow: 0 12px 30px rgba(0, 0, 0, 0.045);
   background:
-    radial-gradient(circle at 18% -10%, rgba(185, 255, 56, 0.16), transparent 0 220px),
-    radial-gradient(circle at 95% 6%, rgba(100, 199, 255, 0.14), transparent 0 210px),
+    radial-gradient(circle at 18% -10%, color-mix(in srgb, var(--theme-primary) 18%, transparent), transparent 0 220px),
+    radial-gradient(circle at 95% 6%, color-mix(in srgb, var(--theme-secondary) 16%, transparent), transparent 0 210px),
     linear-gradient(180deg, #fbfaf6 0%, var(--app-bg) 42%, #f5f7f1 100%);
   color: var(--app-foreground);
 }

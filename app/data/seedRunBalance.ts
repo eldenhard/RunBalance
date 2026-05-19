@@ -8,6 +8,7 @@ export const emptyProfile: UserProfile = {
   id: 'local-runner',
   displayName: '',
   goal: 'base',
+  colorThemeId: 'runbalance',
   maxHeartRate: 0,
   trainingDays: [],
   zones: [],

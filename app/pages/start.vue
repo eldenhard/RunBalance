@@ -72,8 +72,8 @@ onMounted(() => {
           class="absolute inset-0 h-full w-full rounded-none"
         />
       </ClientOnly>
-      <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/56 via-white/0 to-[#f4ffd9]/58" />
-      <div class="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-[#f4ffd9] via-[#f4ffd9]/62 to-transparent" />
+      <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/56 via-white/0 to-[color:color-mix(in_srgb,var(--theme-primary-soft)_72%,transparent)]" />
+      <div class="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-[var(--theme-primary-soft)] via-[color:color-mix(in_srgb,var(--theme-primary-soft)_62%,transparent)] to-transparent" />
 
       <div class="pointer-events-none start-content relative z-10 flex h-full flex-col justify-between px-4 pb-4">
         <div class="space-y-4 pt-2">
@@ -114,10 +114,10 @@ onMounted(() => {
         <div class="pointer-events-auto pb-2">
           <div class="grid grid-cols-[1fr_104px_1fr] items-end gap-3">
             <NuxtLink to="/plan" class="block">
-              <Button class="h-14 w-full rounded-[22px] border-[#b9ff38] bg-[#b9ff38] text-[#101010] shadow-[0_14px_34px_rgba(107,145,18,0.2)] active:bg-[#a9f424]" size="lg">План</Button>
+              <Button class="h-14 w-full rounded-[22px] border-[var(--theme-primary)] bg-[var(--theme-primary)] text-[#101010] shadow-[0_14px_34px_var(--theme-dark-glow)] active:brightness-95" size="lg">План</Button>
             </NuxtLink>
             <button
-              class="mx-auto flex h-[104px] w-[104px] items-center justify-center rounded-full bg-white text-[#0b0b0c] shadow-[0_0_0_10px_rgba(185,255,56,0.24),0_20px_58px_rgba(0,0,0,0.2)] active:bg-[#f1f1ee] disabled:opacity-60"
+              class="mx-auto flex h-[104px] w-[104px] items-center justify-center rounded-full bg-white text-[#0b0b0c] shadow-[0_0_0_10px_var(--theme-dark-glow),0_20px_58px_rgba(0,0,0,0.2)] active:bg-[#f1f1ee] disabled:opacity-60"
               aria-label="Старт тренировки"
               :disabled="isCountingDown"
               @click="startWorkout"
@@ -242,20 +242,20 @@ onMounted(() => {
 
 .launch-streak--one {
   top: 34%;
-  background: linear-gradient(90deg, transparent, #b9ff38, transparent);
+  background: linear-gradient(90deg, transparent, var(--theme-primary), transparent);
 }
 
 .launch-streak--two {
   top: 49%;
   height: 10px;
-  background: linear-gradient(90deg, transparent, #64c7ff, transparent);
+  background: linear-gradient(90deg, transparent, var(--theme-secondary), transparent);
   animation-delay: 0.1s;
 }
 
 .launch-streak--three {
   top: 62%;
   height: 12px;
-  background: linear-gradient(90deg, transparent, #ff7a2b, transparent);
+  background: linear-gradient(90deg, transparent, var(--theme-sport), transparent);
   animation-delay: 0.2s;
 }
 
@@ -269,8 +269,8 @@ onMounted(() => {
   border-radius: 999px;
   background:
     radial-gradient(circle, rgba(255, 255, 255, 0.11) 0 43%, transparent 44%),
-    conic-gradient(from 180deg, #b9ff38, #64c7ff, #ff7a2b, #b9ff38);
-  box-shadow: 0 0 82px rgba(185, 255, 56, 0.24), inset 0 0 0 12px rgba(255, 255, 255, 0.05);
+    conic-gradient(from 180deg, var(--theme-primary), var(--theme-secondary), var(--theme-sport), var(--theme-primary));
+  box-shadow: 0 0 82px var(--theme-dark-glow), inset 0 0 0 12px rgba(255, 255, 255, 0.05);
 }
 
 .launch-panel::before {
@@ -321,8 +321,8 @@ onMounted(() => {
 }
 
 .launch-progress span.is-active {
-  background: #b9ff38;
-  box-shadow: 0 0 20px rgba(185, 255, 56, 0.56);
+  background: var(--theme-primary);
+  box-shadow: 0 0 20px var(--theme-dark-glow);
 }
 
 @keyframes launch-grid-move {
