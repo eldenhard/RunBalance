@@ -79,7 +79,7 @@ function toOptionalNumber(value: string) {
 
 <template>
   <div class="theme-light min-h-dvh space-y-4 p-4">
-    <ScreenHeader eyebrow="План" title="Свои тренировки" description="Тренировки, маршруты и цель — без длинной ленты." />
+    <ScreenHeader eyebrow="План" title="Свои тренировки" />
 
     <div class="sticky top-[calc(env(safe-area-inset-top,0px)+8px)] z-20 rounded-[22px] border border-[#deded9] bg-white/90 p-1 shadow-[0_10px_30px_rgba(0,0,0,0.05)] backdrop-blur">
       <div class="grid grid-cols-3 gap-1">
@@ -100,7 +100,7 @@ function toOptionalNumber(value: string) {
         <CirclePlus class="h-5 w-5 text-[#111111]" />
         <div>
           <h2 class="font-medium">Новая тренировка</h2>
-          <p class="text-sm text-[#767676]">Сразу появится на «Сегодня» и «Старт».</p>
+         
         </div>
       </div>
 

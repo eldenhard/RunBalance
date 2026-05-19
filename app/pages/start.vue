@@ -54,7 +54,6 @@ onBeforeUnmount(() => {
     <ScreenHeader
       eyebrow="Готово к старту"
       :title="hasPlan ? store.adaptedWorkout.title : 'Свободный бег'"
-      :description="hasPlan ? 'Маршрут и обувь готовы.' : 'Свободная GPS-запись.'"
     />
 
     <Card class="p-3">

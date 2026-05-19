@@ -1,4 +1,4 @@
-import type { WorkoutType } from './workout'
+import type { WorkoutSplit, WorkoutType } from './workout'
 
 export type WorkoutSessionStatus = 'idle' | 'active' | 'paused' | 'finished'
 
@@ -20,6 +20,7 @@ export type WorkoutSession = {
   distanceKm: number
   durationSec: number
   avgPaceSecPerKm?: number
+  splits?: WorkoutSplit[]
   trackPoints: TrackPoint[]
   lastAlertAtSec: Partial<Record<WorkoutAlertKind, number>>
   visualAlert?: WorkoutAlert

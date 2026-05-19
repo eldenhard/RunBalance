@@ -360,6 +360,19 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
     return nextRoute
   }
 
+  function saveRouteSnapshot(route: Route, name?: string) {
+    const nextRoute: Route = {
+      ...route,
+      id: `route-saved-${Date.now()}`,
+      name: name?.trim() || route.name || 'Сохранённый трек',
+      isPrivate: true
+    }
+    routes.value = [nextRoute, ...routes.value]
+    selectedRouteId.value = nextRoute.id
+    persistState()
+    return nextRoute
+  }
+
   function deleteSavedRoute(routeId: string) {
     routes.value = routes.value.filter((item) => item.id !== routeId)
     if (selectedRouteId.value === routeId) {
@@ -538,6 +551,7 @@ export const useRunBalanceStore = defineStore('run-balance', () => {
     deletePlannedWorkout,
     updateHeartRateZone,
     createSavedRoute,
+    saveRouteSnapshot,
     deleteSavedRoute,
     selectRouteForToday,
     assignRouteToPlannedWorkout,

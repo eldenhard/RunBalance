@@ -3,6 +3,13 @@ import type { Route } from './route'
 
 export type WorkoutType = 'easy' | 'recovery' | 'long' | 'tempo' | 'intervals' | 'fartlek' | 'free'
 
+export type WorkoutSplit = {
+  index: number
+  distanceKm: number
+  durationSec: number
+  paceSecPerKm?: number
+}
+
 export type Workout = {
   id: string
   type: WorkoutType
@@ -22,4 +29,5 @@ export type Workout = {
   maxHeartRate?: number
   heartRateSource?: HeartRateSourceStatus
   routeSnapshot?: Route
+  splits?: WorkoutSplit[]
 }

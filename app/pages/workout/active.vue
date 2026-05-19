@@ -10,6 +10,7 @@ const progress = computed(() => store.sessionProgress)
 const targetZone = computed(() => store.targetZone)
 const targetZoneAppearance = computed(() => store.targetZoneAppearance)
 const voice = useVoiceAlerts()
+const workoutEvent = ref<string | null>(null)
 const gps = useGeolocationTracking({
   onPoint: (point) => {
     store.appendTrackPoint(point)
@@ -21,6 +22,7 @@ const zoneDetail = computed(() => {
   if (!targetZone.value) return 'зона не выбрана'
   return `${targetZone.value.minBpm}-${targetZone.value.maxBpm} уд/мин`
 })
+const trackedDistanceKm = computed(() => session.value?.distanceKm ?? 0)
 const currentPoint = computed(() => gps.latestPoint.value ?? session.value?.trackPoints.at(-1) ?? null)
 const liveRoute = computed(() => {
   if (session.value?.trackPoints.length) {
@@ -30,9 +32,14 @@ const liveRoute = computed(() => {
   return store.activeRoute
 })
 let runtimeInterval: ReturnType<typeof window.setInterval> | null = null
+let lastHandledKilometer = 0
 
 onMounted(() => {
   store.restorePersistedActiveSession()
+  lastHandledKilometer = Math.floor(trackedDistanceKm.value)
+  if (session.value) {
+    announceWorkoutEvent('Тренировка началась', { vibrate: false })
+  }
   syncRuntimeTimer()
   if (session.value?.status === 'active' && !gps.isTracking.value) {
     gps.start()
@@ -47,14 +54,32 @@ watch(() => session.value?.status, () => {
   syncRuntimeTimer()
 })
 
+watch(
+  trackedDistanceKm,
+  (distanceKm) => {
+    const fullKilometer = Math.floor(distanceKm)
+    if (fullKilometer <= lastHandledKilometer) return
+
+    for (let kilometer = lastHandledKilometer + 1; kilometer <= fullKilometer; kilometer += 1) {
+      if (kilometer > 0) {
+        announceWorkoutEvent(getKilometerEventMessage(kilometer), { vibrationPattern: [80, 50, 80] })
+      }
+    }
+    lastHandledKilometer = fullKilometer
+  },
+  { flush: 'sync' }
+)
+
 function togglePause() {
   if (session.value?.status === 'paused') {
     store.resumeWorkoutSession()
+    announceWorkoutEvent('Продолжаем', { vibrationPattern: 70 })
     gps.start()
     return
   }
 
   store.pauseWorkoutSession()
+  announceWorkoutEvent('Пауза', { vibrationPattern: [70, 40, 70] })
   gps.stop()
 }
 
@@ -69,6 +94,7 @@ function toggleGps() {
 
 async function finishWorkout() {
   gps.stop()
+  announceWorkoutEvent('Финиш', { vibrationPattern: [100, 60, 100] })
   store.finishActiveSession()
   await router.push('/workout/result')
 }
@@ -87,6 +113,16 @@ function stopRuntimeTimer() {
     window.clearInterval(runtimeInterval)
     runtimeInterval = null
   }
+}
+
+function announceWorkoutEvent(message: string, options?: Parameters<typeof voice.announceEvent>[1]) {
+  workoutEvent.value = message
+  voice.announceEvent(message, options)
+}
+
+function getKilometerEventMessage(kilometer: number) {
+  if (kilometer === 1) return 'Первый километр'
+  return `${kilometer} километр`
 }
 
 const gpsStatusClass = computed(() => gps.status.value === 'tracking'
@@ -140,6 +176,15 @@ const voiceStatusClass = computed(() => voice.isEnabled.value && voice.isSupport
           <HeartPulse class="h-5 w-5" />
         </div>
       </div>
+    </div>
+
+    <div
+      v-if="workoutEvent"
+      class="inline-flex max-w-full items-center gap-2 rounded-full border border-[#7cc7ff]/25 bg-[#10202a] px-3 py-2 text-sm font-medium text-[#bfe8ff]"
+      role="status"
+    >
+      <Radio class="h-4 w-4 shrink-0" />
+      <span class="truncate">{{ workoutEvent }}</span>
     </div>
 
     <Card class="overflow-hidden border-[#26301b] bg-[#111411] p-0 shadow-[0_24px_60px_rgba(185,255,56,0.08)]">
