@@ -30,25 +30,21 @@ const showReadinessInfo = ref(false)
     <Card v-if="hasRecovery" class="border-[#d7edc6] bg-[#fbfff2] p-4">
       <div class="flex items-start justify-between gap-4">
         <div>
-          <div class="flex items-center gap-2">
-            <p class="text-xs text-[#767676]">Готовность к нагрузке</p>
-            <button
-              type="button"
-              class="flex h-6 w-6 items-center justify-center rounded-full bg-white text-[#767676] active:bg-[#f3f3ef]"
-              aria-label="Что такое готовность"
-              @click="showReadinessInfo = !showReadinessInfo"
-            >
-              <Info class="h-3.5 w-3.5" />
-            </button>
-          </div>
+          <p class="text-xs text-[#767676]">Готовность к нагрузке</p>
           <div class="mt-1 text-[44px] font-medium leading-none text-[#111111]">{{ store.readinessScore }}</div>
         </div>
-        <Badge variant="success">{{ store.recoveryRecommendation.title }}</Badge>
+        <button
+          type="button"
+          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-[#767676] shadow-[0_8px_20px_rgba(0,0,0,0.05)] active:bg-[#f3f3ef]"
+          aria-label="Что такое готовность"
+          @click="showReadinessInfo = !showReadinessInfo"
+        >
+          <Info class="h-4 w-4" />
+        </button>
       </div>
       <Progress class="mt-4" :value="store.readinessScore" />
-      <p class="mt-3 text-sm leading-5 text-[#62625e]">{{ store.recoveryRecommendation.message }}</p>
       <p v-if="showReadinessInfo" class="mt-3 rounded-2xl bg-white/80 p-3 text-sm leading-5 text-[#62625e]">
-        Это ориентир по самочувствию перед нагрузкой. Он считается из check-in: сон, усталость, стресс и крепатура.
+        Готовность — ориентир по самочувствию перед нагрузкой. Она считается из check-in: сон, усталость, стресс и крепатура.
       </p>
       <NuxtLink to="/recovery" class="mt-3 block">
         <Button class="w-full" variant="outline">Обновить check-in</Button>

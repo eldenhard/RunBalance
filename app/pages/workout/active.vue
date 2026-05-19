@@ -52,7 +52,7 @@ const isHoldingFinish = computed(() => finishHoldProgress.value > 0)
 onMounted(() => {
   store.restorePersistedActiveSession()
   lastHandledKilometer = Math.floor(trackedDistanceKm.value)
-  workoutEvent.value = session.value?.status === 'paused' ? 'Пауза' : null
+  workoutEvent.value = null
   syncRuntimeTimer()
   if (session.value?.status === 'active' && !gps.isTracking.value) {
     gps.start()
@@ -87,13 +87,15 @@ watch(
 function togglePause() {
   if (session.value?.status === 'paused') {
     store.resumeWorkoutSession()
-    announceWorkoutEvent('Продолжаем', { vibrationPattern: 70 })
+    workoutEvent.value = null
+    voice.announceEvent('Продолжаем', { vibrationPattern: 70 })
     gps.start()
     return
   }
 
   store.pauseWorkoutSession()
-  announceWorkoutEvent('Пауза', { vibrationPattern: [70, 40, 70] })
+  workoutEvent.value = null
+  voice.announceEvent('Пауза', { vibrationPattern: [70, 40, 70] })
   gps.stop()
 }
 
@@ -206,7 +208,6 @@ const voiceStatusClass = computed(() => voice.isEnabled.value && voice.isSupport
       <ScreenHeader
         eyebrow="Активная тренировка"
         :title="workout.title"
-        :description="session?.status === 'paused' ? 'Пауза.' : ''"
       />
       <div class="flex shrink-0 items-center gap-2">
         <button
