@@ -64,10 +64,11 @@ onMounted(() => {
           :current-point="currentPoint"
           theme="dark"
           interactive
+          :show-status-hint="false"
           class="absolute inset-0 h-full w-full rounded-none"
         />
       </ClientOnly>
-      <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#0b0b0c]/82 via-[#0b0b0c]/20 to-[#0b0b0c]/82" />
+      <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#0b0b0c]/42 via-transparent to-[#0b0b0c]/48" />
 
       <div class="pointer-events-none relative z-10 flex h-full flex-col justify-between p-4">
         <div class="space-y-4 pt-2">
@@ -132,6 +133,7 @@ onMounted(() => {
             :current-point="currentPoint"
             theme="dark"
             interactive
+            :show-status-hint="false"
             class="h-full w-full rounded-none"
           />
         </ClientOnly>

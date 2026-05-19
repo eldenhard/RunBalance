@@ -11,17 +11,20 @@ const props = withDefaults(defineProps<{
   theme?: 'light' | 'dark'
   interactive?: boolean
   decorativeFallback?: boolean
+  showStatusHint?: boolean
   class?: string
 }>(), {
   theme: 'light',
   interactive: false,
-  decorativeFallback: false
+  decorativeFallback: false,
+  showStatusHint: true
 })
 
 const container = ref<HTMLDivElement | null>(null)
 const map = shallowRef<Map | null>(null)
 const isMounted = ref(false)
 const isMapReady = ref(false)
+const hasSetInitialCamera = ref(false)
 const errorMessage = ref<string | null>(null)
 const routeCoordinates = computed(() => props.route ? getRouteLineCoordinates(props.route) : [])
 const hasTrack = computed(() => routeCoordinates.value.length >= 2)
@@ -37,14 +40,16 @@ const palette = computed(() => {
       land: '#101011',
       track: '#b9ff38',
       trackCasing: '#000000',
-      marker: '#ffffff'
+      marker: '#ffffff',
+      current: '#64c7ff'
     }
   }
   return {
     land: '#f7f7f5',
     track: '#111111',
     trackCasing: '#ffffff',
-    marker: '#111111'
+    marker: '#111111',
+    current: '#0ea5e9'
   }
 })
 
@@ -84,9 +89,9 @@ function buildStyle(): StyleSpecification {
         type: 'raster',
         source: 'osm',
         paint: {
-          'raster-opacity': props.theme === 'dark' ? 0.82 : 0.92,
+          'raster-opacity': 1,
           'raster-saturation': -1,
-          'raster-contrast': props.theme === 'dark' ? -0.24 : -0.14
+          'raster-contrast': props.theme === 'dark' ? -0.08 : -0.04
         }
       }
     ]
@@ -246,7 +251,7 @@ function applyRoute() {
         source: currentSourceId,
         paint: {
           'circle-radius': 14,
-          'circle-color': palette.value.track,
+          'circle-color': palette.value.current,
           'circle-opacity': 0.22
         }
       })
@@ -257,7 +262,7 @@ function applyRoute() {
         paint: {
           'circle-radius': 6,
           'circle-color': palette.value.marker,
-          'circle-stroke-color': palette.value.track,
+          'circle-stroke-color': palette.value.current,
           'circle-stroke-width': 3
         }
       })
@@ -265,13 +270,15 @@ function applyRoute() {
   }
 
   const bounds = props.route ? getRouteBounds(props.route) : null
-  if (bounds && coordinates.length >= 2) {
+  if (!hasSetInitialCamera.value && bounds && coordinates.length >= 2) {
     instance.fitBounds(bounds, { padding: 32, animate: false, maxZoom: 15 })
-  } else if (props.currentPoint) {
+    hasSetInitialCamera.value = true
+  } else if (!hasSetInitialCamera.value && props.currentPoint) {
     instance.jumpTo({
       center: [props.currentPoint.longitude, props.currentPoint.latitude],
       zoom: 16
     })
+    hasSetInitialCamera.value = true
   }
 
   requestAnimationFrame(() => instance.resize())
@@ -282,7 +289,12 @@ onMounted(() => {
   ensureMap()
 })
 
-watch([() => props.route?.id, routeSignature], () => {
+watch(() => props.route?.id, () => {
+  hasSetInitialCamera.value = false
+  ensureMap()
+})
+
+watch(routeSignature, () => {
   ensureMap()
 })
 
@@ -296,7 +308,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div :class="cn('relative overflow-hidden rounded-2xl', $props.class)">
-    <div :class="cn('route-map-fallback absolute inset-0', fallbackClass)">
+    <div :class="cn('route-map-fallback absolute inset-0 transition-opacity duration-200', fallbackClass, isMapReady ? 'opacity-0' : 'opacity-100')">
       <template v-if="decorativeFallback">
         <div class="route-map-fallback__park route-map-fallback__park--one" />
         <div class="route-map-fallback__park route-map-fallback__park--two" />
@@ -312,8 +324,8 @@ onBeforeUnmount(() => {
       v-if="isMounted"
       ref="container"
       :class="[
-        'absolute inset-0 transition-opacity duration-500',
-        isMapReady ? 'opacity-75' : 'opacity-0'
+        'absolute inset-0 transition-opacity duration-200',
+        isMapReady ? 'opacity-100' : 'opacity-0'
       ]"
     />
     <div
@@ -331,7 +343,7 @@ onBeforeUnmount(() => {
     </div>
 
     <div
-      v-else-if="!hasTrack"
+      v-else-if="showStatusHint && !hasTrack"
       :class="cn('pointer-events-none absolute inset-x-4 bottom-3 rounded-full px-3 py-1 text-center text-[11px] leading-snug backdrop-blur', placeholderClass)"
     >
       {{ hasCurrentPoint ? 'Трек появится после движения.' : 'Ждём первую GPS-точку.' }}
@@ -345,11 +357,7 @@ onBeforeUnmount(() => {
 }
 
 .route-map-fallback--plain {
-  background:
-    linear-gradient(18deg, transparent 0 44%, rgba(255, 255, 255, 0.1) 44% 45%, transparent 45% 100%),
-    linear-gradient(112deg, transparent 0 52%, rgba(255, 255, 255, 0.08) 52% 53%, transparent 53% 100%),
-    repeating-linear-gradient(0deg, transparent 0 38px, rgba(255, 255, 255, 0.05) 38px 39px),
-    repeating-linear-gradient(90deg, transparent 0 46px, rgba(255, 255, 255, 0.045) 46px 47px);
+  background: #eef1ec;
 }
 
 .route-map-fallback--decorative {
@@ -365,7 +373,7 @@ onBeforeUnmount(() => {
 }
 
 .route-map-fallback--dark {
-  background-color: #141617;
+  background: #171918;
 }
 
 .route-map-fallback__park,
@@ -448,9 +456,9 @@ onBeforeUnmount(() => {
   width: 18px;
   height: 18px;
   border-radius: 999px;
-  background: #b9ff38;
+  background: #64c7ff;
   border: 4px solid #ffffff;
-  box-shadow: 0 0 0 10px rgba(185, 255, 56, 0.18);
+  box-shadow: 0 0 0 10px rgba(100, 199, 255, 0.18);
   transform: translate(-50%, -50%);
 }
 </style>
