@@ -55,7 +55,7 @@ function saveCheckIn() {
     />
 
     <Card v-if="store.recovery && !isEditing" class="p-4">
-      <div class="flex items-start justify-between gap-4">
+      <div class="space-y-3">
         <div>
           <p class="text-xs text-[#767676]">Readiness</p>
           <p class="mt-1 text-[44px] font-medium leading-none">{{ store.recovery.readinessScore }}</p>

@@ -109,7 +109,7 @@ function toggleRetire(shoe: Shoe) {
           <span class="text-sm font-medium">Название</span>
           <input v-model="createForm.name" class="h-12 rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none" placeholder="Например, Daily Trainer" />
         </label>
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 gap-3">
           <label class="grid gap-1.5">
             <span class="text-sm font-medium">Бренд</span>
             <input v-model="createForm.brand" class="h-12 rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none" />
@@ -119,7 +119,7 @@ function toggleRetire(shoe: Shoe) {
             <input v-model="createForm.model" class="h-12 rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none" />
           </label>
         </div>
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 gap-3">
           <label class="grid gap-1.5">
             <span class="text-sm font-medium">Ресурс, км</span>
             <input v-model="createForm.resourceKm" inputmode="numeric" class="h-12 rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none" />
@@ -187,7 +187,7 @@ function toggleRetire(shoe: Shoe) {
               <span class="text-xs text-[#767676]">Название</span>
               <input v-model="editForm.name" class="h-11 rounded-2xl border border-[#deded9] bg-white px-3 text-[16px] outline-none" />
             </label>
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 gap-3">
               <label class="grid gap-1.5">
                 <span class="text-xs text-[#767676]">Бренд</span>
                 <input v-model="editForm.brand" class="h-11 rounded-2xl border border-[#deded9] bg-white px-3 text-[16px] outline-none" />
@@ -197,7 +197,7 @@ function toggleRetire(shoe: Shoe) {
                 <input v-model="editForm.model" class="h-11 rounded-2xl border border-[#deded9] bg-white px-3 text-[16px] outline-none" />
               </label>
             </div>
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 gap-3">
               <label class="grid gap-1.5">
                 <span class="text-xs text-[#767676]">Ресурс, км</span>
                 <input v-model="editForm.resourceKm" inputmode="numeric" class="h-11 rounded-2xl border border-[#deded9] bg-white px-3 text-[16px] outline-none" />

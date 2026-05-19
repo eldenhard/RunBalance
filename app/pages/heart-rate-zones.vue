@@ -72,7 +72,7 @@ function updateDraft(zoneId: string, key: 'name' | 'minBpm' | 'maxBpm', value: s
           </span>
         </div>
 
-        <div v-if="drafts[zone.id]" class="mt-4 grid grid-cols-3 gap-3">
+        <div v-if="drafts[zone.id]" class="mt-4 grid grid-cols-1 gap-3">
           <label class="grid gap-1.5">
             <span class="text-xs text-[#767676]">Название</span>
             <input :value="drafts[zone.id]?.name ?? zone.name" class="h-11 rounded-2xl border border-[#deded9] bg-white px-3 text-[16px] outline-none" @input="updateDraft(zone.id, 'name', ($event.target as HTMLInputElement).value)" />

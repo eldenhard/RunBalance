@@ -10,24 +10,33 @@ import {
 const route = useRoute()
 
 const navItems = [
-  { label: 'Сегодня', to: '/', icon: Home },
-  { label: 'План', to: '/plan', icon: CalendarDays },
-  { label: 'Трекер', to: '/start', icon: Play, primary: true },
-  { label: 'История', to: '/history', icon: History },
-  { label: 'Профиль', to: '/profile', icon: User }
+  { label: 'Сегодня', to: '/', icon: Home, activePaths: ['/'] },
+  { label: 'План', to: '/plan', icon: CalendarDays, activePaths: ['/plan', '/routes'] },
+  { label: 'Трекер', to: '/start', icon: Play, primary: true, activePaths: ['/start', '/workout/active'] },
+  { label: 'История', to: '/history', icon: History, activePaths: ['/history', '/workout/result'] },
+  { label: 'Профиль', to: '/profile', icon: User, activePaths: ['/profile', '/shoes', '/recovery', '/heart-rate-zones', '/analytics'] }
 ]
 
 const hideNavRoutes = ['/workout/active', '/welcome']
 const showBottomNav = computed(() => !hideNavRoutes.includes(route.path))
+const isDarkShell = computed(() => route.path === '/start' || route.path.startsWith('/workout/active'))
 
-function isActive(path: string) {
-  if (path === '/') return route.path === '/'
-  return route.path === path || route.path.startsWith(`${path}/`)
+useHead({
+  bodyAttrs: {
+    class: computed(() => isDarkShell.value ? 'rb-body-dark' : 'rb-body-light')
+  }
+})
+
+function isActive(item: typeof navItems[number]) {
+  return item.activePaths.some((path) => {
+    if (path === '/') return route.path === '/'
+    return route.path === path || route.path.startsWith(`${path}/`)
+  })
 }
 </script>
 
 <template>
-  <div class="app-shell min-h-dvh bg-[#f7f7f5]">
+  <div class="app-shell min-h-dvh" :class="isDarkShell ? 'app-shell--dark' : 'app-shell--light'">
     <main
       class="app-frame mx-auto min-h-dvh w-full max-w-md"
       :class="showBottomNav ? 'app-frame--with-nav' : ''"
@@ -48,7 +57,7 @@ function isActive(path: string) {
           class="bottom-nav__item"
           :class="[
             item.primary ? 'bottom-nav__item--primary' : '',
-            isActive(item.to) ? 'bottom-nav__item--active' : ''
+            isActive(item) ? 'bottom-nav__item--active' : ''
           ]"
           :aria-label="item.label"
         >
@@ -65,8 +74,17 @@ function isActive(path: string) {
   position: relative;
 }
 
+.app-shell--light {
+  background: #f7f7f5;
+}
+
+.app-shell--dark {
+  background: #0b0b0c;
+}
+
 .app-frame {
   box-sizing: border-box;
+  background: inherit;
   padding-top: calc(env(safe-area-inset-top, 0px) + 20px);
   padding-left: max(env(safe-area-inset-left, 0px), 0px);
   padding-right: max(env(safe-area-inset-right, 0px), 0px);
