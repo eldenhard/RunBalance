@@ -36,6 +36,36 @@ export function calculateTrackDistanceKm(trackPoints: TrackPoint[]) {
   return Number(distance.toFixed(2))
 }
 
+export function calculateRecentPaceSecPerKm(trackPoints: TrackPoint[], sampleSegments = 4) {
+  if (trackPoints.length < 2) return undefined
+
+  let distanceKm = 0
+  let durationSec = 0
+  let acceptedSegments = 0
+
+  for (let index = trackPoints.length - 1; index > 0 && acceptedSegments < sampleSegments; index -= 1) {
+    const point = trackPoints[index]
+    const previousPoint = trackPoints[index - 1]
+    if (!previousPoint || !point || !shouldCountTrackSegment(previousPoint, point)) {
+      continue
+    }
+
+    const segmentDistanceKm = getDistanceBetweenPointsKm(previousPoint, point)
+    const segmentDurationSec = Math.max(
+      1,
+      Math.round((getTrackPointTimeMs(point, 0) - getTrackPointTimeMs(previousPoint, 0)) / 1000)
+    )
+
+    if (segmentDistanceKm <= 0 || segmentDurationSec <= 0) continue
+
+    distanceKm += segmentDistanceKm
+    durationSec += segmentDurationSec
+    acceptedSegments += 1
+  }
+
+  return distanceKm > 0 ? Math.round(durationSec / distanceKm) : undefined
+}
+
 export function calculateWorkoutSplits(trackPoints: TrackPoint[], startedAt: string): WorkoutSplit[] {
   const startedAtMs = new Date(startedAt).getTime()
   if (!Number.isFinite(startedAtMs) || trackPoints.length < 2) {

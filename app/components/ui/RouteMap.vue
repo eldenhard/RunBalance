@@ -28,6 +28,7 @@ const map = shallowRef<Map | null>(null)
 const isMounted = ref(false)
 const isMapReady = ref(false)
 const hasSetInitialCamera = ref(false)
+const hasResizedOnce = ref(false)
 const errorMessage = ref<string | null>(null)
 const routeCoordinates = computed(() => props.route ? getRouteLineCoordinates(props.route) : [])
 const hasTrack = computed(() => routeCoordinates.value.length >= 2)
@@ -36,10 +37,8 @@ const mapPoint = computed<[number, number] | null>(() => {
   return routeCoordinates.value[0] ?? null
 })
 const hasCurrentPoint = computed(() => Boolean(mapPoint.value))
-const routeSignature = computed(() => JSON.stringify({
-  route: routeCoordinates.value,
-  point: mapPoint.value
-}))
+const routeSignature = computed(() => JSON.stringify(routeCoordinates.value))
+const pointSignature = computed(() => JSON.stringify(mapPoint.value))
 
 const palette = computed(() => {
   if (props.theme === 'dark') {
@@ -146,6 +145,10 @@ async function ensureMap() {
     instance.on('load', () => {
       map.value = instance
       applyRoute()
+      requestAnimationFrame(() => {
+        instance.resize()
+        hasResizedOnce.value = true
+      })
     })
     instance.on('idle', () => {
       isMapReady.value = true
@@ -289,7 +292,12 @@ function applyRoute() {
     hasSetInitialCamera.value = true
   }
 
-  requestAnimationFrame(() => instance.resize())
+  if (!hasResizedOnce.value) {
+    requestAnimationFrame(() => {
+      instance.resize()
+      hasResizedOnce.value = true
+    })
+  }
 }
 
 onMounted(() => {
@@ -299,10 +307,15 @@ onMounted(() => {
 
 watch(() => props.route?.id, () => {
   hasSetInitialCamera.value = false
+  hasResizedOnce.value = false
   ensureMap()
 })
 
 watch(routeSignature, () => {
+  ensureMap()
+})
+
+watch(pointSignature, () => {
   ensureMap()
 })
 

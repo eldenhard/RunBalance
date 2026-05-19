@@ -14,7 +14,7 @@ const navItems = [
   { label: 'План', to: '/plan', icon: CalendarDays, activePaths: ['/plan', '/routes'] },
   { label: 'Трекер', to: '/start', icon: Play, primary: true, activePaths: ['/start', '/workout/active'] },
   { label: 'История', to: '/history', icon: History, activePaths: ['/history', '/workout/result'] },
-  { label: 'Профиль', to: '/profile', icon: User, activePaths: ['/profile', '/shoes', '/recovery', '/heart-rate-zones', '/analytics'] }
+  { label: 'Профиль', to: '/profile', icon: User, activePaths: ['/profile', '/settings', '/shoes', '/recovery', '/heart-rate-zones', '/analytics'] }
 ]
 
 const hideNavRoutes = ['/workout/active', '/welcome']
@@ -114,6 +114,10 @@ function isActive(item: typeof navItems[number]) {
   min-height: 0;
   overflow: hidden;
   padding-top: 0;
+}
+
+.app-shell--locked .app-frame--with-nav {
+  padding-bottom: 0;
 }
 
 .app-frame--with-nav {

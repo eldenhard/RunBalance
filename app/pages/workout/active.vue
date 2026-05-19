@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { HeartPulse, Pause, Play, Radio, Satellite, Square, Volume2, VolumeX } from '@lucide/vue'
 import { createRouteFromTrack } from '~/services/routes'
+import { calculateRecentPaceSecPerKm } from '~/services/workoutSession'
 
 const store = useRunBalanceStore()
 const router = useRouter()
@@ -24,7 +25,16 @@ const zoneDetail = computed(() => {
 })
 const trackedDistanceKm = computed(() => session.value?.distanceKm ?? 0)
 const currentPoint = computed(() => gps.latestPoint.value ?? session.value?.trackPoints.at(-1) ?? null)
-const displayPaceSecPerKm = computed(() => session.value?.avgPaceSecPerKm ?? getCurrentPaceFromGps())
+const displayPaceSecPerKm = computed(() => {
+  const gpsPace = getCurrentPaceFromGps()
+  if (gpsPace) return gpsPace
+
+  const recentPace = session.value?.trackPoints
+    ? calculateRecentPaceSecPerKm(session.value.trackPoints)
+    : undefined
+
+  return recentPace ?? session.value?.avgPaceSecPerKm
+})
 const liveRoute = computed(() => {
   if (session.value?.trackPoints.length && session.value.trackPoints.length >= 2) {
     return createRouteFromTrack(session.value.trackPoints, store.activeRoute, session.value.distanceKm)
@@ -35,16 +45,14 @@ const liveRoute = computed(() => {
 let runtimeInterval: ReturnType<typeof window.setInterval> | null = null
 let finishHoldFrame: number | null = null
 let lastHandledKilometer = 0
-const finishHoldMs = 5000
+const finishHoldMs = 3000
 const finishHoldProgress = ref(0)
 const isHoldingFinish = computed(() => finishHoldProgress.value > 0)
 
 onMounted(() => {
   store.restorePersistedActiveSession()
   lastHandledKilometer = Math.floor(trackedDistanceKm.value)
-  if (session.value) {
-    workoutEvent.value = 'Тренировка началась'
-  }
+  workoutEvent.value = session.value?.status === 'paused' ? 'Пауза' : null
   syncRuntimeTimer()
   if (session.value?.status === 'active' && !gps.isTracking.value) {
     gps.start()

@@ -86,6 +86,11 @@ function submitEdit(shoeId: string) {
 function toggleRetire(shoe: Shoe) {
   store.updateShoe(shoe.id, { status: shoe.status === 'retired' ? 'active' : 'retired' })
 }
+
+function deleteShoe(shoeId: string) {
+  if (!window.confirm('Удалить кроссовки?')) return
+  store.deleteShoe(shoeId)
+}
 </script>
 
 <template>
@@ -175,7 +180,7 @@ function toggleRetire(shoe: Shoe) {
               <ArchiveRestore class="h-4 w-4" />
               {{ shoe.status === 'retired' ? 'Вернуть в строй' : 'В архив' }}
             </Button>
-            <Button variant="outline" size="sm" @click="store.deleteShoe(shoe.id)">
+            <Button variant="outline" size="sm" @click="deleteShoe(shoe.id)">
               <Trash2 class="h-4 w-4" />
               Удалить
             </Button>

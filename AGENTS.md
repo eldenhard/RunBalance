@@ -176,8 +176,10 @@ RunBalance должен выглядеть как строгий mobile-first ru
 - Тёмная тема не должна быть декоративной. Она нужна для контраста, читаемости на бегу и снижения отвлечения.
 - Светлая тема должна быть строгой: тёплый off-white фон, белые поверхности, тонкие границы, минимум теней.
 - В интерфейсе сразу предусматривать light/dark tokens, даже если часть экранов принудительно использует конкретную тему по контексту.
-- Цветовая палитра приложения выбирается в Профиле и хранится в `profile.colorThemeId`.
+- Цветовая палитра приложения хранится в `profile.colorThemeId`.
+- Цветовая палитра выбирается на `/settings`; Профиль только ведёт в этот раздел.
 - Палитра меняет только accent/hero/map-marker tokens; нейтральные поверхности, контраст, типографика и semantic colors пульсовых зон не должны ломаться.
+- Кнопки с `--theme-primary` всегда используют `--theme-on-primary` для текста.
 - Доступные палитры: `runbalance`, `velocity`, `aero`, `ember`, `volt`, `graphite`.
 
 ### Typography Rules
@@ -216,7 +218,7 @@ RunBalance должен выглядеть как строгий mobile-first ru
 
 - **Сегодня** → `/`
 - **План** → `/plan`
-- **Старт** → `/start` (центральная кнопка, выделена)
+- **Трекер** → `/start` (центральная кнопка, выделена)
 - **История** → `/history`
 - **Профиль** → `/profile`
 
@@ -230,12 +232,13 @@ RunBalance должен выглядеть как строгий mobile-first ru
 - Восстановление → `/recovery`
 - Пульсовые зоны → `/heart-rate-zones`
 - Аналитика → `/analytics`
+- Настройки → `/settings`
 - Онбординг → `/welcome` (баннер, если `profile.onboarded === false`)
 
 ### Не в bottom nav
 
 - Голосовые подсказки — настройка на экране активной тренировки.
-- Настройки — future scope (частично в Профиле).
+- Настройки — `/settings`, вход из Профиля.
 
 ## Architecture Rules
 
@@ -313,7 +316,7 @@ app/
   pages/
     index.vue, plan.vue, start.vue, welcome.vue
     history.vue, analytics.vue, profile.vue
-    recovery.vue, heart-rate-zones.vue, shoes.vue, routes.vue
+    recovery.vue, heart-rate-zones.vue, settings.vue, shoes.vue, routes.vue
     workout/active.vue, workout/result.vue
 
   plugins/

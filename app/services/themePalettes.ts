@@ -5,6 +5,7 @@ export type AppThemePalette = {
   name: string
   description: string
   primary: string
+  onPrimary: string
   primarySoft: string
   secondary: string
   sport: string
@@ -21,6 +22,7 @@ export const appThemePalettes: AppThemePalette[] = [
     name: 'RunBalance',
     description: 'лайм, небо, оранжевый',
     primary: '#b9ff38',
+    onPrimary: '#101010',
     primarySoft: '#f3ffd8',
     secondary: '#64c7ff',
     sport: '#ff7a2b',
@@ -35,6 +37,7 @@ export const appThemePalettes: AppThemePalette[] = [
     name: 'Velocity',
     description: 'красный, лед, графит',
     primary: '#ff4d3d',
+    onPrimary: '#101010',
     primarySoft: '#fff0ee',
     secondary: '#7dd3fc',
     sport: '#ff8a3d',
@@ -49,6 +52,7 @@ export const appThemePalettes: AppThemePalette[] = [
     name: 'Aero',
     description: 'синий, мята, лайм',
     primary: '#45c8ff',
+    onPrimary: '#101010',
     primarySoft: '#e9f8ff',
     secondary: '#61e6b5',
     sport: '#b9ff38',
@@ -63,6 +67,7 @@ export const appThemePalettes: AppThemePalette[] = [
     name: 'Ember',
     description: 'оранжевый, янтарь, крем',
     primary: '#ff8a1f',
+    onPrimary: '#101010',
     primarySoft: '#fff1e3',
     secondary: '#ffd166',
     sport: '#ff4d3d',
@@ -77,6 +82,7 @@ export const appThemePalettes: AppThemePalette[] = [
     name: 'Volt',
     description: 'кислотный лайм, бирюза',
     primary: '#d7ff2f',
+    onPrimary: '#101010',
     primarySoft: '#f7ffd7',
     secondary: '#32e6d1',
     sport: '#ff6a2a',
@@ -91,6 +97,7 @@ export const appThemePalettes: AppThemePalette[] = [
     name: 'Graphite',
     description: 'чёрный, салатовый, серый',
     primary: '#111111',
+    onPrimary: '#ffffff',
     primarySoft: '#eeeeea',
     secondary: '#b9ff38',
     sport: '#64c7ff',
@@ -111,6 +118,7 @@ export function getAppThemePalette(id?: AppColorThemeId) {
 export function getAppThemeCssVars(palette: AppThemePalette) {
   return {
     '--theme-primary': palette.primary,
+    '--theme-on-primary': palette.onPrimary,
     '--theme-primary-soft': palette.primarySoft,
     '--theme-secondary': palette.secondary,
     '--theme-sport': palette.sport,

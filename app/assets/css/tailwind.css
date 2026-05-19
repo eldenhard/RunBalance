@@ -26,6 +26,7 @@
   --sport-orange: #ff7a2b;
   --sport-red: #ef4444;
   --theme-primary: #b9ff38;
+  --theme-on-primary: #101010;
   --theme-primary-soft: #f3ffd8;
   --theme-secondary: #64c7ff;
   --theme-sport: #ff7a2b;
@@ -38,6 +39,7 @@
 
 html {
   height: 100%;
+  overscroll-behavior: none;
 }
 
 * {
@@ -55,6 +57,12 @@ body {
   -webkit-text-size-adjust: 100%;
   touch-action: manipulation;
   overflow-x: hidden;
+}
+
+#__nuxt {
+  min-height: 100dvh;
+  overflow-x: hidden;
+  overscroll-behavior: none;
 }
 
 body.rb-body-light {

@@ -41,7 +41,7 @@ Computed: `adaptedWorkout`, `activeRoute`, `suggestedRoute`, `analyticsReport`, 
 | `services/routes.ts` | CRUD-черновик маршрута, `pickSuggestedRoute`, bounds, `createRouteFromTrack` |
 | `services/analytics.ts` | `buildAnalyticsReport` — суммы и недельные бакеты по `finishedAt` |
 | `services/heart-rate/heartRateSource.ts` | iOS Safari PWA: пульс `unavailable` |
-| `services/themePalettes.ts` | 6 профилей цвета, CSS variables для recolor приложения |
+| `services/themePalettes.ts` | 6 профилей цвета, CSS variables для recolor приложения, включая `--theme-on-primary` |
 
 ## Composables
 
@@ -59,7 +59,8 @@ Computed: `adaptedWorkout`, `activeRoute`, `suggestedRoute`, `analyticsReport`, 
 | `/workout/result` | `pages/workout/result.vue` | light — итог + карта трека |
 | `/history` | `pages/history.vue` | light |
 | `/analytics` | `pages/analytics.vue` | light |
-| `/profile` | `pages/profile.vue` | light — профиль + выбор палитры приложения |
+| `/profile` | `pages/profile.vue` | light — профиль + ссылка на настройки |
+| `/settings` | `pages/settings.vue` | light — выбор цветовой палитры приложения |
 | `/welcome` | `pages/welcome.vue` | light — онбординг (4 шага, можно пропустить) |
 | `/recovery` | `pages/recovery.vue` | light — форма check-in |
 | `/heart-rate-zones` | `pages/heart-rate-zones.vue` | light |
@@ -78,6 +79,7 @@ Computed: `adaptedWorkout`, `activeRoute`, `suggestedRoute`, `analyticsReport`, 
 - Safe-area сверху: `padding-top: calc(env(safe-area-inset-top) + 12px)` на `.app-frame`.
 - `/start` использует locked shell: без верхнего padding, без overscroll, карта под статусной областью.
 - Профиль хранит `colorThemeId`. Доступные палитры: `runbalance`, `velocity`, `aero`, `ember`, `volt`, `graphite`.
+- Выбор палитры вынесен на `/settings`; `/profile` содержит ссылку на настройки.
 
 ## PWA (iOS)
 
@@ -95,9 +97,11 @@ Computed: `adaptedWorkout`, `activeRoute`, `suggestedRoute`, `analyticsReport`, 
 ## Live-тренировка
 
 - Метрики только из `activeSession` (время от `startedAt`, дистанция из track points).
+- Активный экран показывает live pace от текущей GPS speed/recent GPS segments, а не только средний темп за всю сессию.
 - GPS-фильтр: accuracy ≤30 м, минимальное смещение, max speed 8 m/s (`workoutSession.ts`).
 - Пульс в UI: заглушка «не подключён» (Capacitor BLE — future scope).
 - Голос + визуальный баннер для pace-алертов (пульсовые алерты без HR не срабатывают).
+- Завершение тренировки требует удержания кнопки 3 секунды.
 
 ## Онбординг
 

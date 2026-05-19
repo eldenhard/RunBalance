@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { CheckCircle2, Footprints, Gauge, HeartPulse, History, Home, MapPinned, Maximize2, Play, Save, StickyNote, Timer, X } from '@lucide/vue'
+import { getRouteLineCoordinates } from '~/services/routes'
 import type { Workout, WorkoutSplit } from '~/types/workout'
+import type { TrackPoint } from '~/types/workout-session'
 
 type WorkoutWithSplits = Workout & {
   splits?: WorkoutSplit[]
@@ -8,7 +10,19 @@ type WorkoutWithSplits = Workout & {
 
 const store = useRunBalanceStore()
 const workout = computed<WorkoutWithSplits>(() => store.currentWorkout as WorkoutWithSplits)
-const resultRoute = computed(() => workout.value.routeSnapshot)
+const persistedWorkout = computed(() => store.history.find((item) => item.id === workout.value.id) ?? store.history[0])
+const resultRoute = computed(() => workout.value.routeSnapshot ?? persistedWorkout.value?.routeSnapshot)
+const resultStartPoint = computed<TrackPoint | null>(() => {
+  if (!resultRoute.value) return null
+  const [firstCoordinate] = getRouteLineCoordinates(resultRoute.value)
+  if (!firstCoordinate) return null
+
+  return {
+    latitude: firstCoordinate[1],
+    longitude: firstCoordinate[0],
+    recordedAt: workout.value.startedAt ?? new Date().toISOString()
+  }
+})
 const splits = computed(() => workout.value.splits ?? [])
 const resultShoe = computed(() => store.shoes.find((shoe) => shoe.id === workout.value.shoeId) ?? store.selectedShoe)
 const effort = ref<'easy' | 'steady' | 'hard'>('steady')
@@ -78,6 +92,7 @@ function saveRouteFromResult() {
         <ClientOnly>
           <RouteMap
             :route="resultRoute"
+            :current-point="resultStartPoint"
             interactive
             :show-status-hint="false"
             class="h-56 w-full"
@@ -120,7 +135,7 @@ function saveRouteFromResult() {
           Сохранить маршрут
         </Button>
         <NuxtLink v-else to="/routes" class="block">
-          <Button class="w-full border-[var(--theme-primary)] bg-[var(--theme-primary)] text-[#111111] active:brightness-95">
+          <Button class="w-full border-[var(--theme-primary)] bg-[var(--theme-primary)] text-[var(--theme-on-primary)] active:brightness-95">
             <CheckCircle2 class="h-4 w-4" />
             Маршрут сохранён
           </Button>
@@ -133,6 +148,7 @@ function saveRouteFromResult() {
         <ClientOnly>
           <RouteMap
             :route="resultRoute"
+            :current-point="resultStartPoint"
             interactive
             :show-status-hint="false"
             class="h-full w-full rounded-none"

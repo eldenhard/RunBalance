@@ -121,11 +121,12 @@ Accent:
 
 ### Profile Palettes
 
-The user can choose the app accent palette in Profile. The selected id is stored in `profile.colorThemeId`; palette definitions live in `app/services/themePalettes.ts`.
+The user can choose the app accent palette on `/settings`. The selected id is stored in `profile.colorThemeId`; palette definitions live in `app/services/themePalettes.ts`.
 
 Runtime CSS variables:
 
 - `--theme-primary`
+- `--theme-on-primary`
 - `--theme-primary-soft`
 - `--theme-secondary`
 - `--theme-sport`
@@ -148,8 +149,10 @@ Rules:
 
 - Palette changes must be instant and local-first.
 - Palette choice must persist with the profile snapshot.
+- Palette settings live on `/settings`, not inside the profile form.
 - Do not recolor heart-rate zones with profile palettes; zones keep their own semantic colors.
 - Map current-position marker uses `--theme-marker`.
+- Buttons that use `--theme-primary` must use `--theme-on-primary` for readable text.
 - Completed workout cards and route/result highlights can use palette hero tokens.
 
 ## Screen Mapping

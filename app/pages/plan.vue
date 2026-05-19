@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CalendarDays, CirclePlus, Flame, Map, Target, Trash2 } from '@lucide/vue'
+import { CalendarDays, CheckCircle2, CirclePlus, Flame, Map, Target, Trash2 } from '@lucide/vue'
 import { getRouteTypeLabel } from '~/services/routes'
 import type { UserGoal } from '~/types/profile'
 import type { WorkoutType } from '~/types/workout'
@@ -8,6 +8,9 @@ const store = useRunBalanceStore()
 type PlanSection = 'workouts' | 'routes' | 'goal'
 
 const activeSection = ref<PlanSection>('workouts')
+const createFeedback = ref(false)
+const pendingDeleteWorkoutId = ref<string | null>(null)
+let createFeedbackTimer: ReturnType<typeof window.setTimeout> | null = null
 
 const workoutTypes: { value: WorkoutType, label: string }[] = [
   { value: 'easy', label: 'Лёгкий бег' },
@@ -58,6 +61,7 @@ watch(() => store.activeRoute, (route) => {
 })
 
 function createWorkout() {
+  if (createFeedback.value) return
   const title = form.title.trim() || workoutTypes.find((type) => type.value === form.type)?.label || 'Своя тренировка'
   store.createPlannedWorkout({
     title,
@@ -69,12 +73,35 @@ function createWorkout() {
     shoeId: form.shoeId || undefined,
     routeId: form.routeId || undefined
   })
+  createFeedback.value = true
+  if (createFeedbackTimer) window.clearTimeout(createFeedbackTimer)
+  createFeedbackTimer = window.setTimeout(() => {
+    createFeedback.value = false
+  }, 1100)
 }
 
 function toOptionalNumber(value: string) {
   const parsed = Number(value)
   return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined
 }
+
+function requestDeleteWorkout(workoutId: string) {
+  pendingDeleteWorkoutId.value = workoutId
+}
+
+function confirmDeleteWorkout() {
+  if (!pendingDeleteWorkoutId.value) return
+  store.deletePlannedWorkout(pendingDeleteWorkoutId.value)
+  pendingDeleteWorkoutId.value = null
+}
+
+function cancelDeleteWorkout() {
+  pendingDeleteWorkoutId.value = null
+}
+
+onBeforeUnmount(() => {
+  if (createFeedbackTimer) window.clearTimeout(createFeedbackTimer)
+})
 </script>
 
 <template>
@@ -107,39 +134,39 @@ function toOptionalNumber(value: string) {
       <div class="grid gap-3">
         <label class="grid gap-1.5">
           <span class="text-sm font-medium">Название</span>
-          <input v-model="form.title" class="h-12 rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none" placeholder="Например, темповый 8 км" />
+          <input v-model="form.title" class="plan-input h-12 rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none" placeholder="Например, темповый 8 км" />
         </label>
 
         <div class="grid grid-cols-1 gap-3">
           <label class="grid min-w-0 gap-1.5">
             <span class="text-sm font-medium">Тип</span>
-            <select v-model="form.type" class="h-12 w-full rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none">
+            <select v-model="form.type" class="plan-input h-12 w-full rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none">
               <option v-for="type in workoutTypes" :key="type.value" :value="type.value">{{ type.label }}</option>
             </select>
           </label>
 
           <label class="grid min-w-0 gap-1.5">
             <span class="text-sm font-medium">Дата</span>
-            <input v-model="form.scheduledDate" type="date" class="h-12 w-full rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none" />
+            <input v-model="form.scheduledDate" type="date" class="plan-input h-12 w-full rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none" />
           </label>
         </div>
 
         <div class="grid grid-cols-1 gap-3">
           <label class="grid min-w-0 gap-1.5">
             <span class="text-sm font-medium">Дистанция, км</span>
-            <input v-model="form.plannedDistanceKm" inputmode="decimal" class="h-12 w-full rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none" />
+            <input v-model="form.plannedDistanceKm" inputmode="decimal" class="plan-input h-12 w-full rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none" />
           </label>
 
           <label class="grid min-w-0 gap-1.5">
             <span class="text-sm font-medium">Время, мин</span>
-            <input v-model="form.plannedDurationMin" inputmode="numeric" class="h-12 w-full rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none" />
+            <input v-model="form.plannedDurationMin" inputmode="numeric" class="plan-input h-12 w-full rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none" />
           </label>
         </div>
 
         <div class="grid grid-cols-1 gap-3">
           <label class="grid min-w-0 gap-1.5">
             <span class="text-sm font-medium">Зона</span>
-            <select v-model="form.targetZoneId" class="h-12 w-full rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none">
+            <select v-model="form.targetZoneId" class="plan-input h-12 w-full rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none">
               <option value="">Без зоны</option>
               <option v-for="zone in store.profile.zones" :key="zone.id" :value="zone.id">
                 {{ zone.name }} · {{ zone.minBpm }}-{{ zone.maxBpm }}
@@ -149,7 +176,7 @@ function toOptionalNumber(value: string) {
 
           <label class="grid min-w-0 gap-1.5">
             <span class="text-sm font-medium">Кроссовки</span>
-            <select v-model="form.shoeId" class="h-12 w-full rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none">
+            <select v-model="form.shoeId" class="plan-input h-12 w-full rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none">
               <option value="">Без кроссовок</option>
               <option v-for="shoe in store.shoes" :key="shoe.id" :value="shoe.id">
                 {{ shoe.name }}
@@ -160,7 +187,7 @@ function toOptionalNumber(value: string) {
 
         <label class="grid min-w-0 gap-1.5">
           <span class="text-sm font-medium">Маршрут</span>
-          <select v-model="form.routeId" class="h-12 w-full rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none">
+          <select v-model="form.routeId" class="plan-input h-12 w-full rounded-2xl border border-[#deded9] bg-white px-4 text-[16px] outline-none">
             <option value="">Без привязки</option>
             <option v-for="savedRoute in store.routes" :key="savedRoute.id" :value="savedRoute.id">
               {{ savedRoute.name }} · {{ savedRoute.distanceKm }} км
@@ -168,9 +195,16 @@ function toOptionalNumber(value: string) {
           </select>
         </label>
 
-        <Button class="mt-2 w-full" size="lg" @click="createWorkout">
-          <CirclePlus class="h-5 w-5" />
-          Создать тренировку
+        <Button
+          class="mt-2 w-full transition-transform"
+          :class="createFeedback ? 'scale-[0.98] border-[var(--theme-primary)] bg-[var(--theme-primary)] text-[var(--theme-on-primary)]' : ''"
+          size="lg"
+          :disabled="createFeedback"
+          @click="createWorkout"
+        >
+          <CheckCircle2 v-if="createFeedback" class="h-5 w-5" />
+          <CirclePlus v-else class="h-5 w-5" />
+          {{ createFeedback ? 'Добавлено' : 'Создать тренировку' }}
         </Button>
       </div>
     </Card>
@@ -230,7 +264,7 @@ function toOptionalNumber(value: string) {
               <Flame class="h-4 w-4" :class="store.selectedWorkoutId === workout.id ? 'text-red-500' : ''" />
               {{ store.selectedWorkoutId === workout.id ? 'Сегодня' : 'На сегодня' }}
             </Button>
-            <Button class="w-full" variant="outline" @click="store.deletePlannedWorkout(workout.id)">
+            <Button class="w-full" variant="outline" @click="requestDeleteWorkout(workout.id)">
               <Trash2 class="h-4 w-4" />
               Удалить
             </Button>
@@ -342,5 +376,42 @@ function toOptionalNumber(value: string) {
         </div>
       </Card>
     </template>
+
+    <Teleport to="body">
+      <div
+        v-if="pendingDeleteWorkoutId"
+        class="fixed inset-0 z-[10000] flex items-end bg-black/40 p-4 sm:items-center sm:justify-center"
+        role="dialog"
+        aria-modal="true"
+      >
+        <div class="w-full max-w-sm rounded-[24px] bg-white p-5 text-[#111111] shadow-2xl">
+          <h2 class="text-xl font-medium">Удалить тренировку?</h2>
+          <p class="mt-2 text-sm leading-5 text-[#767676]">
+            Тренировка исчезнет из плана. Завершённые пробежки в истории не изменятся.
+          </p>
+          <div class="mt-5 grid grid-cols-2 gap-3">
+            <Button variant="outline" @click="cancelDeleteWorkout">Отмена</Button>
+            <Button variant="destructive" @click="confirmDeleteWorkout">Удалить</Button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
+
+<style scoped>
+.plan-input {
+  min-width: 0;
+  max-width: 100%;
+}
+
+input[type="date"].plan-input {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[type="date"].plan-input::-webkit-date-and-time-value {
+  min-width: 0;
+  text-align: left;
+}
+</style>

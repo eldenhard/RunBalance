@@ -42,7 +42,8 @@ Implementation rules:
 - Store the chosen palette as `profile.colorThemeId`.
 - Keep definitions in `app/services/themePalettes.ts`.
 - Apply palette through runtime CSS variables on `body`.
-- Use `--theme-primary`, `--theme-primary-soft`, `--theme-secondary`, `--theme-sport`, `--theme-marker`, hero gradient tokens, and `--theme-dark-glow`.
+- Use `--theme-primary`, `--theme-on-primary`, `--theme-primary-soft`, `--theme-secondary`, `--theme-sport`, `--theme-marker`, hero gradient tokens, and `--theme-dark-glow`.
+- Expose palette choice from `/settings`; Profile links to settings instead of owning theme controls.
 - Keep app surfaces readable in both light and dark contexts.
 - GPS/current-position marker follows `--theme-marker`.
 - Heart-rate zones remain independent semantic colors.
@@ -55,6 +56,7 @@ Implementation rules:
 - Workout launch animation should be dynamic and immediate: no blank pre-delay, no double splash.
 - Active workout and result must preserve recorded GPS points. If only one point exists, show the start point instead of an empty map.
 - Finish copy is `Тренировка завершена`.
+- Finish action requires hold confirmation; current product setting is 3 seconds.
 
 ## Implementation Boundary
 

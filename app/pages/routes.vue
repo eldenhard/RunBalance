@@ -39,6 +39,11 @@ function saveRoute() {
   form.name = ''
   form.notes = ''
 }
+
+function deleteRoute(routeId: string) {
+  if (!window.confirm('Удалить маршрут?')) return
+  store.deleteSavedRoute(routeId)
+}
 </script>
 
 <template>
@@ -160,7 +165,7 @@ function saveRoute() {
               <Flame class="h-4 w-4" :class="activeRouteId === savedRoute.id ? 'text-red-500' : ''" />
               {{ activeRouteId === savedRoute.id ? 'Сегодня' : 'На сегодня' }}
             </Button>
-            <Button class="w-full" variant="outline" @click="store.deleteSavedRoute(savedRoute.id)">
+            <Button class="w-full" variant="outline" @click="deleteRoute(savedRoute.id)">
               <Trash2 class="h-4 w-4" />
               Удалить
             </Button>

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { BarChart3, Trash2 } from '@lucide/vue'
+import { getRouteLineCoordinates } from '~/services/routes'
 import type { Workout } from '~/types/workout'
+import type { TrackPoint } from '~/types/workout-session'
 
 const store = useRunBalanceStore()
 const summary = computed(() => store.analyticsReport.summary)
@@ -54,6 +56,18 @@ function onSwipeEnd(workoutId: string) {
 
 function requestDelete(workout: Workout) {
   pendingDeleteWorkout.value = workout
+}
+
+function getWorkoutStartPoint(workout: Workout): TrackPoint | null {
+  if (!workout.routeSnapshot) return null
+  const [firstCoordinate] = getRouteLineCoordinates(workout.routeSnapshot)
+  if (!firstCoordinate) return null
+
+  return {
+    latitude: firstCoordinate[1],
+    longitude: firstCoordinate[0],
+    recordedAt: workout.startedAt ?? workout.finishedAt ?? new Date().toISOString()
+  }
 }
 
 function confirmDelete() {
@@ -124,7 +138,7 @@ function cancelDelete() {
           @pointerleave="onSwipeEnd(workout.id)"
         >
           <ClientOnly v-if="workout.routeSnapshot">
-            <RouteMap :route="workout.routeSnapshot" class="mb-4 h-36 w-full" />
+            <RouteMap :route="workout.routeSnapshot" :current-point="getWorkoutStartPoint(workout)" class="mb-4 h-36 w-full" />
           </ClientOnly>
           <div class="flex items-start justify-between gap-3">
             <div class="min-w-0">

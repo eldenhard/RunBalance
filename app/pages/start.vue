@@ -75,7 +75,7 @@ onMounted(() => {
       <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/56 via-white/0 to-[color:color-mix(in_srgb,var(--theme-primary-soft)_72%,transparent)]" />
       <div class="pointer-events-none absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-[var(--theme-primary-soft)] via-[color:color-mix(in_srgb,var(--theme-primary-soft)_62%,transparent)] to-transparent" />
 
-      <div class="pointer-events-none start-content relative z-10 flex h-full flex-col justify-between px-4 pb-4">
+      <div class="pointer-events-none start-content relative z-10 flex h-full flex-col justify-between px-4">
         <div class="space-y-4 pt-2">
           <div class="pointer-events-auto flex items-start justify-between gap-3">
             <div class="min-w-0">
@@ -114,7 +114,7 @@ onMounted(() => {
         <div class="pointer-events-auto pb-2">
           <div class="grid grid-cols-[1fr_104px_1fr] items-end gap-3">
             <NuxtLink to="/plan" class="block">
-              <Button class="h-14 w-full rounded-[22px] border-[var(--theme-primary)] bg-[var(--theme-primary)] text-[#101010] shadow-[0_14px_34px_var(--theme-dark-glow)] active:brightness-95" size="lg">План</Button>
+              <Button class="h-14 w-full rounded-[22px] border-[var(--theme-primary)] bg-[var(--theme-primary)] text-[var(--theme-on-primary)] shadow-[0_14px_34px_var(--theme-dark-glow)] active:brightness-95" size="lg">План</Button>
             </NuxtLink>
             <button
               class="mx-auto flex h-[104px] w-[104px] items-center justify-center rounded-full bg-white text-[#0b0b0c] shadow-[0_0_0_10px_var(--theme-dark-glow),0_20px_58px_rgba(0,0,0,0.2)] active:bg-[#f1f1ee] disabled:opacity-60"
@@ -176,13 +176,14 @@ onMounted(() => {
 
 <style scoped>
 .start-tracker-screen {
-  height: calc(100dvh - 5.15rem - env(safe-area-inset-bottom, 0px));
+  height: 100dvh;
   overflow: hidden;
   overscroll-behavior: none;
 }
 
 .start-content {
   padding-top: calc(env(safe-area-inset-top, 0px) + 16px);
+  padding-bottom: calc(5.15rem + env(safe-area-inset-bottom, 0px) + 16px);
 }
 
 .launch-enter-active,

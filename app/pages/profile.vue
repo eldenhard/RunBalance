@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { CheckCircle2, ChevronRight, Save, Sparkles } from '@lucide/vue'
-import { appThemePalettes } from '~/services/themePalettes'
+import { CheckCircle2, ChevronRight, Save, Settings, Sparkles } from '@lucide/vue'
 import type { UserGoal } from '~/types/profile'
 
 const store = useRunBalanceStore()
@@ -37,9 +36,6 @@ function saveProfile() {
   isEditing.value = false
 }
 
-function selectColorTheme(themeId: typeof appThemePalettes[number]['id']) {
-  store.updateProfile({ colorThemeId: themeId })
-}
 </script>
 
 <template>
@@ -101,42 +97,15 @@ function selectColorTheme(themeId: typeof appThemePalettes[number]['id']) {
     </Card>
 
     <Card class="p-4">
-      <div class="mb-4">
-        <p class="text-xs text-[#767676]">Цвет приложения</p>
-        <h2 class="mt-1 font-medium">Палитра профиля</h2>
-      </div>
-
-      <div class="grid gap-2">
-        <button
-          v-for="palette in appThemePalettes"
-          :key="palette.id"
-          type="button"
-          class="flex items-center justify-between gap-3 rounded-2xl border bg-white p-3 text-left transition active:scale-[0.99]"
-          :class="store.profile.colorThemeId === palette.id ? 'border-[#111111] shadow-[0_0_0_1px_#111111]' : 'border-[#deded9]'"
-          @click="selectColorTheme(palette.id)"
-        >
-          <div class="flex min-w-0 items-center gap-3">
-            <div class="flex shrink-0 -space-x-2">
-              <span class="h-8 w-8 rounded-full border-2 border-white" :style="{ backgroundColor: palette.primary }" />
-              <span class="h-8 w-8 rounded-full border-2 border-white" :style="{ backgroundColor: palette.secondary }" />
-              <span class="h-8 w-8 rounded-full border-2 border-white" :style="{ backgroundColor: palette.sport }" />
-            </div>
-            <div class="min-w-0">
-              <p class="truncate font-medium">{{ palette.name }}</p>
-              <p class="truncate text-sm text-[#767676]">{{ palette.description }}</p>
-            </div>
-          </div>
-          <CheckCircle2
-            class="h-5 w-5 shrink-0"
-            :class="store.profile.colorThemeId === palette.id ? 'text-[#111111]' : 'text-transparent'"
-          />
-        </button>
-      </div>
-    </Card>
-
-    <Card class="p-4">
       <h2 class="font-medium">Разделы</h2>
       <div class="mt-3 space-y-2">
+        <NuxtLink to="/settings" class="flex justify-between rounded-2xl border border-[#deded9] bg-[#f7f7f5] p-3 text-sm">
+          <span class="inline-flex items-center gap-2 font-medium">
+            <Settings class="h-4 w-4" />
+            Настройки
+          </span>
+          <span class="text-[#767676]">тема</span>
+        </NuxtLink>
         <NuxtLink to="/recovery" class="flex justify-between rounded-2xl border border-[#deded9] bg-[#f7f7f5] p-3 text-sm">
           <span class="font-medium">Восстановление</span>
           <span class="text-[#767676]">{{ store.recovery?.readinessScore ?? '—' }}</span>
